@@ -1,0 +1,127 @@
+[
+  {
+    "question": "A big festival is being held in the Hanyang market. What do you do?",
+    "option1": { "text": "Weave through the crowd, dancing and drinking makgeolli.", "score_type": "E" },
+    "option2": { "text": "Watch quietly from a corner and go home when you run out of energy.", "score_type": "I" }
+  },
+  {
+    "question": "A strange scholar strikes up a conversation, asking for directions.",
+    "option1": { "text": "Kindly give directions and continue the conversation by asking where they are from.", "score_type": "E" },
+    "option2": { "text": "Briefly give directions and quickly leave.", "score_type": "I" }
+  },
+  {
+    "question": "You have a long-awaited vacation. What is your plan?",
+    "option1": { "text": "Gather your friends and go to the mountains or the valley.", "score_type": "E" },
+    "option2": { "text": "Stay in your room and read a book you've been putting off or take a nap alone.", "score_type": "I" }
+  },
+  {
+    "question": "You hear villagers talking about you.",
+    "option1": { "text": "\"Oh, they're talking about me?\" and slyly join in.", "score_type": "E" },
+    "option2": { "text": "Pretend you didn't hear and walk away quickly, but you're bothered inside.", "score_type": "I" }
+  },
+  {
+    "question": "If you have to make a new yokai friend?",
+    "option1": { "text": "Approach them first and say, \"Hi! I'm [your name]!\"", "score_type": "E" },
+    "option2": { "text": "Wait for the other person to talk to you first.", "score_type": "I" }
+  },
+  {
+    "question": "You've been invited to join a table at the local tavern.",
+    "option1": { "text": "\"Sure!\" and become like brothers with a complete stranger.", "score_type": "E" },
+    "option2": { "text": "\"I have company...\" and politely decline.", "score_type": "I" }
+  },
+  {
+    "question": "You see a flower blooming on the side of the road. What are your thoughts?",
+    "option1": { "text": "\"It's so red and pretty. Should I pick it and put it in a vase?\" (Realistic)", "score_type": "S" },
+    "option2": { "text": "\"What kind of person was this flower in its past life? Does it have a sad story?\" (Imaginative)", "score_type": "N" }
+  },
+  {
+    "question": "You are on a mountain path and it's foggy.",
+    "option1": { "text": "\"The fog is thick, I should watch my step and go slowly.\"", "score_type": "S" },
+    "option2": { "text": "\"I wonder if there's a paradise where the gods live beyond this fog?\"", "score_type": "N" }
+  },
+  {
+    "question": "When you learn a new spell, you?",
+    "option1": { "text": "Exactly follow the movements your master taught you.", "score_type": "S" },
+    "option2": { "text": "\"Why do I have to do it this way?\" and think about your own way.", "score_type": "N" }
+  },
+  {
+    "question": "If you saw a dragon in your dream?",
+    "option1": { "text": "\"That's a good dream! Should I buy a lottery ticket tomorrow?\"", "score_type": "S" },
+    "option2": { "text": "\"What is the universe's message that the dragon is trying to convey to me?\"", "score_type": "N" }
+  },
+  {
+    "question": "If you have to read a manual?",
+    "option1": { "text": "Check the pictures and text one by one to understand.", "score_type": "S" },
+    "option2": { "text": "Skim through it and say, \"Ah, it's something like this,\" and try it right away.", "score_type": "N" }
+  },
+  {
+    "question": "When predicting tomorrow's weather?",
+    "option1": { "text": "\"Looking at the shape of the clouds, it looks like it's going to rain.\"", "score_type": "S" },
+    "option2": { "text": "\"The smell of the wind has changed. It's a sign that something big is coming.\"", "score_type": "N" }
+  },
+  {
+    "question": "A friend borrows money and doesn't pay it back. What do you do?",
+    "option1": { "text": "Set a specific date and urge them to pay you back.", "score_type": "T" },
+    "option2": { "text": "\"They must have their reasons...\" and wait for them to bring it up first.", "score_type": "F" }
+  },
+  {
+    "question": "If someone criticizes your yokai for being ugly?",
+    "option1": { "text": "\"That's just your taste. Objectively, it's unique.\"", "score_type": "T" },
+    "option2": { "text": "You get hurt and feel down for a while.", "score_type": "F" }
+  },
+  {
+    "question": "If you have to mediate between two people who are fighting?",
+    "option1": { "text": "Determine who was wrong and settle the argument.", "score_type": "T" },
+    "option2": { "text": "Soothe both of their hurt feelings first and help them reconcile.", "score_type": "F" }
+  },
+  {
+    "question": "Your master sharply criticizes your assignment.",
+    "option1": { "text": "\"You're right. I need to fix my shortcomings.\"", "score_type": "T" },
+    "option2": { "text": "\"Do they hate me?\" and feel upset.", "score_type": "F" }
+  },
+  {
+    "question": "A war has broken out! If you were the general?",
+    "option1": { "text": "Come up with the most efficient strategy for victory.", "score_type": "T" },
+    "option2": { "text": "First, think about how to minimize the damage to your soldiers.", "score_type": "F" }
+  },
+  {
+    "question": "You see an abandoned puppy yokai on the street.",
+    "option1": { "text": "\"Who abandoned it? Should I report it? Can I even raise it?\"", "score_type": "T" },
+    "option2": { "text": "\"Oh, you poor thing...\" and hug it first.", "score_type": "F" }
+  },
+  {
+    "question": "The day before your trip to Hanyang, you?",
+    "option1": { "text": "Make a schedule of what time to wake up and where to rest.", "score_type": "J" },
+    "option2": { "text": "Just pack your bags and leave whenever you feel like it tomorrow.", "score_type": "P" }
+  },
+  {
+    "question": "If you have to clean your room?",
+    "option1": { "text": "Organize books on the bookshelf and clothes in the chest.", "score_type": "J" },
+    "option2": { "text": "Clean up roughly and put things where it's convenient for you (an order only you know).", "score_type": "P" }
+  },
+  {
+    "question": "A sudden summons from the magistrate! You?",
+    "option1": { "text": "You get very flustered and annoyed that your plans are ruined.", "score_type": "J" },
+    "option2": { "text": "\"What's going on? Is it something fun?\" and go out.", "score_type": "P" }
+  },
+  {
+    "question": "When is it time to feed your yokai?",
+    "option1": { "text": "Give it at a set time for breakfast, lunch, and dinner.", "score_type": "J" },
+    "option2": { "text": "Give it when you hear its stomach growl or when you remember.", "score_type": "P" }
+  },
+  {
+    "question": "About a friend who is late for an appointment?",
+    "option1": { "text": "You think it's rude and get angry.", "score_type": "J" },
+    "option2": { "text": "\"It happens,\" and you do something else while you wait.", "score_type": "P" }
+  },
+  {
+    "question": "When preparing food for the Chuseok holiday?",
+    "option1": { "text": "Follow the recipe exactly and in order.", "score_type": "J" },
+    "option2": { "text": "Creatively add this and that according to your taste.", "score_type": "P" }
+  },
+  {
+    "question": "You finally stand before the door of your past life. Your last words are?",
+    "option1": { "text": "\"I have done all I can, so I will humbly accept the results.\"", "score_type": "J" },
+    "option2": { "text": "\"Whatever comes out, it'll be fun! Let's go!\"", "score_type": "P" }
+  }
+]
