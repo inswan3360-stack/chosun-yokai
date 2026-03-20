@@ -1,0 +1,127 @@
+[
+  {
+    "question": "한양 저잣거리에 큰 잔치가 열렸다. 당신은?",
+    "option1": { "text": "사람들 사이를 누비며 함께 춤추고 막걸리를 마신다.", "score_type": "E" },
+    "option2": { "text": "구석에서 조용히 구경하다가 기력이 다하면 집으로 온다.", "score_type": "I" }
+  },
+  {
+    "question": "낯선 선비가 길을 묻는다며 말을 걸어온다.",
+    "option1": { "text": "친절히 길을 알려주고 어디서 오셨냐며 대화를 이어간다.", "score_type": "E" },
+    "option2": { "text": "길만 간략히 알려주고 서둘러 자리를 피한다.", "score_type": "I" }
+  },
+  {
+    "question": "오랜만에 얻은 휴가, 당신의 계획은?",
+    "option1": { "text": "친구들을 불러 모아 산으로 계곡으로 놀러 간다.", "score_type": "E" },
+    "option2": { "text": "방 안에서 밀린 책을 읽거나 혼자 낮잠을 잔다.", "score_type": "I" }
+  },
+  {
+    "question": "마을 사람들이 당신에 대해 이야기하는 소리가 들린다.",
+    "option1": { "text": "\"오, 내 이야기가 나오네?\" 하며 슬쩍 끼어든다.", "score_type": "E" },
+    "option2": { "text": "못 들은 척 빠르게 걸어가지만 속으로는 신경 쓰인다.", "score_type": "I" }
+  },
+  {
+    "question": "새로운 요괴 친구를 사귀어야 한다면?",
+    "option1": { "text": "먼저 다가가서 \"안녕! 나는 누구야!\"라고 인사한다.", "score_type": "E" },
+    "option2": { "text": "상대방이 먼저 말을 걸어줄 때까지 기다린다.", "score_type": "I" }
+  },
+  {
+    "question": "동네 주막에서 합석을 제안받았다.",
+    "option1": { "text": "\"좋지요!\" 하며 처음 본 사람과 형님 동생 사이가 된다.", "score_type": "E" },
+    "option2": { "text": "\"일행이 있어서요...\" 하고 정중히 거절한다.", "score_type": "I" }
+  },
+  {
+    "question": "길가에 핀 꽃을 보았다. 당신의 생각은?",
+    "option1": { "text": "\"참 붉고 예쁘구나. 따서 병에 꽂아둘까?\" (현실적)", "score_type": "S" },
+    "option2": { "text": "\"이 꽃은 전생에 어떤 사람이었을까? 슬픈 사연이 있나?\" (상상적)", "score_type": "N" }
+  },
+  {
+    "question": "산길을 가는데 안개가 자욱하다.",
+    "option1": { "text": "\"안개가 짙으니 발밑을 조심해서 천천히 가야겠다.\"", "score_type": "S" },
+    "option2": { "text": "\"이 안개 너머에 신선들이 사는 무릉도원이 있지 않을까?\"", "score_type": "N" }
+  },
+  {
+    "question": "새로운 주술을 배울 때 당신은?",
+    "option1": { "text": "스승님이 알려준 동작 그대로를 정확하게 따라 한다.", "score_type": "S" },
+    "option2": { "text": "\"왜 이렇게 해야 하지?\" 하며 나만의 방식을 고민해 본다.", "score_type": "N" }
+  },
+  {
+    "question": "꿈속에서 용을 보았다면?",
+    "option1": { "text": "\"좋은 꿈이네! 내일 복권을 사볼까?\"", "score_type": "S" },
+    "option2": { "text": "\"용이 나에게 전하고자 하는 우주의 메시지가 무엇일까?\"", "score_type": "N" }
+  },
+  {
+    "question": "설명서를 읽어야 한다면?",
+    "option1": { "text": "그림과 글자를 하나하나 꼼꼼히 확인하며 이해한다.", "score_type": "S" },
+    "option2": { "text": "대충 훑어보고 \"아, 대충 이런 식이군\" 하며 바로 해본다.", "score_type": "N" }
+  },
+  {
+    "question": "내일의 날씨를 예측할 때?",
+    "option1": { "text": "\"구름 모양을 보니 비가 올 것 같군.\"", "score_type": "S" },
+    "option2": { "text": "\"바람의 냄새가 변했어. 무언가 큰 변화가 올 징조야.\"", "score_type": "N" }
+  },
+  {
+    "question": "친구가 돈을 빌려 가서 갚지 않는다. 당신은?",
+    "option1": { "text": "언제까지 갚을 건지 정확한 날짜를 정해서 독촉한다.", "score_type": "T" },
+    "option2": { "text": "\"사정이 있겠지...\" 하며 먼저 말해줄 때까지 기다린다.", "score_type": "F" }
+  },
+  {
+    "question": "누군가 내 요괴가 못생겼다고 비난한다면?",
+    "option1": { "text": "\"그건 네 취향일 뿐이야. 객관적으로는 개성 있어.\"", "score_type": "T" },
+    "option2": { "text": "마음에 상처를 입고 한동안 우울해한다.", "score_type": "F" }
+  },
+  {
+    "question": "싸우고 있는 두 사람을 중재해야 한다면?",
+    "option1": { "text": "누가 잘못했는지 따져서 시시비비를 가려준다.", "score_type": "T" },
+    "option2": { "text": "양쪽의 서운한 마음을 먼저 달래주고 화해시킨다.", "score_type": "F" }
+  },
+  {
+    "question": "스승님이 내 과제에 대해 따끔하게 지적한다.",
+    "option1": { "text": "\"맞는 말씀이네. 부족한 부분을 고쳐야지.\"", "score_type": "T" },
+    "option2": { "text": "\"나를 미워하시나?\" 하고 속상해한다.", "score_type": "F" }
+  },
+  {
+    "question": "전쟁이 났다! 당신이 대장이라면?",
+    "option1": { "text": "승리를 위해 가장 효율적인 전략을 짠다.", "score_type": "T" },
+    "option2": { "text": "병사들의 피해를 최소화하는 방향을 먼저 생각한다.", "score_type": "F" }
+  },
+  {
+    "question": "길가에 버려진 강아지 요괴를 보았다.",
+    "option1": { "text": "\"누가 버렸지? 신고해야 하나? 키울 환경이 되나?\"", "score_type": "T" },
+    "option2": { "text": "\"어머, 불쌍해라...\" 하며 일단 안아준다.", "score_type": "F" }
+  },
+  {
+    "question": "한양으로 떠나는 여행 전날, 당신은?",
+    "option1": { "text": "몇 시에 일어나서 어디서 쉴지 시간표를 짠다.", "score_type": "J" },
+    "option2": { "text": "일단 짐부터 싸고 내일 기분 따라 출발한다.", "score_type": "P" }
+  },
+  {
+    "question": "방 정리를 해야 한다면?",
+    "option1": { "text": "책은 책장에, 옷은 함에 딱딱 맞춰 정리한다.", "score_type": "J" },
+    "option2": { "text": "대충 치우고 내가 편한 위치에 둔다 (나만 아는 질서).", "score_type": "P" }
+  },
+  {
+    "question": "갑작스러운 사또의 호출! 당신은?",
+    "option1": { "text": "계획이 틀어져서 매우 당황스럽고 짜증 난다.", "score_type": "J" },
+    "option2": { "text": "\"무슨 일이지? 재밌는 일인가?\" 하며 나간다.", "score_type": "P" }
+  },
+  {
+    "question": "요괴에게 밥 주는 시간은?",
+    "option1": { "text": "아침, 점심, 저녁 정해진 시간에 딱 맞춰 준다.", "score_type": "J" },
+    "option2": { "text": "배고픈 소리가 들리거나 생각날 때 준다.", "score_type": "P" }
+  },
+  {
+    "question": "약속 시간에 늦는 친구에 대해?",
+    "option1": { "text": "예의가 아니라고 생각하며 화가 난다.", "score_type": "J" },
+    "option2": { "text": "\"그럴 수도 있지\" 하며 나도 딴짓을 하며 기다린다.", "score_type": "P" }
+  },
+  {
+    "question": "추석 명절 음식을 준비할 때?",
+    "option1": { "text": "레시피 정량대로, 순서대로 차근차근 만든다.", "score_type": "J" },
+    "option2": { "text": "손맛대로 이것저것 넣어보며 창의적으로 만든다.", "score_type": "P" }
+  },
+  {
+    "question": "마침내 전생의 문 앞에 섰다. 당신의 마지막 한마디는?",
+    "option1": { "text": "\"나는 내 할 일을 다 했으니, 결과는 겸허히 받겠다.\"", "score_type": "J" },
+    "option2": { "text": "\"뭐가 나오든 재밌겠네! 일단 가보자고!\"", "score_type": "P" }
+  }
+]
