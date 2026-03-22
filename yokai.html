@@ -3868,21 +3868,22 @@
       var evoScMap = [0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6];
       var scFactor = evoScMap[Math.min(stage, 6)];
       var baseSc = STAGE_SCALES[Math.min(stage, 6)];
-      var alpha = 1;
-      // filter 사용 안 함 (globalAlpha로 대체)
-
       if (stage === 0) { drawSoul(ctx, yk, t, ox, oy, baseSc); return; }
-      if (stage === 1) { alpha = 0.4; }
-      if (stage === 2) { alpha = 0.75; }
-      // stage 4: 오라는 파티클로 표현
-      // stage 5: 오라는 파티클로 표현
-      // stage 6: 오라는 파티클로 표현
+
+      // ── 7단계별 외형(모습) 변화 필터 적용 ──
+      var alpha = 1;
+      var filt = "none";
+      if (stage === 1) { alpha = 0.5; filt = "grayscale(100%) blur(1px)"; }
+      else if (stage === 2) { alpha = 0.8; filt = "sepia(100%) hue-rotate(180deg)"; }
+      else if (stage === 4) { filt = "brightness(130%) contrast(120%)"; }
+      else if (stage === 5) { filt = "drop-shadow(0 0 8px gold) sepia(40%) saturate(150%)"; }
+      else if (stage === 6) { filt = "drop-shadow(0 0 15px white) brightness(150%)"; }
 
       var bobY = Math.sin(t * 2) * 3;
       var scaleX = scFactor, scaleY = scFactor;
       var rotX = 0;
 
-      // 액션별 애니메이션 보정
+      // 액션별 제스처 및 애니메이션 보정
       if (extraAnim) {
         var a = extraAnim, at = a.t;
         if (a.act === 'feed') { var s = 1 + Math.abs(Math.sin(at * 8)) * 0.12; scaleX *= s; scaleY *= s; }
@@ -3894,9 +3895,19 @@
         }
       }
 
+      // 스스로 걸어다니는 (Autonomous Walking) 애니메이션
+      var isWalking = (typeof petWalkVX !== 'undefined' && Math.abs(petWalkVX) > 0.05);
+      if (isWalking) {
+         bobY += Math.abs(Math.sin(t * 15)) * 8; // 통통 뛰는 발걸음
+         rotX += Math.sin(t * 10) * 0.12; // 갸우뚱
+         if (typeof petWalkDir !== 'undefined' && petWalkDir < 0) {
+            scaleX *= -1; // 걷는 방향(왼쪽)으로 몸 뒤집기
+         }
+      }
+
       ctx.save();
-      // ctx.filter 대신 globalAlpha만 사용 (크로스브라우저 안전)
       ctx.globalAlpha = alpha;
+      ctx.filter = filt; // 7단계 동적 외형 변화 적용!
 
       // 64x64 기준 중심점 (ox+32, oy+32)
       var cx = ox + 32;
@@ -3906,31 +3917,53 @@
       if (rotX) ctx.rotate(rotX);
       ctx.translate(-cx, -cy - bobY);
 
-      // 이미지 렌더링 (DigitalArtist 기반 고성능 64x64)
+      // 이미지 렌더링
       var spriteId = yk.id + "_sprite";
       var img = sLoader.get(spriteId);
 
       if (img && img.complete && img.naturalWidth > 0) {
-        ctx.drawImage(img, ox, oy, 64, 64); // 96px 스프라이트를 64px로 축소 렌더
+        ctx.drawImage(img, ox, oy, 64, 64);
       } else {
         // 이미지 로딩 중일 경우 대비한 기본 형태
-        ctx.fillStyle = yk.bc;
+        ctx.fillStyle = yk.bc || '#000';
         ctx.beginPath();
         ctx.arc(ox + 32, oy + 40, 20, 0, Math.PI * 2);
         ctx.fill();
       }
+      ctx.restore();
 
-      // ── 단계별 오라 효과 (ctx.filter 대체) ──
+      // ── 단계별 오라 효과 (파티클) ──
       if (stage >= 4) {
-        var puls = Math.sin(t * 3) * 0.12 + 0.18;
+        ctx.save();
+        var puls = Math.sin(t * 3) * 0.15 + 0.2;
         ctx.globalAlpha = puls;
-        for (var _a = 0; _a < 12; _a++) {
-          var _ang = _a / 12 * Math.PI * 2 + t * 0.6;
-          var _r = 26 + Math.sin(t * 2 + _a) * 5;
-          ctx.fillStyle = stage >= 5 ? '#f8d060' : yk.gc;
-          ctx.fillRect(ox + 32 + Math.cos(_ang) * _r - 2, oy + 32 + Math.sin(_ang) * _r * 0.55 - 2, 4, 4);
+        var pColor = stage >= 6 ? '#ffffff' : (stage >= 5 ? '#f8d060' : yk.gc);
+        var pCount = stage >= 6 ? 16 : 12;
+        var pSpeed = stage >= 5 ? 1.2 : 0.6;
+        for (var _a = 0; _a < pCount; _a++) {
+          var _ang = _a / pCount * Math.PI * 2 + t * pSpeed;
+          var _r = (stage >= 5 ? 36 : 26) + Math.sin(t * 2 + _a) * 5;
+          ctx.fillStyle = pColor;
+          ctx.beginPath();
+          ctx.arc(ox + 32 + Math.cos(_ang) * _r, oy + 32 + Math.sin(_ang) * _r * 0.55, stage >= 6 ? 4 : 3, 0, Math.PI * 2);
+          ctx.fill();
         }
-        ctx.globalAlpha = 1;
+        ctx.restore();
+      }
+
+      // ── 특유 제스처 이모티콘 ──
+      if (extraAnim && extraAnim.act) {
+         ctx.save();
+         ctx.font = "20px Arial";
+         ctx.textAlign = "center";
+         var emoY = oy - 10 + Math.sin(t * 5) * 5;
+         if (extraAnim.act === 'feed') ctx.fillText("💖", ox + 32, emoY);
+         else if (extraAnim.act === 'play') ctx.fillText("🎶", ox + 32, emoY);
+         else if (extraAnim.act === 'meditate') ctx.fillText("✨", ox + 32, emoY);
+         else if (extraAnim.act === 'chat') ctx.fillText("💬", ox + 32, emoY);
+         else if (extraAnim.act === 'heal') ctx.fillText("💊", ox + 32, emoY);
+         else if (extraAnim.act === 'study') ctx.fillText("💡", ox + 32, emoY);
+         ctx.restore();
       }
       // ── 장착 아이템 드로잉 (Equipped Items) ──
       if (typeof gS !== 'undefined' && gS.equip) {
