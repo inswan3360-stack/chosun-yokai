@@ -2111,6 +2111,20 @@
       </div>
     </div>
 
+    <!-- DIRECT SELECT -->
+    <div id="directSelectScreen" class="screen">
+      <div class="result-head" style="background:#151008;">
+        <h2 id="ldDirSelTitle">요괴 직접 선택</h2><button class="hdr-music" onclick="toggleMusic()">♪ ON</button>
+      </div>
+      <div class="ency-grid" id="dirSelGrid"
+        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#1a140c;height:calc(100vh - 40px);overflow-y:auto;align-content:start;">
+      </div>
+      <div
+        style="position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:440px;background:#151008;padding:10px;border-top:3px solid var(--border);display:flex;justify-content:center;align-items:center;">
+        <button class="result-btn sec" style="width:auto;padding:8px 30px;margin:0;" onclick="goTitle()">← 돌아가기</button>
+      </div>
+    </div>
+
     <!-- TUTORIAL -->
     <div id="tutorialPopup"
       style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
@@ -6953,6 +6967,105 @@
           }
         });
       }, 50);
+    }
+
+    function openDirectSelect() {
+      playSFX('click');
+      if (titleRAF) { cancelAnimationFrame(titleRAF); titleRAF = null; }
+      showScreen('directSelectScreen');
+
+      var html = '';
+      YOKAI.forEach(function (yk, i) {
+        var enData = (currentLang==='en' && L.en.yokai && L.en.yokai[yk.id]);
+        var name = enData ? enData.name : yk.name;
+        var bg = '#1a140c';
+        var bdr = '#8a5a28';
+        var cvId = 'dirSelCv' + i;
+        html += '<div style="background:' + bg + ';border:2px solid ' + bdr + ';padding:8px;text-align:center;cursor:pointer;transition:transform 0.1s;" '
+          + 'onmouseover="this.style.background=\'#2e1e0c\';this.style.transform=\'scale(1.05)\'" '
+          + 'onmouseout="this.style.background=\'#1a140c\';this.style.transform=\'scale(1)\'" '
+          + 'onclick="selectYokaiDirectly(' + i + ')">'
+          + '<canvas id="' + cvId + '" width="64" height="64" style="image-rendering:pixelated;margin-bottom:6px;"></canvas>'
+          + '<div style="color:var(--gold);font-size:11px;font-weight:700;">' + name + '</div>'
+          + '</div>';
+      });
+      document.getElementById('dirSelGrid').innerHTML = html;
+
+      setTimeout(function () {
+        YOKAI.forEach(function (yk, i) {
+          var cv = document.getElementById('dirSelCv' + i);
+          if (cv) {
+            var ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, 64, 64);
+            drawYokai(ctx, yk, 3, 0, 0, 0, null);
+          }
+        });
+      }, 50);
+    }
+
+    window._forceMBTI = null;
+    function selectYokaiDirectly(idx) {
+      playSFX('click');
+      var yk = YOKAI[idx];
+      window._resultYk = yk;
+      
+      var defaultMBTI = "ENFP";
+      for (var k in MD) {
+          if (MD[k].y === yk.id) {
+              defaultMBTI = k;
+              break;
+          }
+      }
+      window._forceMBTI = defaultMBTI;
+      
+      if (titleRAF) { cancelAnimationFrame(titleRAF); titleRAF = null; }
+      showScreen('resultScreen');
+      
+      document.getElementById('resultScreen').classList.remove('active');
+      
+      // Instead of going to result screen right away (which demands MBTI calculation locally), let's jump straight to startGame bypass.
+      // Wait, we WANT them to see their Yokai in resultScreen, so we can mock result rendering directly!
+      
+      renderResultPage(defaultMBTI);
+    }
+    
+    // We extracted result page rendering to manually call it.
+    function renderResultPage(mbti) {
+      showScreen('resultScreen');
+      var yk = window._resultYk;
+      
+      var enMD = currentLang==='en' ? L.en.mbti[mbti] : null;
+      var enYk = currentLang==='en' && L.en.yokai[yk.id];
+      var ykName = enYk ? enYk.name : yk.name;
+      var badgeTxt = mbti + (currentLang==='en' ? ' Type' : ' 유형');
+      document.getElementById('rBadge').textContent = badgeTxt;
+      var mbtiNameStr = enMD ? enMD.n : MD[mbti].n;
+      document.getElementById('ldResultHead').innerHTML = (currentLang==='en'?'Your Reincarnation':'당신의 전생 요괴') + '<br><span style="font-size:16px;color:#c0d8e8;">- ' + mbtiNameStr + ' -</span>';
+
+      document.getElementById('rName').textContent = ykName;
+      document.getElementById('rType').textContent = (enYk?enYk.region:yk.region) + ' · ' + (enYk?enYk.trait:yk.trait);
+
+      document.getElementById('rJoseonTxt').textContent = currentLang==='en' ? "In the Joseon Dynasty, you were..." : "조선시대의 당신은...";
+      document.getElementById('rJoseonPara').innerHTML = enMD ? enMD.j : MD[mbti].j;
+      document.getElementById('rModernTxt').textContent = currentLang==='en' ? "In the modern era..." : "현대 사회에서는...";
+      document.getElementById('rModernPara').innerHTML = enMD ? enMD.m : MD[mbti].m;
+      document.getElementById('rStrTxt').textContent = currentLang==='en' ? "Strengths" : "강점";
+      document.getElementById('rStrPara').innerHTML = enMD ? enMD.s : MD[mbti].s;
+      document.getElementById('rCauTxt').textContent = currentLang==='en' ? "Weaknesses & Cautions" : "약점 / 주의점";
+      document.getElementById('rCauPara').innerHTML = enMD ? enMD.w : MD[mbti].w;
+
+      var rMatch = enMD ? enMD.f : MD[mbti].f;
+      document.getElementById('rMatchPara').innerHTML = rMatch;
+
+      var kwRow = document.getElementById('rKwRow');
+      kwRow.innerHTML = '';
+      var kwList = enMD ? enMD.k : MD[mbti].k;
+      kwList.forEach(function (k) { kwRow.innerHTML += '<span class="r-kw">#' + k + '</span>'; });
+
+      document.getElementById('btnLangKo').style.display = 'none';
+      document.getElementById('btnLangEn').style.display = 'none';
+
+      requestAnimationFrame(renderResult);
     }
 
     function showEncyDetail(idx) {
