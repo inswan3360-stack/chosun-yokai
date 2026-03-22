@@ -3656,72 +3656,7 @@
     const sLoader = new SpriteLoader();
 
     function initYokaiSprites() {
-      if (typeof YOKAI === 'undefined') return;
-      sLoader.sprites.clear();
-      
-      const img = new Image();
-      // Load the cute pixel art spritesheet
-      img.src = "assets/sprites/cute_spritesheet.png";
-      
-      sLoader.totalToLoad = 16;
-      sLoader.loadingCount = 0;
-      
-      img.onload = () => {
-        const cellW = Math.floor(img.width / 4);
-        const cellH = Math.floor(img.height / 4);
-        
-        for (let i = 0; i < 16; i++) {
-          if (i >= YOKAI.length) break;
-          const yk = YOKAI[i];
-          const col = i % 4;
-          const row = Math.floor(i / 4);
-          
-          const tempCv = document.createElement('canvas');
-          tempCv.width = cellW;
-          tempCv.height = cellH;
-          const tCtx = tempCv.getContext('2d', { willReadFrequently: true });
-          
-          tCtx.clearRect(0, 0, cellW, cellH);
-          tCtx.drawImage(img, col * cellW, row * cellH, cellW, cellH, 0, 0, cellW, cellH);
-          
-          try {
-            const imgData = tCtx.getImageData(0, 0, cellW, cellH);
-            const data = imgData.data;
-            const bgR = data[0], bgG = data[1], bgB = data[2];
-            
-            for (let j = 0; j < data.length; j += 4) {
-               const r = data[j], g = data[j+1], b = data[j+2];
-               
-               // The AI often generates a bright magenta/pink background.
-               // We will be very aggressive here to guarantee transparent background.
-               if (r > 150 && g < 100 && b > 150) {
-                 data[j+3] = 0; // Make perfectly transparent
-               } else if (r > 100 && g < 130 && b > 100 && r > g + 40 && b > g + 40) {
-                 // Soft halo of pink around the character
-                 const dist = Math.abs(r - 255) + Math.abs(g - 0) + Math.abs(b - 255);
-                 data[j+3] = Math.max(0, data[j+3] - Math.max(0, 200 - dist));
-               } else if (bgR > 100 && bgB > 100) {
-                 // Fallback: If top-left pixel is somewhat magenta, use it as baseline
-                 if (Math.abs(r - bgR) < 30 && Math.abs(g - bgG) < 30 && Math.abs(b - bgB) < 30) {
-                   data[j+3] = 0; 
-                 }
-               }
-            }
-            tCtx.putImageData(imgData, 0, 0);
-          } catch(e) {
-            console.warn("Could not remove background:", e);
-          }
-          
-          const finalImg = new Image();
-          finalImg.onload = () => sLoader.loadingCount++;
-          finalImg.src = tempCv.toDataURL("image/png");
-          sLoader.sprites.set(yk.id + "_sprite", finalImg);
-        }
-      };
-      
-      img.onerror = () => {
-         console.warn("cute_spritesheet.png failed to load.");
-      };
+      // 픽셀아트 스프라이트를 버리고 완벽한 개별 절차적(도형) 애니메이션 엔진을 사용하도록 전환되었습니다!
     }
 
     var YOKAI = [
@@ -3878,104 +3813,231 @@
       var evoScMap = [0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6];
       var scFactor = evoScMap[Math.min(stage, 6)];
       var baseSc = STAGE_SCALES[Math.min(stage, 6)];
-      if (stage === 0) { drawSoul(ctx, yk, t, ox, oy, baseSc); return; }
+    function drawYokai(ctx, yk, stage, t, ox, oy, extraAnim) {
+      if (!ctx || !yk) return;
 
-      // ── 7단계별 외형(모습) 변화 필터 적용 ──
-      var alpha = 1;
-      var filt = "none";
-      if (stage === 1) { alpha = 0.5; filt = "grayscale(100%) blur(1px)"; }
-      else if (stage === 2) { alpha = 0.8; filt = "sepia(100%) hue-rotate(180deg)"; }
-      else if (stage === 4) { filt = "brightness(130%) contrast(120%)"; }
-      else if (stage === 5) { filt = "drop-shadow(0 0 8px gold) sepia(40%) saturate(150%)"; }
-      else if (stage === 6) { filt = "drop-shadow(0 0 15px white) brightness(150%)"; }
-
-      var bobY = Math.sin(t * 2) * 3;
-      var scaleX = scFactor, scaleY = scFactor;
-      var rotX = 0;
-
-      // 액션별 제스처 및 애니메이션 보정
-      if (extraAnim) {
-        var a = extraAnim, at = a.t;
-        if (a.act === 'feed') { var s = 1 + Math.abs(Math.sin(at * 8)) * 0.12; scaleX *= s; scaleY *= s; }
-        else if (a.act === 'play') { bobY += Math.abs(Math.sin(at * 6)) * (-20); rotX = Math.sin(at * 5) * 0.25; }
-        else if (a.act.startsWith('tap_')) {
-          if (a.act === 'tap_E') { bobY += Math.abs(Math.sin(at * 7)) * (-25); scaleX *= 1.2; }
-          else if (a.act === 'tap_N') { rotX = Math.sin(at * 8) * 0.4; scaleX *= 1.15; }
-          else { scaleX *= 1.1; scaleY *= 1.1; }
-        }
-      }
-
-      // 스스로 걸어다니는 (Autonomous Walking) 애니메이션
       var isWalking = (typeof petWalkVX !== 'undefined' && Math.abs(petWalkVX) > 0.05);
-      if (isWalking) {
-         bobY += Math.abs(Math.sin(t * 15)) * 8; // 통통 뛰는 발걸음
-         rotX += Math.sin(t * 10) * 0.12; // 갸우뚱
-         if (typeof petWalkDir !== 'undefined' && petWalkDir < 0) {
-            scaleX *= -1; // 걷는 방향(왼쪽)으로 몸 뒤집기
-         }
-      }
+      var walkDir = (typeof petWalkDir !== 'undefined') ? petWalkDir : 1;
+
+      var act = "";
+      if (extraAnim && extraAnim.act) act = extraAnim.act;
 
       ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.filter = filt; // 7단계 동적 외형 변화 적용!
-
-      // 64x64 기준 중심점 (ox+32, oy+32)
+      // 발밑 중심점을 (0, 0)으로 맞춤 (ox, oy는 64x64 영역의 좌상단)
       var cx = ox + 32;
-      var cy = oy + 32;
-      ctx.translate(cx, cy + bobY);
-      ctx.scale(scaleX, scaleY);
-      if (rotX) ctx.rotate(rotX);
-      ctx.translate(-cx, -cy - bobY);
-
-      // 이미지 렌더링
-      var spriteId = yk.id + "_sprite";
-      var img = sLoader.get(spriteId);
-
-      if (img && img.complete && img.naturalWidth > 0) {
-        ctx.drawImage(img, ox, oy, 64, 64);
-      } else {
-        // 이미지 로딩 중일 경우 대비한 기본 형태
-        ctx.fillStyle = yk.bc || '#000';
-        ctx.beginPath();
-        ctx.arc(ox + 32, oy + 40, 20, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      var cy = oy + 64;
+      
+      ctx.translate(cx, cy);
+      // 방향 전환 (왼쪽 거닐 때 반전)
+      if (walkDir < 0) ctx.scale(-1, 1);
+      
+      // ── 완벽한 개별 애니메이션 / 형태 렌더링 호출 ──
+      drawProceduralYokai(ctx, yk, parseInt(stage), t, isWalking, act);
+      
       ctx.restore();
 
-      // ── 단계별 오라 효과 (파티클) ──
-      if (stage >= 4) {
-        ctx.save();
-        var puls = Math.sin(t * 3) * 0.15 + 0.2;
-        ctx.globalAlpha = puls;
-        var pColor = stage >= 6 ? '#ffffff' : (stage >= 5 ? '#f8d060' : yk.gc);
-        var pCount = stage >= 6 ? 16 : 12;
-        var pSpeed = stage >= 5 ? 1.2 : 0.6;
-        for (var _a = 0; _a < pCount; _a++) {
-          var _ang = _a / pCount * Math.PI * 2 + t * pSpeed;
-          var _r = (stage >= 5 ? 36 : 26) + Math.sin(t * 2 + _a) * 5;
-          ctx.fillStyle = pColor;
-          ctx.beginPath();
-          ctx.arc(ox + 32 + Math.cos(_ang) * _r, oy + 32 + Math.sin(_ang) * _r * 0.55, stage >= 6 ? 4 : 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      // ── 특유 제스처 이모티콘 ──
-      if (extraAnim && extraAnim.act) {
+      // ── 장착 아이템 및 이모티콘 기믹 ──
+      if (act && act !== 'tap_E' && act !== 'tap_N') {
          ctx.save();
          ctx.font = "20px Arial";
          ctx.textAlign = "center";
-         var emoY = oy - 10 + Math.sin(t * 5) * 5;
-         if (extraAnim.act === 'feed') ctx.fillText("💖", ox + 32, emoY);
-         else if (extraAnim.act === 'play') ctx.fillText("🎶", ox + 32, emoY);
-         else if (extraAnim.act === 'meditate') ctx.fillText("✨", ox + 32, emoY);
-         else if (extraAnim.act === 'chat') ctx.fillText("💬", ox + 32, emoY);
-         else if (extraAnim.act === 'heal') ctx.fillText("💊", ox + 32, emoY);
-         else if (extraAnim.act === 'study') ctx.fillText("💡", ox + 32, emoY);
+         var emoY = oy - 5 + Math.sin(t * 5) * 5;
+         if (act === 'feed') ctx.fillText("💖", ox + 32, emoY);
+         else if (act === 'play') ctx.fillText("🎶", ox + 32, emoY);
+         else if (act === 'meditate') ctx.fillText("✨", ox + 32, emoY);
+         else if (act === 'chat') ctx.fillText("💬", ox + 32, emoY);
+         else if (act === 'heal') ctx.fillText("💊", ox + 32, emoY);
+         else if (act === 'study') ctx.fillText("💡", ox + 32, emoY);
          ctx.restore();
       }
-      // ── 장착 아이템 드로잉 (Equipped Items) ──
+    }
+
+    function drawProceduralYokai(ctx, yk, stage, t, isWalking, act) {
+        var id = yk.id;
+        
+        // 0단계: 아주 작은 영혼 형태
+        if (stage === 0) {
+            ctx.fillStyle = yk.bc;
+            ctx.beginPath();
+            var by = -15 + Math.sin(t*4)*3;
+            if (act === 'play') by -= 10; // 점프
+            ctx.arc(0, by, 10, 0, Math.PI);
+            ctx.quadraticCurveTo(-15, by-20, 0, by-30);
+            ctx.quadraticCurveTo(15, by-20, 10, by);
+            ctx.fill();
+            return; // 영혼은 여기서 끝!
+        }
+
+        // 진화 단계에 따른 크기/길이 점진적 성장 로직
+        var gro = stage - 1; // 0 to 5
+        var baseW = 10 + gro * 2.5;  // 몸통 너비 (점점 뚱뚱해짐)
+        var baseH = 12 + gro * 3.5;  // 몸통 높이 (점점 커짐)
+        var headR = 9 + gro * 1.5;   // 머리 크기
+        var legL = 5 + gro * 1.8;    // 다리 길이 (점점 길어짐)
+        var armL = 6 + gro * 1.8;    // 팔 길이
+        
+        var isQuad = (id === 'haetae' || id === 'jiha' || id === 'malgwisin' || id === 'bulgasari');
+        var isHover = (id === 'hwangryong' || id === 'imugi' || id === 'gwisin' || id === 'cheolyeo' || stage >= 6);
+        var isHopper = (id === 'tokkaebi2' || id === 'gangshi' || id === 'gaeguri');
+
+        // 네발수 특수보정
+        if (isQuad) { baseW *= 1.4; baseH *= 0.8; legL *= 0.8; }
+
+        // 관절 걷기 애니메이션 삼각함수
+        var walkSpd = isHopper ? 8 : 12;
+        var walkA = isWalking ? Math.sin(t * walkSpd) : 0;
+        var walkB = isWalking ? Math.abs(Math.sin(t * walkSpd)) : 0;
+        
+        var bob = isWalking ? (isHopper ? walkB * 12 : Math.abs(walkA) * 4) : Math.sin(t * 3) * 1.5; // 숨쉬기/바운스
+        if (act === 'play' || act === 'feed') { bob += Math.abs(Math.sin(t * 8)) * 10; }
+
+        var rootY = -legL - bob;
+        // 공중에 떠있는 요괴 (다리 없음)
+        if (isHover) { 
+            rootY = -15 - legL - Math.sin(t*3)*5 - bob; 
+            legL = 0; 
+        }
+        if (isHopper && isWalking) { rootY -= walkB * 10; }
+
+        // [단계 효과] 빛오라 렌더링
+        if (stage >= 4) {
+            ctx.save();
+            ctx.globalAlpha = 0.2 + Math.sin(t*4)*0.1;
+            ctx.fillStyle = stage >= 6 ? '#ffffff' : (stage === 5 ? '#ffd700' : yk.gc);
+            ctx.beginPath(); ctx.arc(0, rootY - baseH, baseH*2, 0, Math.PI*2); ctx.fill();
+            if (stage >= 6) { // 궁극체 승천 궤도 구슬
+                ctx.globalAlpha = 0.9;
+                for(let i=0;i<6;i++){
+                    let a = t*2 + i*Math.PI*2/6;
+                    ctx.beginPath(); ctx.arc(Math.cos(a)*baseH*2.5, rootY-baseH+Math.sin(a)*baseH*2.5, 3+gro*0.5, 0, Math.PI*2); ctx.fill();
+                }
+            }
+            ctx.restore();
+        }
+
+        // ── 1. 맨 뒤 요소 (구미호 꼬리, 용 몸통) ──
+        if (id === 'gumiho') {
+            var tailCount = Math.min(9, stage + 1); // 단계별 꼬리 증가
+            ctx.fillStyle = '#ff8800';
+            for(var i=0; i<tailCount; i++) {
+               ctx.save();
+               ctx.translate(-baseW*0.6, rootY - baseH*0.4);
+               var angle = (i - (tailCount-1)/2) * 0.3 + Math.sin(t*4 + i)*0.2 - 0.5;
+               ctx.rotate(angle);
+               ctx.beginPath(); ctx.ellipse(0, -5, 4+gro*0.6, 12+gro*3, 0, 0, Math.PI*2); ctx.fill();
+               ctx.restore();
+            }
+        }
+        if (id === 'hwangryong' || id === 'imugi') {
+           ctx.strokeStyle = yk.bc;
+           ctx.lineWidth = 10 + gro*2.5; ctx.lineCap = 'round';
+           ctx.beginPath(); ctx.moveTo(0, rootY - baseH);
+           for(var i=0; i<=4; i++) {
+              ctx.lineTo(-10 - i*12, rootY - baseH + i*15 + Math.sin(t*4 - i)*10);
+           }
+           ctx.stroke();
+        }
+
+        // ── 2. 다리 (걷는 모션) ──
+        ctx.strokeStyle = yk.bc;
+        ctx.lineWidth = 4 + gro*0.6;
+        ctx.lineCap = 'round';
+        if (!isHover) {
+            if (isQuad) {
+                [-1, 1].forEach(front => { // 앞다리, 뒷다리
+                   [-1, 1].forEach(left => { // 좌우 다리
+                      var lx = front > 0 ? baseW*0.6 : -baseW*0.5;
+                      var ang = front * left * walkA * 0.6;
+                      ctx.save(); ctx.translate(lx, rootY); ctx.rotate(ang);
+                      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(left*2, legL); ctx.stroke(); ctx.restore();
+                   });
+                });
+            } else if (id === 'tokkaebi2') {
+                ctx.save(); ctx.translate(0, rootY); ctx.rotate(walkA*0.3); // 한발로 통통
+                ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, legL); ctx.stroke(); ctx.restore();
+            } else {
+                [-1, 1].forEach(side => { // 두 발 걷기
+                    var ang = side * walkA * (isHopper ? 0.3 : 0.8);
+                    ctx.save(); ctx.translate(side*baseW*0.3, rootY); ctx.rotate(ang);
+                    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, legL); ctx.stroke(); ctx.restore();
+                });
+            }
+        }
+
+        // ── 3. 몸통 ──
+        ctx.fillStyle = yk.gc;
+        ctx.beginPath(); 
+        if (id === 'gwisin' || id === 'cheolyeo') { // 치마
+           ctx.moveTo(-baseW*0.8, rootY - baseH);
+           ctx.lineTo(baseW*0.8, rootY - baseH);
+           ctx.lineTo(baseW*1.5, rootY + 10 + Math.sin(t*5)*5);
+           ctx.lineTo(-baseW*1.5, rootY + 10 + Math.sin(t*5+2)*5);
+           ctx.fill();
+        } else {
+           ctx.ellipse(0, rootY - baseH/2, baseW, baseH/2, 0, 0, Math.PI*2); ctx.fill();
+        }
+
+        // ── 4. 머리 및 얼굴 ──
+        var headY = rootY - baseH - headR*0.6;
+        var hx = isQuad ? baseW*0.6 : 0; // 네발수는 머리가 앞쪽으로
+        ctx.fillStyle = yk.bc;
+        ctx.beginPath(); ctx.arc(hx, headY, headR, 0, Math.PI*2); ctx.fill();
+        
+        if (id === 'gwisin' || id === 'cheolyeo') { // 치렁치렁한 검은 머리칼
+            ctx.fillStyle = '#222';
+            ctx.beginPath(); ctx.arc(hx, headY, headR*1.1, Math.PI, Math.PI*2); ctx.fill();
+            ctx.fillRect(hx - headR*1.1, headY, headR*2.2, headR*1.6);
+        }
+
+        // 성장할수록 눈 크기 변화
+        var eyeY = headY - 1;
+        ctx.fillStyle = '#ffffff';
+        var eyeR = 3 + gro*0.4;
+        if (id === 'gaeguri') eyeR *= 1.6; // 개구리 왕눈이
+        ctx.beginPath(); ctx.arc(hx + 3, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx + headR*0.6, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
+        
+        ctx.fillStyle = '#000000';
+        ctx.beginPath(); ctx.arc(hx + 3 + 1, eyeY, eyeR*0.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(hx + headR*0.6 + 1, eyeY, eyeR*0.5, 0, Math.PI*2); ctx.fill();
+
+        // ── 특정 요괴 머리 장식 ──
+        if (id === 'dokkaebi' || id === 'yaksha' || id === 'tokkaebi2') {
+           ctx.fillStyle = '#f0d040'; // 도깨비 뿔
+           ctx.beginPath(); ctx.moveTo(hx+2, headY-headR+1); ctx.lineTo(hx+6, headY-headR-6-gro*3); ctx.lineTo(hx+10, headY-headR+1); ctx.fill();
+        }
+        if (id === 'gangshi') { // 부적
+           ctx.fillStyle = '#ffd700'; ctx.fillRect(hx-4, headY-headR-gro*2, 8, 12+gro*2); 
+           ctx.fillStyle = '#ff0000'; ctx.fillRect(hx-2, headY-headR-gro*2+2, 4, 8+gro*2);
+        }
+        if (id === 'hwangryong' || id === 'imugi') { // 용 수염
+           ctx.strokeStyle = '#fff'; ctx.lineWidth=2+gro*0.5; ctx.beginPath(); 
+           ctx.moveTo(hx+headR, headY); ctx.quadraticCurveTo(hx+headR+10, headY+5, hx+headR+20+gro*5, headY-5 + Math.sin(t*5)*5); ctx.stroke();
+        }
+
+        // ── 5. 전면 팔 / 도구 ──
+        ctx.strokeStyle = yk.bc;
+        if (!isHover && !isQuad) {
+            var armY = rootY - baseH*0.7;
+            [-1, 1].forEach(side => {
+                var ang = -side * walkA * (isHopper ? -0.5 : 0.8) - 0.2;
+                if (id === 'gangshi') ang = -Math.PI/2; // 강시는 완전히 무조건 앞쪽으로
+                ctx.save(); ctx.translate(side*baseW*0.8, armY); ctx.rotate(ang);
+                ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, armL); ctx.stroke(); 
+                
+                // 손에 쥔 도구 (성장하면 크기가 길어짐!)
+                if (side === 1 && id === 'dokkaebi' && stage >= 2) {
+                   ctx.fillStyle = '#6b4226'; ctx.fillRect(-2, armL-3, 14+gro*4, 5+gro); // 방망이
+                   ctx.fillStyle = '#f0d040'; ctx.fillRect(-3, armL+2, 16+gro*4, 3); // 징
+                }
+                if (side === 1 && id === 'yaksha' && stage >= 3) {
+                   ctx.fillStyle = '#cccccc'; ctx.fillRect(-1, armL-2, 18+gro*5, 3+gro*0.5); // 야차 검
+                   ctx.fillStyle = '#ff0000'; ctx.fillRect(-2, armL-2, 4, 6); // 손잡이
+                }
+                ctx.restore();
+            });
+        }
+    }
       if (typeof gS !== 'undefined' && gS.equip) {
         ctx.save();
         if (gS.equip.hat) {
