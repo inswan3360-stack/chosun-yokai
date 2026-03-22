@@ -3658,20 +3658,85 @@
     function initYokaiSprites() {
       if (typeof YOKAI === 'undefined') return;
       sLoader.sprites.clear();
-      sLoader.totalToLoad = YOKAI.length;
+      sLoader.totalToLoad = 5; // 4 groups + 1 base
       sLoader.loadingCount = 0;
       
-      YOKAI.forEach(yk => {
-          const img = new Image();
-          // Load pre-generated individual walk animation sprite sheets
-          img.src = "assets/sprites/" + yk.id + "_walk.png";
-          img.onload = () => { sLoader.loadingCount++; };
-          img.onerror = () => { 
-             console.warn("Failed to load:", img.src); 
-             sLoader.loadingCount++; 
-          };
-          sLoader.sprites.set(yk.id + "_sprite", img);
-      });
+      var pending = 5;
+      function checkDone() {
+          pending--;
+          if (pending <= 0) sLoader.loadingCount = sLoader.totalToLoad;
+      }
+
+      function extractCharacter(img, gridCols, gridRows, col, row, cropRatio) {
+          if (!img || !img.complete || img.naturalWidth === 0) return null;
+          var c = document.createElement('canvas');
+          var w = img.naturalWidth / gridCols;
+          var h = img.naturalHeight / gridRows;
+
+          // 내부의 약 6~70% 구역 정중앙만 자름 (상단 텍스트 및 그리드 선 자르기)
+          var cw = w * cropRatio;
+          var ch = h * cropRatio;
+          var sx = (col * w) + (w - cw) / 2;
+          var sy = (row * h) + (h - ch) / 2 + (h * 0.05);
+          
+          c.width = 64; c.height = 64;
+          var ctx = c.getContext('2d');
+          ctx.drawImage(img, sx, sy, cw, ch, 0, 0, 64, 64);
+          
+          // 배경 투명화 크로마키 (첫 픽셀을 기준으로 톨러런스 지정해 주변색 전부 투명처리)
+          var imgData = ctx.getImageData(0, 0, 64, 64);
+          var d = imgData.data;
+          // 첫 픽셀 색상 (배경색 추정)
+          var bgR = d[0], bgG = d[1], bgB = d[2];
+          for (var i = 0; i < d.length; i += 4) {
+              if (Math.abs(d[i]-bgR) < 30 && Math.abs(d[i+1]-bgG) < 30 && Math.abs(d[i+2]-bgB) < 30) {
+                  d[i+3] = 0; // 알파값 0(투명)
+              }
+          }
+          ctx.putImageData(imgData, 0, 0);
+          return c;
+      }
+      
+      var group1 = new Image(); group1.src = "assets/sprites/group1.png";
+      group1.onload = () => {
+         sLoader.sprites.set("dokkaebi_sprite", extractCharacter(group1, 2, 2, 0, 0, 0.75));
+         sLoader.sprites.set("hwangryong_sprite", extractCharacter(group1, 2, 2, 1, 0, 0.75));
+         sLoader.sprites.set("haetae_sprite", extractCharacter(group1, 2, 2, 0, 1, 0.75));
+         sLoader.sprites.set("imugi_sprite", extractCharacter(group1, 2, 2, 1, 1, 0.75));
+         checkDone();
+      };
+      
+      var group2 = new Image(); group2.src = "assets/sprites/group2.png";
+      group2.onload = () => {
+         sLoader.sprites.set("gwisin_sprite", extractCharacter(group2, 2, 2, 0, 0, 0.75));
+         sLoader.sprites.set("gangshi_sprite", extractCharacter(group2, 2, 2, 1, 0, 0.75));
+         sLoader.sprites.set("cheolyeo_sprite", extractCharacter(group2, 2, 2, 0, 1, 0.75));
+         sLoader.sprites.set("samyeongdang_sprite", extractCharacter(group2, 2, 2, 1, 1, 0.75));
+         checkDone();
+      };
+
+      var group3 = new Image(); group3.src = "assets/sprites/group3.png";
+      group3.onload = () => {
+         sLoader.sprites.set("yaksha_sprite", extractCharacter(group3, 2, 2, 0, 0, 0.75));
+         sLoader.sprites.set("jiha_sprite", extractCharacter(group3, 2, 2, 1, 0, 0.75));
+         sLoader.sprites.set("malgwisin_sprite", extractCharacter(group3, 2, 2, 0, 1, 0.75));
+         sLoader.sprites.set("gaeguri_sprite", extractCharacter(group3, 2, 2, 1, 1, 0.75));
+         checkDone();
+      };
+      
+      var group4 = new Image(); group4.src = "assets/sprites/group4.png";
+      group4.onload = () => {
+         sLoader.sprites.set("nurehaego_sprite", extractCharacter(group4, 3, 1, 0, 0, 0.9));
+         sLoader.sprites.set("tokkaebi2_sprite", extractCharacter(group4, 3, 1, 1, 0, 0.9));
+         sLoader.sprites.set("bulgasari_sprite", extractCharacter(group4, 3, 1, 2, 0, 0.9));
+         checkDone();
+      };
+      
+      var gumi = new Image(); gumi.src = "assets/sprites/gumiho_base.png";
+      gumi.onload = () => {
+         sLoader.sprites.set("gumiho_sprite", extractCharacter(gumi, 2, 2, 1, 0, 0.9));
+         checkDone();
+      };
     }
 
     var YOKAI = [
@@ -3864,28 +3929,22 @@
       if (rotX) ctx.rotate(rotX);
       ctx.translate(-cx, -cy - bobY);
 
-      // ── 진짜 PNG 프레임 애니메이션 렌더링 ──
+      // ── 진짜 잘려진 맑은 캔버스 원본 출력 ──
       var img = sLoader.get(yk.id + "_sprite");
-      if (img && img.complete && img.naturalWidth > 0 && stage > 0) {
-          // 멀티 프레임으로 생성된 10종 리스트
-          var multiFrameIds = ['gumiho', 'gwisin', 'yaksha', 'samyeongdang', 'gangshi', 'cheolyeo', 'dokkaebi', 'hwangryong', 'haetae', 'imugi'];
-          var isMulti = multiFrameIds.includes(yk.id);
-          
-          var frameCount = isMulti ? 4 : 1;
-          var frameW = img.naturalWidth / frameCount;
-          
-          // 가로로 긴 이미지가 정사각형 캔버스 중앙에 놓인 경우, 세로도 해당 가로(프레임단위)만큼만 잘라옴
-          var frameH = isMulti ? frameW : img.naturalHeight;
-          var frameY = isMulti ? (img.naturalHeight - frameH) / 2 : 0;
-          
-          // 걷기 프레임 계산 (t * 속도)
-          var frameIdx = 0;
-          if (isWalking && frameCount > 1) {
-              frameIdx = Math.floor(t * 8) % frameCount;
+      // HTMLCanvasElement는 width 프로퍼티를 가짐. (img.complete 조건 삭제)
+      if (img && img.width > 0 && stage > 0) {
+          // 크로마키 및 크롭이 완벽히 끝난 64x64 사이즈 캔버스를 그대로 출력합니다.
+          // 걷는 모션 중일 경우 살짝 좌우로 기울어져 귀엽게 통통 걷는 애니메이션 구현
+          var walkWobble = isWalking ? Math.sin(t * 12) * 0.15 : 0;
+          if (walkWobble) {
+              ctx.translate(ox+32, oy+32);
+              ctx.rotate(walkWobble);
+              ctx.drawImage(img, 0, 0, 64, 64, -32, -32, 64, 64);
+              ctx.rotate(-walkWobble);
+              ctx.translate(-ox-32, -oy-32);
+          } else {
+              ctx.drawImage(img, 0, 0, 64, 64, ox, oy, 64, 64);
           }
-
-          // PNG 원본 출력 (정확한 1칸을 잘라 64x64로 출력)
-          ctx.drawImage(img, frameIdx * frameW, frameY, frameW, frameH, ox, oy, 64, 64);
       } else if (stage === 0) {
           // 0단계 영혼: PNG를 쓰지 않고 파란 불꽃 렌더링
           drawSoul(ctx, yk, t, ox, oy, 1);
@@ -3961,17 +4020,10 @@
       ctx.save();
       // 영혼 상태에서도 캐릭터의 형태가 희미하게 보이도록 (Premium Feel)
       var img = sLoader.get(yk.id + "_sprite");
-      if (img && img.complete && img.naturalWidth > 0) {
-        var multiFrameIds = ['gumiho', 'gwisin', 'yaksha', 'samyeongdang', 'gangshi', 'cheolyeo', 'dokkaebi', 'hwangryong', 'haetae', 'imugi'];
-        var isMulti = multiFrameIds.includes(yk.id);
-        var frameCount = isMulti ? 4 : 1;
-        var frameW = img.naturalWidth / frameCount;
-        var frameH = isMulti ? frameW : img.naturalHeight;
-        var frameY = isMulti ? (img.naturalHeight - frameH) / 2 : 0;
-        
+      if (img && img.width > 0) {
         ctx.globalAlpha = 0.25 * fl;
         ctx.globalAlpha *= 0.6; // filter 대신 투명도로 표현
-        ctx.drawImage(img, 0, frameY, frameW, frameH, ox, oy + bob, 64, 64);
+        ctx.drawImage(img, 0, 0, 64, 64, ox, oy + bob, 64, 64);
       }
 
       // 중심 불꽃
