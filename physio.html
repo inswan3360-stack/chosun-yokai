@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관상으로 보는 로또 명당</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+    :root {
+      --ink: #0a0c10; --paper: #e8d09a; --gold: #b08a40; --gold-bright: #f8d060;
+      --accent: #8b2222; --glass: rgba(15, 18, 22, 0.95); --border: #b08a40;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+        background: var(--ink); color: var(--paper); font-family: 'Noto Sans KR', sans-serif; 
+        display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+    }
+    #app { width: 100%; max-width: 480px; }
+    .screen { display: none; }
+    .screen.active { display: block; animation: screenOpen 0.5s; }
+    @keyframes screenOpen { from { opacity: 0; } to { opacity: 1; } }
+    
+    .physio-title { font-size: 24px; color: var(--gold-bright); margin-bottom: 20px; text-shadow: 2px 2px 4px #000; text-align: center; }
+    p { text-align: center; font-size: 14px; color: var(--muted); margin-bottom: 15px; }
+    .upload-box { border: 2px dashed var(--border); padding: 30px; margin-bottom: 20px; cursor: pointer; background: var(--glass); text-align: center; }
+    #physioPreview { max-width: 100%; max-height: 250px; margin-top: 15px; border: 2px solid var(--border); display: none; }
+    .birth-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .birth-row select { background: var(--glass); color: var(--gold-bright); border: 1px solid var(--border); padding: 8px; }
+    .title-btn { width: 100%; background: var(--gold); color: var(--ink); border: 1px solid var(--gold-bright); padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+    .title-btn.sub { background: var(--glass); border-color: var(--border); color: var(--paper); }
+    
+    #physioProcessScreen { text-align: center; }
+    #scanTarget { width:280px; height:350px; border:2px solid var(--gold-bright); background:#111; overflow:hidden; margin: 0 auto; }
+    .scan-line { width: 100%; height: 2px; background: rgba(248, 208, 96, 0.8); position: absolute; top: 10%; left: 0; box-shadow: 0 0 15px var(--gold-bright); animation: scan 2s infinite linear; }
+    @keyframes scan { 0% { top: 10%; } 100% { top: 90%; } }
+
+    #physioResultScreen .result-section { background: var(--glass); border: 1px solid var(--border); padding: 15px; margin-top: 15px; text-align: left; }
+    #physioResultScreen .result-label { color: var(--gold); font-weight: 700; margin-bottom: 5px; }
+    #physioResultScreen .result-text { color: var(--paper); font-size: 14px; line-height: 1.5; }
+    .lotto-balls { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:15px 0; }
+    .lotto-ball { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 16px; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4); }
+    .ball-0 { background: #fbc400; } .ball-1 { background: #69c8f2; } .ball-2 { background: #ff7272; } .ball-3 { background: #aaaaaa; } .ball-4 { background: #b0d840; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="physioInputScreen" class="screen active">
+      <div class="physio-title">🔮 조선 관상가</div>
+      <p>그대의 얼굴에 비친 기운을 살펴<br>행운의 숫자를 점지해 주겠소.</p>
+      <div class="upload-box" onclick="document.getElementById('physioFile').click()">
+        <span id="uploadLabel">📸 사진을 등록하시오</span>
+        <input type="file" id="physioFile" accept="image/*" style="display:none;" onchange="handlePhysioFile(event)">
+        <img id="physioPreview">
+      </div>
+      <div class="result-label" style="margin-bottom:10px;text-align:center;">생년월일을 선택하시오</div>
+      <div class="birth-row">
+        <select id="birthYear"></select>
+        <select id="birthMonth"></select>
+        <select id="birthDay"></select>
+      </div>
+      <button class="title-btn main" onclick="startPhysioAnalysis()">💡 관상 분석 시작</button>
+      <button class="title-btn sub" onclick="location.href='index.html'">◀ 돌아가기</button>
+    </div>
+
+    <div id="physioProcessScreen" class="screen">
+    </div>
+
+    <div id="physioResultScreen" class="screen">
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.remove('active');
+        });
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.style.display = 'block';
+            targetScreen.classList.add('active');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initBirthSelects();
+        showScreen('physioInputScreen');
+    });
+  </script>
+</body>
+</html>
