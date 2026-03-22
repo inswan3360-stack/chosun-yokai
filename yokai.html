@@ -3809,13 +3809,6 @@
     function drawYokai(ctx, yk, stage, t, ox, oy, extraAnim) {
       if (!ctx || !yk) return;
 
-      // ── 동적 진화 설정 (Dynamic Evolution) — 캐릭터 확대 ──
-      var evoScMap = [0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6];
-      var scFactor = evoScMap[Math.min(stage, 6)];
-      var baseSc = STAGE_SCALES[Math.min(stage, 6)];
-    function drawYokai(ctx, yk, stage, t, ox, oy, extraAnim) {
-      if (!ctx || !yk) return;
-
       var isWalking = (typeof petWalkVX !== 'undefined' && Math.abs(petWalkVX) > 0.05);
       var walkDir = (typeof petWalkDir !== 'undefined') ? petWalkDir : 1;
 
@@ -3849,6 +3842,54 @@
          else if (act === 'heal') ctx.fillText("💊", ox + 32, emoY);
          else if (act === 'study') ctx.fillText("💡", ox + 32, emoY);
          ctx.restore();
+      }
+
+      // ── 장착 아이템 드로잉 (Equipped Items) ──
+      if (typeof gS !== 'undefined' && gS.equip) {
+        ctx.save();
+        if (gS.equip.hat) {
+          // 갓 (Gat)
+          ctx.fillStyle = '#111';
+          ctx.fillRect(ox + 20, oy + 10, 24, 4); // 챙
+          ctx.fillRect(ox + 26, oy + 4, 12, 6);  // 모자
+          ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(ox + 20, oy + 10, 24, 4);
+        }
+        if (gS.equip.toy) {
+          // 팽이 (Paengi) - 빙글빙글 회전 효과
+          ctx.save();
+          var ptx = ox + 15, pty = oy + 48;
+          ctx.translate(ptx, pty);
+          ctx.rotate(t * 15);
+          ctx.fillStyle = '#8b4513';
+          artist.fillTriangle(ctx, -5, -4, 5, -4, 0, 6);
+          ctx.fillStyle = '#d2691e'; ctx.fillRect(-5, -6, 10, 2);
+          ctx.restore();
+        }
+        if (gS.equip.fan) {
+          // 부채 (Fan)
+          ctx.save();
+          var ftx = ox + 50, fty = oy + 45;
+          ctx.translate(ftx, fty);
+          ctx.rotate(-0.3 + Math.sin(t * 4) * 0.2);
+          ctx.fillStyle = '#fff9e0';
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, -Math.PI * 0.8, -Math.PI * 0.2); ctx.fill();
+          ctx.strokeStyle = '#8b4513'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -15); ctx.stroke();
+          ctx.restore();
+        }
+        if (gS.equip.mask) {
+          // 하회탈 (Mask)
+          ctx.fillStyle = '#f5deb3';
+          artist.fillEllipse(ctx, ox + 32, oy + 28, 7, 9);
+          ctx.fillStyle = '#111'; ctx.fillRect(ox + 28, oy + 25, 3, 2); ctx.fillRect(ox + 33, oy + 25, 3, 2); // 눈
+          ctx.strokeStyle = '#8b2222'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(ox + 32, oy + 32, 4, 0.2, Math.PI - 0.2); ctx.stroke(); // 미소
+        }
+        if (gS.equip.scroll) {
+          // 두루마리 (Scroll)
+          ctx.fillStyle = '#fffbe8'; ctx.fillRect(ox + 44, oy + 40, 10, 18);
+          ctx.fillStyle = '#111'; ctx.fillRect(ox + 44, oy + 42, 10, 1); ctx.fillRect(ox + 44, oy + 45, 10, 1);
+          ctx.fillStyle = '#8b0000'; ctx.fillRect(ox + 43, oy + 38, 12, 3); ctx.fillRect(ox + 43, oy + 57, 12, 3);
+        }
+        ctx.restore();
       }
     }
 
@@ -4037,69 +4078,6 @@
                 ctx.restore();
             });
         }
-    }
-      if (typeof gS !== 'undefined' && gS.equip) {
-        ctx.save();
-        if (gS.equip.hat) {
-          // 갓 (Gat)
-          ctx.fillStyle = '#111';
-          ctx.fillRect(ox + 20, oy + 10, 24, 4); // 챙
-          ctx.fillRect(ox + 26, oy + 4, 12, 6);  // 모자
-          ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(ox + 20, oy + 10, 24, 4);
-        }
-        if (gS.equip.toy) {
-          // 팽이 (Paengi) - 빙글빙글 회전 효과
-          ctx.save();
-          var ptx = ox + 15, pty = oy + 48;
-          ctx.translate(ptx, pty);
-          ctx.rotate(t * 15);
-          ctx.fillStyle = '#8b4513';
-          artist.fillTriangle(ctx, -5, -4, 5, -4, 0, 6);
-          ctx.fillStyle = '#d2691e'; ctx.fillRect(-5, -6, 10, 2);
-          ctx.restore();
-        }
-        if (gS.equip.fan) {
-          // 부채 (Fan)
-          ctx.save();
-          var ftx = ox + 50, fty = oy + 45;
-          ctx.translate(ftx, fty);
-          ctx.rotate(-0.3 + Math.sin(t * 4) * 0.2);
-          ctx.fillStyle = '#fff9e0';
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, -Math.PI * 0.8, -Math.PI * 0.2); ctx.fill();
-          ctx.strokeStyle = '#8b4513'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -15); ctx.stroke();
-          ctx.restore();
-        }
-        if (gS.equip.mask) {
-          // 하회탈 (Mask)
-          ctx.fillStyle = '#f5deb3';
-          artist.fillEllipse(ctx, ox + 32, oy + 28, 7, 9);
-          ctx.fillStyle = '#111'; ctx.fillRect(ox + 28, oy + 25, 3, 2); ctx.fillRect(ox + 33, oy + 25, 3, 2); // 눈
-          ctx.strokeStyle = '#8b2222'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(ox + 32, oy + 32, 4, 0.2, Math.PI - 0.2); ctx.stroke(); // 미소
-        }
-        if (gS.equip.scroll) {
-          // 두루마리 (Scroll)
-          ctx.fillStyle = '#fffbe8'; ctx.fillRect(ox + 44, oy + 40, 10, 18);
-          ctx.fillStyle = '#111'; ctx.fillRect(ox + 44, oy + 42, 10, 1); ctx.fillRect(ox + 44, oy + 45, 10, 1);
-          ctx.fillStyle = '#8b0000'; ctx.fillRect(ox + 43, oy + 38, 12, 3); ctx.fillRect(ox + 43, oy + 57, 12, 3);
-        }
-        ctx.restore();
-      }
-
-      ctx.restore();
-
-      // 신성 오라 효과 (Stage 4+)
-      if (stage >= 4) {
-        ctx.save();
-        ctx.globalAlpha = 0.15 + Math.sin(t * 3) * 0.1;
-        ctx.fillStyle = yk.gc;
-        for (var i = 0; i < 2; i++) {
-          var r = 30 + i * 15 + Math.sin(t * 2 + i) * 8;
-          ctx.beginPath();
-          ctx.arc(cx, cy + bobY, r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
     }
 
     function drawSoul(ctx, yk, t, ox, oy, sc) {
