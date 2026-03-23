@@ -96,6 +96,42 @@
     .btn { background-color: #fff; color: #000; border: none; padding: 12px 40px; font-weight: bold; font-size: 18px; cursor: pointer; border-radius: 4px; font-family: inherit; }
     .btn:hover { background-color: #ddd; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
 
+    /* ─── Name Entry Popup ─── */
+    #name-popup {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+        display: none; justify-content: center; align-items: center;
+        z-index: 200; backdrop-filter: blur(6px);
+    }
+    .name-popup-box {
+        background: rgba(8, 12, 28, 0.92);
+        border: 1px solid rgba(0,255,204,0.35);
+        border-radius: 16px;
+        padding: 28px 32px;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 20px rgba(0,255,204,0.2);
+        width: 320px; max-width: 90vw;
+    }
+    .name-popup-title { font-size: 22px; font-weight: 900; color: #00ffcc; letter-spacing: 2px; margin-bottom: 6px; }
+    .name-popup-sub { font-size: 12px; color: #888; margin-bottom: 18px; }
+    #pilot-name-input {
+        width: 100%; box-sizing: border-box;
+        background: rgba(255,255,255,0.07); border: 1.5px solid rgba(0,255,204,0.4);
+        color: #fff; font-size: 18px; font-weight: 700; font-family: inherit;
+        padding: 10px 14px; border-radius: 8px; text-align: center;
+        outline: none; letter-spacing: 1px; margin-bottom: 16px;
+        transition: border-color 0.2s;
+    }
+    #pilot-name-input:focus { border-color: #00ffcc; box-shadow: 0 0 12px rgba(0,255,204,0.3); }
+    .name-confirm-btn {
+        width: 100%; padding: 11px; font-size: 16px; font-weight: 900;
+        font-family: inherit; cursor: pointer; border-radius: 8px; border: none;
+        background: linear-gradient(135deg, #00d080, #005030); color: #fff;
+        box-shadow: 0 0 16px rgba(0,200,100,0.4); letter-spacing: 1px;
+        transition: all 0.2s;
+    }
+    .name-confirm-btn:hover { filter: brightness(1.2); box-shadow: 0 0 24px rgba(0,200,100,0.6); }
+    .lb-name { flex: 1; color: #ccddff; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+
     #stats-panel {
         position: absolute; top: 10px; left: 10px; background-color: rgba(20, 25, 30, 0.85); color: #fff;
         padding: 15px; border-radius: 8px; font-size: 12px; line-height: 1.5; pointer-events: none; border: 1px solid #444; display:none;
@@ -258,6 +294,16 @@
         <button class="btn" onclick="returnToHangar()">✈️ REBOOT SYSTEM</button>
         <button class="btn" style="background:#222;color:#00ffcc;border:1px solid #00ffcc;" onclick="toggleLeaderboard()">🏆 FULL RANKINGS</button>
     </div>
+</div>
+
+<!-- ─── Name Entry Popup ─── -->
+<div id="name-popup">
+  <div class="name-popup-box">
+    <div class="name-popup-title">✈️ PILOT LOG</div>
+    <div class="name-popup-sub">Enter your pilot name to save your score.</div>
+    <input id="pilot-name-input" type="text" maxlength="16" placeholder="PILOT" autocomplete="off" />
+    <button class="name-confirm-btn" onclick="confirmPilotName()">&#10003; SAVE TO RANKINGS</button>
+  </div>
 </div>
 
 <div id="warning-overlay"></div>
@@ -761,12 +807,8 @@ function triggerGameOver(reasonStr) {
     }
     const finalDist = Math.floor(distanceTraveled / 10);
     document.getElementById('final-distance').innerText = finalDist;
-    const isNew = saveScore(selectedDiff, diffLevel, finalDist);
-    const newRecEl = document.getElementById('go-new-record');
-    if (newRecEl) newRecEl.style.display = isNew ? 'inline' : 'none';
-    document.getElementById('go-diff-label').textContent = selectedDiff.toUpperCase();
-    renderMiniLeaderboard(selectedDiff);
-    setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 1000);
+    // Show the name-entry popup instead of game-over immediately
+    setTimeout(() => showNamePopup(finalDist, selectedDiff, diffLevel), 1000);
 }
 
 function resetPlayer() {
@@ -1067,22 +1109,26 @@ function loadScores() {
 }
 
 /**
- * Save a new score and return true if it's a personal best for that level.
- * Keeps top 5 per difficulty+level combo.
+ * Save a new score with pilot name. Keeps top 5 per difficulty+level.
+ * Score entries are { name, dist } objects sorted by dist desc.
+ * Returns true if it's a new personal best for that level.
  */
-function saveScore(diff, level, dist) {
+function saveScore(diff, level, dist, name) {
     if (dist <= 0) return false;
+    name = (name || 'PILOT').toUpperCase().trim().slice(0, 16) || 'PILOT';
     const data = loadScores();
     if (!data[diff]) data[diff] = {};
     const key = String(level);
     if (!data[diff][key]) data[diff][key] = [];
     const arr = data[diff][key];
-    const prevBest = arr.length ? arr[0] : 0;
-    arr.push(dist);
-    arr.sort((a,b) => b - a);
-    data[diff][key] = arr.slice(0, 5); // keep top 5
+    // Normalise old format (plain numbers) to objects
+    const normalised = arr.map(e => typeof e === 'number' ? { name:'PILOT', dist:e } : e);
+    const prevBest = normalised.length ? normalised[0].dist : 0;
+    normalised.push({ name, dist });
+    normalised.sort((a,b) => b.dist - a.dist);
+    data[diff][key] = normalised.slice(0, 5);
     localStorage.setItem(LB_KEY, JSON.stringify(data));
-    return dist > prevBest; // new personal best = true
+    return dist > prevBest;
 }
 
 /** Rank icon helper */
@@ -1101,14 +1147,15 @@ function buildLbRows(diff) {
     if (levels.length === 0) return `<div class="lb-empty">No records yet!<br>Take off and make history 🚀</div>`;
     let html = '';
     levels.forEach(lv => {
-        const scores = diffData[String(lv)] || [];
-        if (!scores.length) return;
+        const entries = (diffData[String(lv)] || []).map(e => typeof e === 'number' ? {name:'PILOT', dist:e} : e);
+        if (!entries.length) return;
         html += `<div class="lb-group-label">⚡ Danger Lv ${lv}</div>`;
-        scores.forEach((dist, i) => {
+        entries.forEach((entry, i) => {
             const [ico, cls] = rankIcon(i);
             html += `<div class="lb-row">
                 <span class="lb-rank ${cls}">${ico}</span>
-                <span class="lb-dist">${dist.toLocaleString()} m</span>
+                <span class="lb-name">${entry.name || 'PILOT'}</span>
+                <span class="lb-dist">${(entry.dist||0).toLocaleString()} m</span>
             </div>`;
         });
     });
@@ -1132,15 +1179,16 @@ function renderMiniLeaderboard(diff) {
     let html = '';
     let count = 0;
     levels.forEach(lv => {
-        const scores = diffData[String(lv)] || [];
-        if (!scores.length || count >= 5) return;
+        const entries = (diffData[String(lv)] || []).map(e => typeof e === 'number' ? {name:'PILOT', dist:e} : e);
+        if (!entries.length || count >= 5) return;
         html += `<div class="lb-group-label">Lv ${lv}</div>`;
-        scores.slice(0, 3).forEach((dist, i) => {
+        entries.slice(0, 3).forEach((entry, i) => {
             if (count >= 5) return;
             const [ico, cls] = rankIcon(i);
             html += `<div class="lb-row">
                 <span class="lb-rank ${cls}">${ico}</span>
-                <span class="lb-dist">${dist.toLocaleString()} m</span>
+                <span class="lb-name">${entry.name || 'PILOT'}</span>
+                <span class="lb-dist">${(entry.dist||0).toLocaleString()} m</span>
             </div>`;
             count++;
         });
@@ -1177,6 +1225,34 @@ function clearScores() {
         localStorage.removeItem(LB_KEY);
         renderLeaderboard(lbCurrentTab);
     }
+}
+
+// ─── Name Popup Logic ───
+let _pendingDist = 0, _pendingDiff = 'casual', _pendingLevel = 1;
+const LAST_NAME_KEY = 'flightglitch_last_pilot';
+
+function showNamePopup(dist, diff, level) {
+    _pendingDist = dist; _pendingDiff = diff; _pendingLevel = level;
+    const input = document.getElementById('pilot-name-input');
+    input.value = localStorage.getItem(LAST_NAME_KEY) || '';
+    document.getElementById('name-popup').style.display = 'flex';
+    setTimeout(() => input.focus(), 80);
+    // Allow Enter key to confirm
+    input.onkeydown = (e) => { if (e.key === 'Enter') confirmPilotName(); };
+}
+
+function confirmPilotName() {
+    const input = document.getElementById('pilot-name-input');
+    const name = input.value.trim() || 'PILOT';
+    localStorage.setItem(LAST_NAME_KEY, name);
+    document.getElementById('name-popup').style.display = 'none';
+
+    const isNew = saveScore(_pendingDiff, _pendingLevel, _pendingDist, name);
+    const newRecEl = document.getElementById('go-new-record');
+    if (newRecEl) newRecEl.style.display = isNew ? 'inline' : 'none';
+    document.getElementById('go-diff-label').textContent = _pendingDiff.toUpperCase();
+    renderMiniLeaderboard(_pendingDiff);
+    document.getElementById('game-over-screen').style.display = 'flex';
 }
 
 // Init: render leaderboard once on load (hidden)
