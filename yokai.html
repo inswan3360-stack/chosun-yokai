@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -2109,23 +2109,23 @@
           <div class="r-box-txt" style="color:#c89090;" id="rCaution"></div>
         </div>
         <div class="r-box r-box-match">
-          <div class="r-box-title" style="color:#5090c0;" id="ldSecMatch">💫 궁합 · 키워드</div>
+          <div class="r-box-title" style="color:#5090c0;" id="ldSecMatch">💫 Compatibility & Keywords</div>
           <div class="r-box-txt" style="color:#7ab0d0;" id="rMatch"></div>
           <div class="r-kw-row" id="rKw"></div>
         </div>
         <div class="result-share-row" style="display:flex;gap:6px;margin-bottom:12px;">
           <button class="result-btn sec"
             style="flex:1;background:#fee500;color:#3c1e1e;border-color:#fee500;margin:0;font-size:13px;"
-            onclick="shareKakao()">카카오톡 공유</button>
+            id="btnShareKakao" onclick="shareKakao()">KakaoTalk Share</button>
           <button class="result-btn sec"
             style="flex:1;background:#f0f0f0;color:#222;border-color:#ccc;margin:0;font-size:13px;"
-            onclick="saveForInstagram()">인스타용 저장</button>
+            id="btnSaveInsta" onclick="saveForInstagram()">Save for Instagram</button>
           <button class="result-btn sec"
             style="width:48px;padding:0;margin:0;display:flex;align-items:center;justify-content:center;"
-            onclick="shareWeb()" title="공유하기">🔗</button>
+            id="btnShareWeb" onclick="shareWeb()" title="Share">🔗</button>
         </div>
-        <button class="result-btn" id="ldBtnPlay" onclick="startGame()">이 요괴와 함께 시작하기 →</button>
-        <button class="result-btn sec" id="ldBtnRetry" onclick="retryQuiz()">다시 검사하기</button>
+        <button class="result-btn" id="ldBtnPlay" onclick="startGame()">Start with this Yokai →</button>
+        <button class="result-btn sec" id="ldBtnRetry" onclick="retryQuiz()">Retake Quiz</button>
       </div>
     </div>
 
@@ -2355,9 +2355,9 @@
         <div class="ascend-desc" id="ascendDesc"></div>
         <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
           <button class="ascend-btn" style="flex:1;background:#fee500;color:#3c1e1e;border-color:#fee500;"
-            onclick="shareKakaoAscend()">카카오톡 공유</button>
+            id="btnShareKakaoAsc" onclick="shareKakaoAscend()">KakaoTalk Share</button>
           <button class="ascend-btn" style="flex:1;background:#f0f0f0;color:#222;border-color:#ccc;"
-            onclick="saveForInstagram()">인스타용 저장</button>
+            id="btnSaveInstaAsc" onclick="saveForInstagram()">Save for Instagram</button>
         </div>
         <button class="ascend-btn" id="ldAscendBack" onclick="goTitle()">타이틀로 돌아가기</button>
       </div>
@@ -2882,13 +2882,25 @@
         mg1n: '수수께끼', mg1s: '지식·추리',
         mg2n: '윷놀이', mg2s: '운·전략',
         mgInfo: '소진 시 광고로 1회 추가',
-        logTitle: '📜 요괴 일지', statusTitle: '📊 현황',
-        ascendBack: '타이틀로 돌아가기',
-        encyTitle: '영혼 도감', encyLabel: '수집 달성',
-        selectTitle: '요괴 선택', btnDirect: '✨ 직접 요괴 선택',
-        btnPick: '이 요괴로 시작하기 →',
-        stages: ['영혼', '유령', '요귀', '요괴', '정령', '신수', '승천'],
         coin: '냥', playsLeft: '남은 횟수',
+        secMatch: '💫 궁합 · 키워드',
+        btnShareKakao: '카카오톡 공유',
+        btnSaveInsta: '인스타용 저장',
+        btnShareWeb: '공유하기',
+        startWith: '이 요괴와 함께 시작하기 →',
+        retry: '다시 검사하기',
+        ascend: '승천',
+        backToTitle: '타이틀로 돌아가기',
+        msgResult: (n, m) => `나의 전생 요괴는 [${n}(${m})]입니다! 당신의 전생 요괴를 지금 바로 확인해보세요.`,
+        msgAscend: (n, d) => `나의 요괴 [${n}]이(가) ${d}일간의 여정 끝에 드디어 승천했습니다! 당신만의 요괴도 키워보세요.`,
+        msgClipboard: '메시지와 링크가 클립보드에 복사되었습니다. 카카오톡에 붙여넣어주세요!',
+        msgLinkCopied: '링크가 복사되었습니다!',
+        msgShareLink: '공유 링크: ',
+        msgSaving: '이미지 생성 중...',
+        msgSaved: '이미지가 저장되었습니다!',
+        imgTitle: '조선 요괴 전생기',
+        imgSub: '나의 전생 요괴는 무엇인가?',
+        imgBadge: '당신만의 조선 요괴를 찾아보세요',
       },
       en: {
         gameDesc: '🎮 About This Game',
@@ -2921,6 +2933,24 @@
         btnPick: 'Start with this Yokai →',
         stages: ['Spirit', 'Ghost', 'Specter', 'Yokai', 'Elemental', 'Divine Beast', 'Ascended'],
         coin: 'coins', playsLeft: 'Remaining',
+        secMatch: '💫 Compatibility & Keywords',
+        btnShareKakao: 'KakaoTalk Share',
+        btnSaveInsta: 'Save for Instagram',
+        btnShareWeb: 'Share',
+        startWith: 'Start with this Yokai →',
+        retry: 'Retake Quiz',
+        ascend: 'Ascension',
+        backToTitle: 'Back to Title',
+        msgResult: (n, m) => `My past life was [${n}(${m})]! Find your past life yokai now.`,
+        msgAscend: (n, d) => `My yokai [${n}] has finally ascended after ${d} days! Raise your own yokai too.`,
+        msgClipboard: 'Message and link copied to clipboard. Please paste it into KakaoTalk!',
+        msgLinkCopied: 'Link copied to clipboard!',
+        msgShareLink: 'Share Link: ',
+        msgSaving: 'Generating image...',
+        msgSaved: 'Image saved!',
+        imgTitle: 'Chosun Yokai: Rebirth',
+        imgSub: 'What was your past life yokai?',
+        imgBadge: 'Discover your own Chosun Yokai',
         yokai: {
           gumiho: { name: "Gumiho", region: "Jeolla Province", trait: "Magic", desc: "A nine-tailed fox spirit, master of illusion and charm.", pers: "In your past life, you saw the world through intuition and emotion." },
           dokkaebi: { name: "Dokkaebi", region: "Nationwide", trait: "Strength", desc: "A mischievous trickster wielding a magical club.", pers: "In your past life, you were an energetic adventurer full of life." },
@@ -3028,6 +3058,17 @@
       _el('ldResultHead', T.resultHead);
       _el('ldSelectTitle', T.selectTitle);
       _el('ldBtnPick', T.btnPick);
+      _el('btnShareKakao', T.btnShareKakao);
+      _el('btnSaveInsta', T.btnSaveInsta);
+      var bsw = document.getElementById('btnShareWeb'); if (bsw) bsw.title = T.btnShareWeb;
+      _el('ldBtnPlay', T.startWith);
+      _el('ldBtnRetry', T.retry);
+      _el('ldSecMatch', T.secMatch);
+      _el('ascendTitle', T.ascend);
+      _el('btnShareKakaoAsc', T.btnShareKakao);
+      _el('btnSaveInstaAsc', T.btnSaveInsta);
+      _el('ldAscendBack', T.backToTitle);
+
       var cb = document.getElementById('continueBtn');
       if (cb) cb.textContent = T.btnCont;
       // 스탯
@@ -7324,17 +7365,17 @@
       playSFX('click');
       var mbti = calcMBTI();
       var yk = window._resultYk;
-      var msg = "나의 전생 요괴는 [" + yk.name + "(" + mbti + ")]입니다! 당신의 전생 요괴를 지금 바로 확인해보세요.";
+      var T = L[currentLang] || L.ko;
+      var msg = T.msgResult(yk.name, mbti);
       if (navigator.share) {
-        navigator.share({ title: '조선 요괴 전생기', text: msg, url: window.location.href }).catch(function () { });
+        navigator.share({ title: T.imgTitle, text: msg, url: window.location.href }).catch(function () { });
       } else {
-        // Fallback: Clipboard or Alert
         if (navigator.clipboard) {
           navigator.clipboard.writeText(window.location.href + "\n" + msg).then(function () {
-            alert("메시지와 링크가 클립보드에 복사되었습니다. 카카오톡에 붙여넣어주세요!\n\n" + msg);
+            alert(T.msgClipboard + "\n\n" + msg);
           });
         } else {
-          alert(msg + "\n\n(카카오톡 SDK 연동이 필요합니다)");
+          alert(msg);
         }
       }
     }
@@ -7342,14 +7383,14 @@
     function shareKakaoAscend() {
       playSFX('click');
       var yk = gS.yk;
-      var msg = "나의 요괴 [" + yk.name + "]이(가) " + gS.age + "일간의 여정 끝에 드디어 승천했습니다! 당신만의 요괴도 키워보세요.";
+      var T = L[currentLang] || L.ko;
+      var msg = T.msgAscend(yk.name, gS.age);
       if (navigator.share) {
-        navigator.share({ title: '조선 요괴 전생기 - 승천!', text: msg, url: window.location.href }).catch(function () { });
+        navigator.share({ title: T.imgTitle + ' - ' + T.ascend, text: msg, url: window.location.href }).catch(function () { });
       } else {
-        // Fallback
         if (navigator.clipboard) {
           navigator.clipboard.writeText(window.location.href + "\n" + msg).then(function () {
-            alert("메시지와 링크가 클립보드에 복사되었습니다. 카카오톡에 붙여넣어주세요!\n\n" + msg);
+            alert(T.msgClipboard + "\n\n" + msg);
           });
         } else {
           alert(msg);
@@ -7360,16 +7401,18 @@
     function shareWeb() {
       playSFX('click');
       var url = window.location.href;
+      var T = L[currentLang] || L.ko;
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function () { showNotif('링크가 복사되었습니다!'); });
+        navigator.clipboard.writeText(url).then(function () { showNotif(T.msgLinkCopied); });
       } else {
-        alert("공유 링크: " + url);
+        alert(T.msgShareLink + url);
       }
     }
 
     function saveForInstagram() {
       playSFX('click');
-      showNotif('이미지 생성 중...');
+      var T = L[currentLang] || L.ko;
+      showNotif(T.msgSaving);
 
       var canvas = document.createElement('canvas');
       canvas.width = 1080; canvas.height = 1920;
@@ -7381,7 +7424,7 @@
       grad.addColorStop(0, '#07080e'); grad.addColorStop(1, '#1a1008');
       ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1920);
 
-      // 장식 패턴 (반투명 격자)
+      // 장식 패턴
       ctx.globalAlpha = 0.05;
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
       for (var i = 0; i < 1080; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1920); ctx.stroke(); }
@@ -7397,17 +7440,17 @@
       // 타이틀
       ctx.fillStyle = '#f8d060';
       ctx.font = '900 90px Noto Sans KR'; ctx.textAlign = 'center';
-      ctx.fillText('조선 요괴 전생기', 540, 220);
+      ctx.fillText(T.imgTitle, 540, 220);
       ctx.font = '700 45px Noto Sans KR'; ctx.fillStyle = '#b09050';
-      ctx.fillText('나의 전생 요괴는 무엇인가?', 540, 300);
+      ctx.fillText(T.imgSub, 540, 300);
 
       var yk = window._resultYk;
       var mbti = calcMBTI();
 
-      // 중앙 배치 및 대형 스케일 (Stage 6 시각 효과 포함)
+      // 요괴 렌더링
       ctx.save();
-      ctx.translate(540, 750); // 위치 조정
-      ctx.scale(5, 5); // 5배 확대
+      ctx.translate(540, 750);
+      ctx.scale(5, 5);
       drawYokai(ctx, yk, 6, 0, -32, -32, null);
       ctx.restore();
 
@@ -7424,7 +7467,7 @@
       ctx.font = '700 60px Noto Sans KR';
       ctx.fillText(mbti, 540, 1315);
 
-      // 상세 설명 (현대적 해석)
+      // 상세 설명
       ctx.fillStyle = '#d8e0e8';
       ctx.font = '500 38px Noto Sans KR';
       var txt = MD[mbti].m;
@@ -7444,7 +7487,7 @@
       // 하단 뱃지
       ctx.fillStyle = '#7a9060';
       ctx.font = '700 32px Noto Sans KR';
-      ctx.fillText('당신만의 조선 요괴를 찾아보세요', 540, 1780);
+      ctx.fillText(T.imgBadge, 540, 1780);
       ctx.fillStyle = '#fff';
       ctx.fillText(window.location.hostname || 'chosun-yokai.web.app', 540, 1830);
 
@@ -7455,7 +7498,7 @@
       link.href = dataUrl;
       link.click();
 
-      setTimeout(function () { showNotif('이미지가 저장되었습니다!'); }, 1000);
+      setTimeout(function () { showNotif(T.msgSaved); }, 1000);
     }
 
     // ════════════════════════════════════════════════════════════
