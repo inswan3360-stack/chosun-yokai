@@ -17,7 +17,6 @@
             display: block;
         }
 
-        /* ─── ★ UI 스타일 ★ ─── */
         #hangar-screen {
             position: absolute;
             top: 0;
@@ -210,7 +209,6 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
-        /* 좌측 스탯 패널 */
         #stats-panel {
             position: absolute;
             top: 10px;
@@ -244,7 +242,6 @@
             margin-bottom: 5px;
         }
 
-        /* 우측 속도계(Speedometer) UI */
         #hud-speedometer {
             position: absolute;
             right: 20px;
@@ -319,7 +316,6 @@
             text-shadow: 0 0 5px #00ff88;
         }
 
-        /* 경고 텍스트 (화면 중앙) */
         #center-warning {
             position: absolute;
             top: 35%;
@@ -418,7 +414,7 @@
 
     <div id="hangar-screen">
         <h1 class="hangar-title">FLIGHT GLITCH</h1>
-        <div class="hangar-subtitle">시스템 오류: 제한 구역 이탈을 엄격히 금지합니다.</div>
+        <div class="hangar-subtitle">시스템 오류: 정면 돌파 외의 우회 경로(꼼수)는 통제됩니다.</div>
 
         <div class="selector-container">
             <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
@@ -527,7 +523,7 @@
             runwayGroup.add(block);
         }
 
-        // ─── 4. 지상 장애물 ───
+        // ─── 4. 지상 장애물 생성 (★ 밀도 2배 이상 폭증) ───
         function createTree() {
             const g = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 15, 5), mats.treeTrunk); trunk.position.y = 7.5; g.add(trunk);
@@ -561,14 +557,15 @@
             return g;
         }
 
+        // ★ 총 330개의 촘촘한 지상 장애물 세팅
         const groundObstacles = [];
-        for (let i = 0; i < 80; i++) groundObstacles.push(createTree());
-        for (let i = 0; i < 40; i++) groundObstacles.push(createBuilding());
-        for (let i = 0; i < 40; i++) groundObstacles.push(createMountain());
-        for (let i = 0; i < 15; i++) groundObstacles.push(createCastle());
+        for (let i = 0; i < 150; i++) groundObstacles.push(createTree());
+        for (let i = 0; i < 80; i++) groundObstacles.push(createBuilding());
+        for (let i = 0; i < 80; i++) groundObstacles.push(createMountain());
+        for (let i = 0; i < 20; i++) groundObstacles.push(createCastle());
         groundObstacles.forEach(obs => {
             scene.add(obs);
-            repositionGroundObstacle(obs, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(), 4000);
+            repositionGroundObstacle(obs, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(), 2000);
         });
 
         function repositionGroundObstacle(obs, pPos, pQuat, spawnWidth) {
@@ -576,7 +573,8 @@
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
             let x, z;
             do {
-                const forwardOffset = 1500 + Math.random() * 2500;
+                // ★ 코앞에서부터 빽빽하게 깔리도록 거리 단축
+                const forwardOffset = 800 + Math.random() * 2200;
                 const rightOffset = (Math.random() - 0.5) * spawnWidth;
                 const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
                 x = newPos.x; z = newPos.z;
@@ -695,7 +693,6 @@
 
             h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 800));
             h.position.y = -300;
-
             const targetPos = pPos.clone().add(new THREE.Vector3(0, 1500 + Math.random() * 1000, 0));
             h.lookAt(targetPos);
 
@@ -986,30 +983,30 @@
 
             if (!keys.w && !keys.s) pitch += (0 - pitch) * 2 * delta;
 
-            // ★ 꼼수 방지: 기수 자동 복원(정면 보기) 및 회전각 한계
-            if (!keys.a && !keys.d) {
-                roll += (0 - roll) * 2 * delta;
-                yaw += (0 - yaw) * 1.0 * delta;
-            }
-
             pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch));
             roll = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, roll));
-            yaw = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, yaw));
 
             if (planeGroup.position.y >= MAX_ALTITUDE) {
                 planeGroup.position.y = MAX_ALTITUDE;
                 if (pitch < 0) pitch = 0;
+                document.getElementById('altitude-warning').style.display = 'block';
+            } else {
+                document.getElementById('altitude-warning').style.display = 'none';
             }
 
             let isStalling = hasTakenOff && currentSpeed < stallSpeed;
-            let isOutOfBounds = Math.abs(planeGroup.position.x) > 1500;
+
+            // ★ 꼼수 방지: 작전 구역 판정 변수
+            let isOutOfBoundsWarning = Math.abs(planeGroup.position.x) > 800;
+            let isOutOfBoundsDeath = Math.abs(planeGroup.position.x) > 1200;
+
             const warningEl = document.getElementById('center-warning');
 
             let warningMsg = "";
             if (isStalling && !isGameOver) {
                 warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 내려 가속하거나 부스터를 켜세요!</span>";
-            } else if (isOutOfBounds && hasTakenOff && !isGameOver) {
-                warningMsg = "⚠️ 작전 구역 이탈 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>가운데로 복귀하지 않으면 격추됩니다!</span>";
+            } else if (isOutOfBoundsWarning && hasTakenOff && !isGameOver) {
+                warningMsg = "⚠️ 작전 구역 이탈 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 중앙으로 돌리지 않으면 격추됩니다!</span>";
             } else if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1 && keys.s && currentSpeed < takeoffSpeed && !hasTakenOff) {
                 warningMsg = "⚠️ 속도 부족 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>흰색 선을 넘겨 가속하세요!</span>";
             }
@@ -1021,15 +1018,11 @@
                 warningEl.style.display = 'none';
             }
 
-            // ★ 꼼수 방지: 강제 폭파 구역
-            if (Math.abs(planeGroup.position.x) > 2000 && hasTakenOff && !isGameOver) {
-                triggerGameOver("작전 구역을 무단 이탈하여 처형당했습니다.");
+            // ★ 꼼수 방지: 강제 폭파 처형
+            if (isOutOfBoundsDeath && hasTakenOff && !isGameOver) {
+                triggerGameOver("작전 구역을 무단 이탈하여 시스템에 의해 격추되었습니다!");
                 return;
             }
-
-            // 고도 경고 UI
-            if (planeGroup.position.y >= MAX_ALTITUDE) document.getElementById('altitude-warning').style.display = 'block';
-            else document.getElementById('altitude-warning').style.display = 'none';
 
             if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
                 if (hasTakenOff && !isGameOver) { triggerGameOver("지면에 추락했습니다!"); return; }
@@ -1142,7 +1135,7 @@
 
                 let targetVol = 0.1;
                 if (hasTakenOff) targetVol = 0.3;
-                if (isStalling || planeGroup.position.y >= MAX_ALTITUDE || isOutOfBounds) {
+                if (isStalling || planeGroup.position.y >= MAX_ALTITUDE || isOutOfBoundsWarning) {
                     targetVol = 0.5 + Math.sin(clock.elapsedTime * 20) * 0.3;
                 }
                 engineGain.gain.setTargetAtTime(targetVol, audioCtx.currentTime, 0.1);
@@ -1150,7 +1143,7 @@
 
             const forwardVec = new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion);
             const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(planeGroup.quaternion);
-            const spawnWidth = Math.max(800, 6000 - (diffLevel * 600));
+            const spawnWidth = Math.max(800, 4000 - (diffLevel * 600));
 
             distanceTraveled += currentSpeed;
             const biomeLength = 15000;
@@ -1195,11 +1188,11 @@
 
             let threatClose = false;
             skyHazards.forEach(h => {
-                // ★ 꼼수 방지: 유도탄 추적 로직 추가
+                // ★ 꼼수 방지: 유도 미사일 추적 로직 추가
                 if (h.visible && h.type === 'rocket') {
                     const dummy = h.clone();
                     dummy.lookAt(planeGroup.position);
-                    h.quaternion.slerp(dummy.quaternion, delta * 1.5); // 강력한 유도 성능
+                    h.quaternion.slerp(dummy.quaternion, delta * 3.0); // 빠르고 무자비한 추적
                 }
 
                 h.translateZ((h.speed + (diffLevel * 0.5)) * delta * 60);
