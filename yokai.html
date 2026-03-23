@@ -3209,12 +3209,17 @@
       generate(ykId) {
         if (this.cache.has(ykId)) return this.cache.get(ykId);
         const canvas = document.createElement('canvas');
-        canvas.width = 96; canvas.height = 96;
+        canvas.width = 128; canvas.height = 128;
         const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         const yk = YOKAI.find(y => y.id === ykId);
         if (!yk) return null;
+        // 96px 좌표계를 128px 캔버스에 꽉 차게 스케일 적용
+        ctx.save();
+        ctx.scale(128 / 96, 128 / 96);
         this.drawYokaiFull(ctx, yk);
+        ctx.restore();
         this.applyPixelEffect(ctx);
         this.applyOutline(ctx);
         const img = new Image();
@@ -3225,7 +3230,7 @@
 
       // 2×2 픽셀 퀀타이즈 + 팔레트 매핑
       applyPixelEffect(ctx) {
-        const W = 96, H = 96, BLOCK = 2;
+        const W = 128, H = 128, BLOCK = 2;
         const src = ctx.getImageData(0, 0, W, H);
         const d = src.data;
         // 블록 단위로 대표색 선택
@@ -3253,7 +3258,7 @@
 
       // 외곽선 추가 (검은 1px)
       applyOutline(ctx) {
-        const W = 96, H = 96;
+        const W = 128, H = 128;
         const src = ctx.getImageData(0, 0, W, H);
         const d = src.data;
         const out = new Uint8ClampedArray(d);
