@@ -694,53 +694,34 @@ let selectedDiff = 'casual'; // 'casual' | 'extreme'
 
 const DIFF_CONFIGS = {
     casual: {
-        baseSpeed: 3.5,           // same starting speed as extreme
-        speedScalePerLevel: 0.25, // very gentle speed ramp
-        stallSpeedMulti: 0.55,
+        baseSpeed: 3.5,
+        speedScalePerLevel: 0.4,
+        stallSpeedMulti: 0.6,       // relative to takeoffSpeed
         maxAltitude: 900,
-        boundsWarn: 2200,
-        boundsDeath: 3200,
-        hazardSpeedMult: 0.65,
-        hazardSpeedPerLevel: 0.2, // gentle hazard speed ramp
-        homingLevel: 99,          // never homing in casual
-        spawnWidthBase: 6500,
-        diffScalePerDist: 3500,   // very slow level-up
-        boostExtra: 3.5,
-        // Obstacle density: starts at 20% of pool, gains +8% per level, caps at 70%
-        obsBaseRatio: 0.20,
-        obsRampPerLevel: 0.08,
-        obsMaxRatio: 0.70,
-        // Sky hazard active caps per level: [planes, rockets, balloons]
-        // rockets never appear, balloons only after level 3
-        hazardCaps: (lv) => ({
-            plane:   Math.min(2 + Math.floor(lv / 2), 8),
-            rocket:  0,           // no rockets in casual
-            balloon: lv >= 3 ? Math.min(1 + Math.floor((lv-3) / 2), 6) : 0,
-        }),
+        boundsWarn: 2000,
+        boundsDeath: 3000,
+        hazardSpeedMult: 0.7,
+        homingLevel: 6,             // rockets home only at diffLevel >= 6
+        spawnWidthBase: 6000,
+        obstacleCountMult: 0.6,
+        skyHazardCount: { plane:7, rocket:4, balloon:9 },
+        diffScalePerDist: 3000,     // distanceTraveled per diffLevel tick
+        boostExtra: 4.0,
     },
     extreme: {
-        baseSpeed: 3.5,           // same start as casual
-        speedScalePerLevel: 0.75, // steeper ramp per level
-        stallSpeedMulti: 0.80,
-        maxAltitude: 480,
-        boundsWarn: 1000,
-        boundsDeath: 1600,
-        hazardSpeedMult: 1.0,
-        hazardSpeedPerLevel: 0.6, // rockets get fast
-        homingLevel: 5,           // homing starts at level 5
-        spawnWidthBase: 4000,
-        diffScalePerDist: 1500,
-        boostExtra: 8.0,
-        obsBaseRatio: 0.50,
-        obsRampPerLevel: 0.12,
-        obsMaxRatio: 1.0,
-        // Sky hazard active caps per level
-        // planes always, rockets from lv3, balloons always
-        hazardCaps: (lv) => ({
-            plane:   Math.min(2 + lv, 10),
-            rocket:  lv >= 3 ? Math.min((lv - 2) * 2, 10) : 0,  // 0→2→4→6→... per level above 3
-            balloon: Math.min(1 + Math.floor(lv / 2), 8),
-        }),
+        baseSpeed: 6.0,
+        speedScalePerLevel: 1.2,
+        stallSpeedMulti: 0.85,
+        maxAltitude: 420,
+        boundsWarn: 900,
+        boundsDeath: 1400,
+        hazardSpeedMult: 1.5,
+        homingLevel: 1,             // rockets home immediately
+        spawnWidthBase: 3500,
+        obstacleCountMult: 1.4,
+        skyHazardCount: { plane:14, rocket:10, balloon:16 },
+        diffScalePerDist: 1200,
+        boostExtra: 9.0,
     }
 };
 
@@ -753,11 +734,11 @@ function setDifficulty(diff) {
     const btn = document.getElementById('start-btn');
     const desc = document.getElementById('diff-desc');
     if (diff === 'casual') {
-        desc.textContent = 'Start easy · Slow ramp-up · No missiles · Perfect for beginners!';
+        desc.textContent = 'Relaxed physics · Fewer hazards · Wider airspace · Great for learning the controls!';
         btn.className = 'start-btn casual-start';
         btn.textContent = '🚀 SYSTEM LOGIN (START)';
     } else {
-        desc.textContent = '💀 Same start speed · Missiles from Lv 3 · Homing at Lv 5 · Gets brutal fast!';
+        desc.textContent = '💀 MAX SPEED · Homing missiles · Tight boundaries · Only for the brave. Good luck.';
         btn.className = 'start-btn';
         btn.textContent = '☠️ ENTER HELL (START)';
     }
@@ -1068,55 +1049,24 @@ function animate() {
             if(h.visible) { h.translateZ(h.speed * delta * 60); h.rotateX(-0.15 * delta); if(h.position.y < -600) h.visible = false; }
         });
     } else {
-        // Level-based obstacle density
-        const obsRatio = Math.min(dc.obsBaseRatio + dc.obsRampPerLevel * (diffLevel - 1), dc.obsMaxRatio);
-        const obsActiveCount = Math.floor(groundObstacles.length * obsRatio);
-        groundObstacles.forEach((obs, idx) => {
-            const shouldBeActive = idx < obsActiveCount;
-            obs.visible = shouldBeActive;
-            if (shouldBeActive && obs.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) {
-                repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, spawnWidth);
-            }
+        groundObstacles.forEach(obs => {
+            obs.visible = true;
+            if (obs.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, spawnWidth);
         });
         oceanLeviathans.forEach(h => h.visible = false);
     }
 
     if (hasTakenOff) {
-        const caps = dc.hazardCaps(diffLevel);
-        // Count currently visible hazards by type
-        const activeCount = { plane: 0, rocket: 0, balloon: 0 };
-        skyHazards.forEach(h => { if (h.visible) activeCount[h.type] = (activeCount[h.type] || 0) + 1; });
-
         skyHazards.forEach(h => {
-            const cap = caps[h.type] || 0;
-
-            // Hide if over cap for this type at current level
-            if (activeCount[h.type] > cap) {
-                if (h.visible) { h.visible = false; activeCount[h.type]--; }
-                return;
-            }
-            // Show if under cap
-            if (!h.visible && activeCount[h.type] < cap) {
-                h.visible = true;
-                activeCount[h.type]++;
-                resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
-            }
-            if (!h.visible) return;
-
-            // Homing missile logic (level-gated)
+            if (!h.visible) h.visible = true;
             if (h.type === 'rocket' && diffLevel >= dc.homingLevel) {
-                const dummy = h.clone(); dummy.lookAt(planeGroup.position);
-                // Homing strength scales with level above homingLevel
-                const homingStr = Math.min(2.0 + (diffLevel - dc.homingLevel) * 1.5, 9.0);
+                const dummy = h.clone(); dummy.lookAt(planeGroup.position); 
+                const homingStr = selectedDiff === 'extreme' ? 6.0 : 3.0;
                 h.quaternion.slerp(dummy.quaternion, delta * homingStr);
             }
-
-            // Speed: base * mult + per-level bonus
-            const spd = h.speed * dc.hazardSpeedMult + (diffLevel * dc.hazardSpeedPerLevel);
-            h.translateZ(spd * delta * 60);
-            if (h.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) {
-                resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
-            }
+            const hazardSpeedBonus = selectedDiff === 'extreme' ? diffLevel * 1.2 : diffLevel * 0.4;
+            h.translateZ((h.speed * dc.hazardSpeedMult + hazardSpeedBonus) * delta * 60);
+            if (h.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
         });
     } else { skyHazards.forEach(h => h.visible = false); }
 
