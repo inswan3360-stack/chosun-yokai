@@ -3209,13 +3209,13 @@
       generate(ykId) {
         if (this.cache.has(ykId)) return this.cache.get(ykId);
         const canvas = document.createElement('canvas');
-        canvas.width = 128; canvas.height = 128;
+        canvas.width = 96; canvas.height = 96;
         const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
+        ctx.imageSmoothingEnabled = false;
         const yk = YOKAI.find(y => y.id === ykId);
         if (!yk) return null;
         this.drawYokaiFull(ctx, yk);
+        this.applyPixelEffect(ctx);
         this.applyOutline(ctx);
         const img = new Image();
         img.src = canvas.toDataURL();
@@ -3223,28 +3223,54 @@
         return img;
       }
 
+      // 2×2 픽셀 퀀타이즈 + 팔레트 매핑
+      applyPixelEffect(ctx) {
+        const W = 96, H = 96, BLOCK = 2;
+        const src = ctx.getImageData(0, 0, W, H);
+        const d = src.data;
+        // 블록 단위로 대표색 선택
+        for (let by = 0; by < H; by += BLOCK) {
+          for (let bx = 0; bx < W; bx += BLOCK) {
+            let r = 0, g = 0, b = 0, a = 0, cnt = 0;
+            for (let dy = 0; dy < BLOCK; dy++) for (let dx = 0; dx < BLOCK; dx++) {
+              const i = ((by + dy) * W + (bx + dx)) * 4;
+              if (d[i + 3] > 64) { r += d[i]; g += d[i + 1]; b += d[i + 2]; a += d[i + 3]; cnt++; }
+            }
+            if (cnt === 0) {
+              for (let dy = 0; dy < BLOCK; dy++)for (let dx = 0; dx < BLOCK; dx++) { const i = ((by + dy) * W + (bx + dx)) * 4; d[i + 3] = 0; }
+              continue;
+            }
+            const best = this.getNearestColor(r / cnt, g / cnt, b / cnt);
+            const av = Math.round(a / cnt);
+            for (let dy = 0; dy < BLOCK; dy++)for (let dx = 0; dx < BLOCK; dx++) {
+              const i = ((by + dy) * W + (bx + dx)) * 4;
+              d[i] = best.r; d[i + 1] = best.g; d[i + 2] = best.b; d[i + 3] = av > 128 ? 255 : 0;
+            }
+          }
+        }
+        ctx.putImageData(src, 0, 0);
+      }
 
-      // 외곽선 추가 (2px 진한 외곽선)
+      // 외곽선 추가 (검은 1px)
       applyOutline(ctx) {
-        const W = 128, H = 128;
+        const W = 96, H = 96;
         const src = ctx.getImageData(0, 0, W, H);
         const d = src.data;
         const out = new Uint8ClampedArray(d);
-        const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
         for (let y = 1; y < H - 1; y++) {
           for (let x = 1; x < W - 1; x++) {
             const i = (y * W + x) * 4;
             if (d[i + 3] === 0) {
-              for (const [dy, dx] of dirs) {
+              const neighbors = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+              for (const [dy, dx] of neighbors) {
                 const ni = ((y + dy) * W + (x + dx)) * 4;
-                if (d[ni + 3] > 128) { out[i] = 20; out[i+1] = 10; out[i+2] = 5; out[i+3] = 220; break; }
+                if (d[ni + 3] > 0) { out[i] = 0; out[i + 1] = 0; out[i + 2] = 0; out[i + 3] = 255; break; }
               }
             }
           }
         }
         ctx.putImageData(new ImageData(out, W, H), 0, 0);
       }
-
 
       getNearestColor(r, g, b) {
         let minD = Infinity, best = { r, g, b };
@@ -3263,13 +3289,10 @@
 
       drawYokaiFull(ctx, yk) {
         const id = yk.id, bc = yk.bc, gc = yk.gc;
-        const W = 128, H = 128, CX = 48; // CX remains 48 since we scale 96px coords
-        // 96px 좌표계를 128px 캔버스에 꽉 채우도록 스케일
-        ctx.save();
-        ctx.scale(128 / 96, 128 / 96);
-        // 바닥 그림자 (96px 기준)
+        const W = 96, H = 96, CX = 48;
+        // 바닥 그림자
         ctx.fillStyle = 'rgba(0,0,0,0.22)';
-        this.fillEllipse(ctx, 48, 90, 28, 6);
+        this.fillEllipse(ctx, CX, 90, 28, 6);
 
         if (id === 'gumiho') {
           // ── 구미호 : 9꼬리 여우 (96×96 업그레이드) ──
@@ -3989,9 +4012,7 @@
           ctx.fillStyle = '#000'; ctx.fillRect(42, 32, 4, 4); ctx.fillRect(54, 32, 4, 4);
         }
       }
-      ctx.restore(); // 스케일 변환 복원
-    } // drawYokaiFull 종료
-  } // DigitalArtist 클래스 종료
+    }
     const artist = new DigitalArtist();
     const sLoader = new SpriteLoader();
 
