@@ -2033,6 +2033,7 @@
         <!-- CTA 버튼 -->
         <div class="title-btns">
           <button class="title-btn main" id="ldBtnQuiz" onclick="goQuiz()">⚔ 전생을 알아보러 가기</button>
+          <button class="title-btn main" style="background:linear-gradient(135deg,#5a8aaa,#2c4c64);border-color:#8ab8d8;margin-top:8px;" id="ldBtnDirect" onclick="openDirectSelect()">✨ 직접 요괴 선택</button>
           <button class="title-btn secondary" style="display:none;" id="continueBtn" onclick="continueGame()">📜 이전 수련
             이어하기</button>
           <button class="title-btn secondary" id="ldBtnEncy" onclick="openEncyclopedia()">📖 영혼 도감 보기</button>
@@ -2415,6 +2416,38 @@
             style="color:#c8d8e8;font-size:14px;line-height:1.7;margin-bottom:16px;text-align:center;"></div>
           <button class="result-btn"
             onclick="document.getElementById('encyModal').style.display='none';playSFX('click');">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIRECT SELECT -->
+    <div id="selectYokaiScreen" class="screen">
+      <div class="result-head" style="background:#1a2838;">
+        <h2 id="ldSelectTitle">요괴 선택</h2><button class="hdr-music" id="musicBtnSelect" onclick="toggleMusic()">♪ ON</button>
+      </div>
+      <div class="ency-grid" id="selectGrid"
+        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;height:calc(100vh - 40px);overflow-y:auto;align-content:start;">
+      </div>
+      <div
+        style="position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:440px;background:#101828;padding:10px;border-top:3px solid var(--border);display:flex;justify-content:flex-end;align-items:center;">
+        <button class="result-btn sec" style="width:auto;padding:8px 20px;margin:0;" onclick="goTitle()">← 뒤로</button>
+      </div>
+      <!-- 선택 확인 모달 -->
+      <div id="selectModal"
+        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:#141c28;border:3px solid #b8d0e0;padding:16px;width:90%;max-width:360px;">
+          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;">
+            <canvas id="selDetCv" width="160" height="180"
+              style="image-rendering:pixelated;margin-bottom:8px;"></canvas>
+            <div id="selDetName" style="color:var(--gold);font-size:20px;font-weight:700;"></div>
+            <div id="selDetType" style="color:#8ab8d8;font-size:13px;margin:4px 0 8px;"></div>
+          </div>
+          <div id="selDetDesc"
+            style="color:#c8d8e8;font-size:14px;line-height:1.7;margin-bottom:16px;text-align:center;"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="result-btn sec" style="flex:1;" onclick="document.getElementById('selectModal').style.display='none';playSFX('click');">취소</button>
+            <button class="result-btn" id="ldBtnPick" style="flex:2;" onclick="startDirectGame()">이 요괴로 시작하기</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2839,6 +2872,8 @@
         logTitle: '📜 요괴 일지', statusTitle: '📊 현황',
         ascendBack: '타이틀로 돌아가기',
         encyTitle: '영혼 도감', encyLabel: '수집 달성',
+        selectTitle: '요괴 선택', btnDirect: '✨ 직접 요괴 선택',
+        btnPick: '이 요괴로 시작하기 →',
         stages: ['영혼', '유령', '요귀', '요괴', '정령', '신수', '승천'],
         coin: '냥', playsLeft: '남은 횟수',
       },
@@ -2869,6 +2904,8 @@
         logTitle: '📜 Yokai Journal', statusTitle: '📊 Status',
         ascendBack: 'Back to Title',
         encyTitle: 'Soul Encyclopedia', encyLabel: 'Collected',
+        selectTitle: 'Select Yokai', btnDirect: '✨ Direct Selection',
+        btnPick: 'Start with this Yokai →',
         stages: ['Spirit', 'Ghost', 'Specter', 'Yokai', 'Elemental', 'Divine Beast', 'Ascended'],
         coin: 'coins', playsLeft: 'Remaining',
         yokai: {
@@ -2973,8 +3010,11 @@
       _el('ldC3T', T.c3t); _el('ldC3D', T.c3d);
       _el('ldC4T', T.c4t); _el('ldC4D', T.c4d);
       _el('ldBtnQuiz', T.btnQuiz);
+      _el('ldBtnDirect', T.btnDirect);
       _el('ldBtnEncy', T.btnEncy);
       _el('ldResultHead', T.resultHead);
+      _el('ldSelectTitle', T.selectTitle);
+      _el('ldBtnPick', T.btnPick);
       var cb = document.getElementById('continueBtn');
       if (cb) cb.textContent = T.btnCont;
       // 스탯
@@ -7167,6 +7207,76 @@
       // 닫기 버튼 텍스트도 언어 반영
       var closeBtn = document.querySelector('#encyModal button');
       if (closeBtn) closeBtn.textContent = currentLang === 'en' ? 'Close' : '닫기';
+    }
+
+    function openDirectSelect() {
+      playSFX('click');
+      if (titleRAF) { cancelAnimationFrame(titleRAF); titleRAF = null; }
+      showScreen('selectYokaiScreen');
+      renderDirectSelectGrid();
+    }
+
+    function renderDirectSelectGrid() {
+      var html = '';
+      YOKAI.forEach(function (yk, i) {
+        var enData = (currentLang === 'en' && L.en.yokai && L.en.yokai[yk.id]);
+        var name = enData ? enData.name : yk.name;
+        var cvId = 'selCv' + i;
+        html += '<div style="background:#142028;border:2px solid #5a8aaa;padding:8px;text-align:center;cursor:pointer;" '
+          + 'onclick="showSelectDetail(' + i + ')">'
+          + '<canvas id="' + cvId + '" width="64" height="64" style="image-rendering:pixelated;margin-bottom:6px;"></canvas>'
+          + '<div style="color:var(--gold);font-size:11px;font-weight:700;">' + name + '</div>'
+          + '</div>';
+      });
+      document.getElementById('selectGrid').innerHTML = html;
+
+      setTimeout(function () {
+        YOKAI.forEach(function (yk, i) {
+          var cv = document.getElementById('selCv' + i);
+          if (cv) {
+            var ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, 64, 64);
+            drawYokai(ctx, yk, 3, 0, 0, 0, null);
+          }
+        });
+      }, 50);
+    }
+
+    var _selectedYkIdx = -1;
+    function showSelectDetail(idx) {
+      playSFX('click');
+      _selectedYkIdx = idx;
+      var yk = YOKAI[idx];
+      var enData = (currentLang === 'en' && L.en.yokai && L.en.yokai[yk.id]);
+      var name = enData ? enData.name : yk.name;
+      var region = enData ? enData.region : yk.region;
+      var trait = enData ? enData.trait : yk.trait;
+      var desc = enData ? enData.desc : yk.desc;
+
+      document.getElementById('selectModal').style.display = 'flex';
+      document.getElementById('selDetName').textContent = name;
+      document.getElementById('selDetType').textContent = region + ' · ' + trait;
+      document.getElementById('selDetDesc').textContent = desc;
+
+      var cv = document.getElementById('selDetCv');
+      var ctx = cv.getContext('2d');
+      ctx.clearRect(0, 0, 160, 180);
+      ctx.save();
+      ctx.translate(160 / 2 - 32, 180 / 2 - 32);
+      drawYokai(ctx, yk, 6, 0, 0, 0, null);
+      ctx.restore();
+
+      // 취소 버튼 텍스트 반영
+      var cancelBtn = document.querySelector('#selectModal button.sec');
+      if (cancelBtn) cancelBtn.textContent = currentLang === 'en' ? 'Cancel' : '취소';
+    }
+
+    function startDirectGame() {
+      if (_selectedYkIdx < 0) return;
+      playSFX('click');
+      window._resultYk = YOKAI[_selectedYkIdx];
+      document.getElementById('selectModal').style.display = 'none';
+      startGame();
     }
 
     // ════════════════════════════════════════════════════════════
