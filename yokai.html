@@ -2434,19 +2434,32 @@
       </div>
       <!-- 선택 확인 모달 -->
       <div id="selectModal"
-        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
-        <div style="background:#141c28;border:3px solid #b8d0e0;padding:16px;width:90%;max-width:360px;">
-          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;">
+        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;overflow-y:auto;">
+        <div style="background:linear-gradient(180deg,#141c28 0%,#0d1520 100%);border:2px solid #5a8aaa;padding:18px;width:90%;max-width:380px;border-radius:4px;margin:auto;">
+          <!-- 캐릭터 + 이름 -->
+          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:10px;">
             <canvas id="selDetCv" width="160" height="180"
               style="image-rendering:pixelated;margin-bottom:8px;"></canvas>
-            <div id="selDetName" style="color:var(--gold);font-size:20px;font-weight:700;"></div>
-            <div id="selDetType" style="color:#8ab8d8;font-size:13px;margin:4px 0 8px;"></div>
+            <div id="selDetName" style="color:var(--gold);font-size:22px;font-weight:900;letter-spacing:2px;"></div>
+            <div id="selDetType" style="color:#8ab8d8;font-size:12px;margin:3px 0 8px;opacity:0.85;"></div>
           </div>
+          <!-- MBTI 배지 -->
+          <div style="text-align:center;margin-bottom:10px;">
+            <div style="color:#a0c0d8;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;">⚡ 관련 MBTI</div>
+            <div id="selDetMbti" style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;"></div>
+          </div>
+          <!-- 요괴 설명 -->
           <div id="selDetDesc"
-            style="color:#c8d8e8;font-size:14px;line-height:1.7;margin-bottom:16px;text-align:center;"></div>
+            style="color:#c8d8e8;font-size:13px;line-height:1.7;margin-bottom:10px;text-align:center;background:rgba(255,255,255,0.04);padding:8px;border-radius:3px;border:1px solid rgba(90,138,170,0.3);"></div>
+          <!-- 전생 해석 (pers) -->
+          <div style="margin-bottom:14px;">
+            <div style="color:#b0d080;font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">🔮 전생 해석</div>
+            <div id="selDetPers" style="color:#a0c068;font-size:13px;line-height:1.6;font-style:italic;"></div>
+          </div>
+          <!-- 버튼 -->
           <div style="display:flex;gap:8px;">
             <button class="result-btn sec" style="flex:1;" onclick="document.getElementById('selectModal').style.display='none';playSFX('click');">취소</button>
-            <button class="result-btn" id="ldBtnPick" style="flex:2;" onclick="startDirectGame()">이 요괴로 시작하기</button>
+            <button class="result-btn" id="ldBtnPick" style="flex:2;background:linear-gradient(135deg,#5a8aaa,#2c4c64);border-color:#8ab8d8;" onclick="startDirectGame()">✨ 이 요괴로 시작하기</button>
           </div>
         </div>
       </div>
@@ -7222,10 +7235,18 @@
         var enData = (currentLang === 'en' && L.en.yokai && L.en.yokai[yk.id]);
         var name = enData ? enData.name : yk.name;
         var cvId = 'selCv' + i;
-        html += '<div style="background:#142028;border:2px solid #5a8aaa;padding:8px;text-align:center;cursor:pointer;" '
-          + 'onclick="showSelectDetail(' + i + ')">'
-          + '<canvas id="' + cvId + '" width="64" height="64" style="image-rendering:pixelated;margin-bottom:6px;"></canvas>'
-          + '<div style="color:var(--gold);font-size:11px;font-weight:700;">' + name + '</div>'
+        var mbtiArr = yk.mbti || [];
+        var mbtiTag = mbtiArr.length > 0
+          ? '<div style="font-size:9px;font-weight:700;color:#8ab8d8;margin-top:3px;">' + mbtiArr[0] + '</div>'
+          : '';
+        html += '<div style="background:#142028;border:2px solid #3a6a88;padding:6px 4px;text-align:center;cursor:pointer;border-radius:3px;transition:border-color 0.2s;" '
+          + 'onclick="showSelectDetail(' + i + ')" '
+          + 'onmouseover="this.style.borderColor=\'#8ab8d8\'" '
+          + 'onmouseout="this.style.borderColor=\'#3a6a88\'"'
+          + '>'
+          + '<canvas id="' + cvId + '" width="64" height="64" style="image-rendering:pixelated;margin-bottom:4px;"></canvas>'
+          + '<div style="color:var(--gold);font-size:10px;font-weight:700;">' + name + '</div>'
+          + mbtiTag
           + '</div>';
       });
       document.getElementById('selectGrid').innerHTML = html;
@@ -7252,11 +7273,27 @@
       var region = enData ? enData.region : yk.region;
       var trait = enData ? enData.trait : yk.trait;
       var desc = enData ? enData.desc : yk.desc;
+      var pers = enData ? enData.pers : yk.pers;
 
       document.getElementById('selectModal').style.display = 'flex';
       document.getElementById('selDetName').textContent = name;
       document.getElementById('selDetType').textContent = region + ' · ' + trait;
       document.getElementById('selDetDesc').textContent = desc;
+      document.getElementById('selDetPers').textContent = pers || '';
+
+      // MBTI 배지 렌더링
+      var mbtiArr = yk.mbti || [];
+      var mbtiColors = {
+        'E': '#e07030', 'I': '#5080c0',
+        'N': '#a040c0', 'S': '#30a060',
+        'T': '#3080b0', 'F': '#c05080',
+        'J': '#8060a0', 'P': '#50a0a0'
+      };
+      var mbtiHtml = mbtiArr.map(function (m) {
+        var col = mbtiColors[m[0]] || '#608090';
+        return '<span style="background:' + col + ';color:#fff;font-size:11px;font-weight:800;padding:4px 8px;border-radius:3px;letter-spacing:1px;">' + m + '</span>';
+      }).join('');
+      document.getElementById('selDetMbti').innerHTML = mbtiHtml;
 
       var cv = document.getElementById('selDetCv');
       var ctx = cv.getContext('2d');
@@ -7265,10 +7302,6 @@
       ctx.translate(160 / 2 - 32, 180 / 2 - 32);
       drawYokai(ctx, yk, 6, 0, 0, 0, null);
       ctx.restore();
-
-      // 취소 버튼 텍스트 반영
-      var cancelBtn = document.querySelector('#selectModal button.sec');
-      if (cancelBtn) cancelBtn.textContent = currentLang === 'en' ? 'Cancel' : '취소';
     }
 
     function startDirectGame() {
