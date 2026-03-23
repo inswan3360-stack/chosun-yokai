@@ -141,6 +141,79 @@
     #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(0, 255, 136, 0.5); font-size: 24px; pointer-events: none; display:none;}
     .hud-line { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 255, 136, 0.2); pointer-events: none; display:none;}
     #warning-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 150px rgba(255, 0, 0, 0); pointer-events: none; transition: box-shadow 0.2s; }
+
+    /* ─── Leaderboard Panel ─── */
+    #leaderboard-panel {
+        position: absolute; top: 50%; right: 80px; transform: translateY(-50%);
+        width: 260px;
+        background: rgba(5, 8, 20, 0.55);
+        backdrop-filter: blur(14px) saturate(1.5);
+        -webkit-backdrop-filter: blur(14px) saturate(1.5);
+        border: 1px solid rgba(0, 255, 204, 0.25);
+        border-radius: 14px;
+        padding: 14px 16px;
+        z-index: 50;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.06);
+        color: #fff;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        transition: right 0.35s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+    }
+    #leaderboard-panel.hangar-mode {
+        position: fixed; top: 50%; right: 20px; transform: translateY(-50%);
+    }
+    .lb-title {
+        font-size: 13px; font-weight: 900; letter-spacing: 2px; text-align: center;
+        color: #00ffcc; text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(0,255,204,0.6);
+        border-bottom: 1px solid rgba(0,255,204,0.2);
+        padding-bottom: 8px;
+    }
+    .lb-tabs { display: flex; gap: 6px; }
+    .lb-tab {
+        flex: 1; padding: 5px 0; font-size: 11px; font-weight: 900;
+        text-align: center; cursor: pointer; border-radius: 20px;
+        border: 1.5px solid transparent; font-family: inherit;
+        transition: all 0.2s; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .lb-tab.casual { color: #00d080; border-color: rgba(0,200,100,0.4); background: rgba(0,180,100,0.1); }
+    .lb-tab.casual.active { background: rgba(0,180,100,0.3); border-color: #00d080; color: #fff; box-shadow: 0 0 10px rgba(0,200,100,0.4); }
+    .lb-tab.extreme { color: #ff4488; border-color: rgba(255,0,85,0.4); background: rgba(255,0,85,0.08); }
+    .lb-tab.extreme.active { background: rgba(255,0,85,0.25); border-color: #ff0055; color: #fff; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
+    .lb-list { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
+    .lb-list::-webkit-scrollbar { width: 4px; } .lb-list::-webkit-scrollbar-track { background: transparent; } .lb-list::-webkit-scrollbar-thumb { background: rgba(0,255,204,0.3); border-radius: 4px; }
+    .lb-group-label {
+        font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase;
+        margin-top: 4px; padding: 2px 4px;
+        border-left: 2px solid rgba(0,255,204,0.3);
+    }
+    .lb-row {
+        display: flex; align-items: center; gap: 6px;
+        padding: 4px 6px; border-radius: 6px; font-size: 11px;
+        background: rgba(255,255,255,0.04);
+        transition: background 0.2s;
+    }
+    .lb-row:hover { background: rgba(255,255,255,0.09); }
+    .lb-rank { width: 20px; font-size: 12px; text-align: center; flex-shrink: 0; }
+    .lb-rank.gold { color: #ffd700; font-weight: 900; filter: drop-shadow(0 0 4px #ffd700); }
+    .lb-rank.silver { color: #c0c0c0; font-weight: 900; }
+    .lb-rank.bronze { color: #cd7f32; font-weight: 900; }
+    .lb-dist { flex: 1; color: #00ff88; font-weight: 700; }
+    .lb-dist.new-record { animation: new-rec 0.6s 3 alternate; }
+    @keyframes new-rec { from { color:#00ff88; } to { color:#fff700; text-shadow: 0 0 8px #ff0; } }
+    .lb-level { font-size: 10px; color: #888; flex-shrink:0; }
+    .lb-empty { text-align: center; color: #555; font-size: 11px; padding: 12px 0; }
+    .lb-toggle-btn {
+        position: absolute; padding: 8px 14px; font-size: 12px; font-weight: 900;
+        background: rgba(0,255,204,0.12); color: #00ffcc; border: 1.5px solid rgba(0,255,204,0.4);
+        border-radius: 20px; cursor: pointer; font-family: inherit; letter-spacing: 1px;
+        backdrop-filter: blur(8px); transition: all 0.2s; z-index: 60;
+    }
+    .lb-toggle-btn:hover { background: rgba(0,255,204,0.25); box-shadow: 0 0 12px rgba(0,255,204,0.4); }
+    /* Game-over mini board */
+    .go-lb-mini { margin-top: 10px; width: 280px; max-width:90vw; }
+    .go-lb-mini .lb-list { max-height: 160px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -169,13 +242,22 @@
     </div>
 
     <button class="start-btn casual-start" id="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
+    <button class="lb-toggle-btn" style="position:relative;" onclick="toggleLeaderboard()">🏆 RANKINGS</button>
 </div>
 
 <div id="game-over-screen">
     <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
     <div id="game-over-reason">You hit an obstacle.</div>
-    <div class="final-score">Survival Distance: <span id="final-distance">0</span> m</div>
-    <button class="btn" onclick="returnToHangar()">REBOOT SYSTEM</button>
+    <div class="final-score">Survival Distance: <span id="final-distance">0</span> m  <span id="go-new-record" style="display:none;color:#ffd700;font-size:18px;">⭐ NEW RECORD!</span></div>
+    <!-- Mini leaderboard inside game-over -->
+    <div class="go-lb-mini">
+        <div class="lb-title" style="font-size:12px;">🏆 LOCAL RANKINGS — <span id="go-diff-label">CASUAL</span></div>
+        <div id="go-lb-list" class="lb-list" style="margin-top:6px;"></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:16px;">
+        <button class="btn" onclick="returnToHangar()">✈️ REBOOT SYSTEM</button>
+        <button class="btn" style="background:#222;color:#00ffcc;border:1px solid #00ffcc;" onclick="toggleLeaderboard()">🏆 FULL RANKINGS</button>
+    </div>
 </div>
 
 <div id="warning-overlay"></div>
@@ -203,6 +285,19 @@
     <div style="color:#aaa;">[W] Pitch DOWN (Dive/Accel)</div>
     <div style="color:#aaa;">[A/D] Turn Left/Right</div>
     <div style="color:#00ff88; font-weight:bold; margin-top:5px;">[SHIFT] BOOST 💨</div>
+</div>
+
+<!-- ─── Leaderboard Panel ─── -->
+<div id="leaderboard-panel">
+    <div class="lb-title">🏆 LOCAL RANKINGS</div>
+    <div class="lb-tabs">
+        <button class="lb-tab casual active" id="lb-tab-casual" onclick="switchLbTab('casual')">🌿 Casual</button>
+        <button class="lb-tab extreme" id="lb-tab-extreme" onclick="switchLbTab('extreme')">💀 Extreme</button>
+    </div>
+    <div id="lb-list" class="lb-list"></div>
+    <div style="text-align:center;margin-top:4px;">
+        <button onclick="clearScores()" style="background:none;border:none;color:#444;font-size:10px;cursor:pointer;font-family:inherit;">⚠ Clear All Records</button>
+    </div>
 </div>
 
 <div id="crosshair" class="ingame-ui">✛</div>
@@ -664,8 +759,14 @@ function triggerGameOver(reasonStr) {
         expOsc.connect(expGain); expGain.connect(audioCtx.destination);
         expOsc.start(); expOsc.stop(audioCtx.currentTime + 0.6);
     }
-    document.getElementById('final-distance').innerText = Math.floor(distanceTraveled / 10);
-    setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 1000); 
+    const finalDist = Math.floor(distanceTraveled / 10);
+    document.getElementById('final-distance').innerText = finalDist;
+    const isNew = saveScore(selectedDiff, diffLevel, finalDist);
+    const newRecEl = document.getElementById('go-new-record');
+    if (newRecEl) newRecEl.style.display = isNew ? 'inline' : 'none';
+    document.getElementById('go-diff-label').textContent = selectedDiff.toUpperCase();
+    renderMiniLeaderboard(selectedDiff);
+    setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 1000);
 }
 
 function resetPlayer() {
@@ -951,6 +1052,135 @@ function animate() {
 }
 
 animate();
+
+// ─────────────────────────────────────────────
+//  LEADERBOARD SYSTEM
+// ─────────────────────────────────────────────
+const LB_KEY = 'flightglitch_scores_v2';
+let lbVisible = false;
+let lbCurrentTab = 'casual';
+
+/** Load scores object: { casual: { 1:[dist,...], 2:[...] }, extreme:{...} } */
+function loadScores() {
+    try { return JSON.parse(localStorage.getItem(LB_KEY)) || { casual:{}, extreme:{} }; }
+    catch(e) { return { casual:{}, extreme:{} }; }
+}
+
+/**
+ * Save a new score and return true if it's a personal best for that level.
+ * Keeps top 5 per difficulty+level combo.
+ */
+function saveScore(diff, level, dist) {
+    if (dist <= 0) return false;
+    const data = loadScores();
+    if (!data[diff]) data[diff] = {};
+    const key = String(level);
+    if (!data[diff][key]) data[diff][key] = [];
+    const arr = data[diff][key];
+    const prevBest = arr.length ? arr[0] : 0;
+    arr.push(dist);
+    arr.sort((a,b) => b - a);
+    data[diff][key] = arr.slice(0, 5); // keep top 5
+    localStorage.setItem(LB_KEY, JSON.stringify(data));
+    return dist > prevBest; // new personal best = true
+}
+
+/** Rank icon helper */
+function rankIcon(i) {
+    if (i === 0) return ['🥇','gold'];
+    if (i === 1) return ['🥈','silver'];
+    if (i === 2) return ['🥉','bronze'];
+    return [`${i+1}.`, ''];
+}
+
+/** Build HTML rows for a given difficulty's scores, grouped by danger level */
+function buildLbRows(diff) {
+    const data = loadScores();
+    const diffData = data[diff] || {};
+    const levels = Object.keys(diffData).map(Number).sort((a,b)=>a-b);
+    if (levels.length === 0) return `<div class="lb-empty">No records yet!<br>Take off and make history 🚀</div>`;
+    let html = '';
+    levels.forEach(lv => {
+        const scores = diffData[String(lv)] || [];
+        if (!scores.length) return;
+        html += `<div class="lb-group-label">⚡ Danger Lv ${lv}</div>`;
+        scores.forEach((dist, i) => {
+            const [ico, cls] = rankIcon(i);
+            html += `<div class="lb-row">
+                <span class="lb-rank ${cls}">${ico}</span>
+                <span class="lb-dist">${dist.toLocaleString()} m</span>
+            </div>`;
+        });
+    });
+    return html;
+}
+
+/** Render the full leaderboard panel */
+function renderLeaderboard(tab) {
+    tab = tab || lbCurrentTab;
+    document.getElementById('lb-list').innerHTML = buildLbRows(tab);
+}
+
+/** Render the mini leaderboard inside the game-over screen */
+function renderMiniLeaderboard(diff) {
+    const el = document.getElementById('go-lb-list');
+    if (!el) return;
+    const data = loadScores();
+    const diffData = data[diff] || {};
+    const levels = Object.keys(diffData).map(Number).sort((a,b)=>a-b);
+    if (levels.length === 0) { el.innerHTML = `<div class="lb-empty">No records yet!</div>`; return; }
+    let html = '';
+    let count = 0;
+    levels.forEach(lv => {
+        const scores = diffData[String(lv)] || [];
+        if (!scores.length || count >= 5) return;
+        html += `<div class="lb-group-label">Lv ${lv}</div>`;
+        scores.slice(0, 3).forEach((dist, i) => {
+            if (count >= 5) return;
+            const [ico, cls] = rankIcon(i);
+            html += `<div class="lb-row">
+                <span class="lb-rank ${cls}">${ico}</span>
+                <span class="lb-dist">${dist.toLocaleString()} m</span>
+            </div>`;
+            count++;
+        });
+    });
+    el.innerHTML = html || `<div class="lb-empty">Play more to fill the board!</div>`;
+}
+
+/** Switch tab in the full leaderboard */
+function switchLbTab(tab) {
+    lbCurrentTab = tab;
+    document.getElementById('lb-tab-casual').classList.toggle('active', tab === 'casual');
+    document.getElementById('lb-tab-extreme').classList.toggle('active', tab === 'extreme');
+    renderLeaderboard(tab);
+}
+
+/** Toggle full leaderboard visibility */
+function toggleLeaderboard() {
+    const panel = document.getElementById('leaderboard-panel');
+    lbVisible = !lbVisible;
+    // Hangar mode: fixed position so it sits nicely
+    const onHangar = document.getElementById('hangar-screen').style.display !== 'none';
+    panel.className = lbVisible ? (onHangar ? 'hangar-mode' : '') : '';
+    panel.style.display = lbVisible ? 'flex' : 'none';
+    if (lbVisible) {
+        renderLeaderboard(lbCurrentTab);
+        // default tab = current difficulty
+        switchLbTab(selectedDiff);
+    }
+}
+
+/** Clear all records (with confirmation) */
+function clearScores() {
+    if (confirm('Clear ALL leaderboard records? This cannot be undone.')) {
+        localStorage.removeItem(LB_KEY);
+        renderLeaderboard(lbCurrentTab);
+    }
+}
+
+// Init: render leaderboard once on load (hidden)
+renderLeaderboard('casual');
 </script>
 </body>
 </html>
