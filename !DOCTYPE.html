@@ -1,1261 +1,851 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Glitch</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #87CEEB;
-            font-family: 'Courier New', Courier, monospace;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flight Glitch</title>
+<style>
+    body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'Courier New', Courier, monospace; }
+    #gameCanvas { display: block; }
+    
+    #hangar-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
+        display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+        z-index: 100; padding: 50px 0; box-sizing: border-box;
+    }
+    
+    .hangar-title { 
+        font-size: 70px; color: #fff; font-weight:900; margin:0; letter-spacing: 5px;
+        text-transform: uppercase; position: relative;
+        text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc;
+        animation: glitch-anim 0.3s infinite linear alternate-reverse;
+    }
+    @keyframes glitch-anim {
+        0% { text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc; transform: translate(0); }
+        20% { text-shadow: -4px 4px 0px #ff0055, 4px -4px 0px #00ffcc; transform: translate(-2px, 2px); }
+        40% { text-shadow: 4px -4px 0px #ff0055, -4px -4px 0px #00ffcc; transform: translate(2px, -2px); }
+        60% { text-shadow: -4px -4px 0px #ff0055, 4px -4px 0px #00ffcc; transform: translate(-2px, -2px); }
+        80% { text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc; transform: translate(2px, 2px); }
+        100% { text-shadow: -4px 4px 0px #ff0055, 4px -4px 0px #00ffcc; transform: translate(0); }
+    }
 
-        #gameCanvas {
-            display: block;
-        }
+    .hangar-subtitle { font-size: 18px; color: #ffaa00; margin-top: -10px; margin-bottom: 20px; font-weight: bold; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 5px;}
+    
+    .selector-container {
+        display: flex; align-items: center; gap: 30px;
+        background: rgba(10, 15, 25, 0.8); padding: 15px 30px; border-radius: 10px; border: 2px solid #555;
+        box-shadow: 0 0 15px rgba(0,255,204,0.2);
+    }
+    .arrow-btn { background: none; border: none; color: #fff; font-size: 40px; cursor: pointer; transition: 0.2s; }
+    .arrow-btn:hover { color: #00ff88; transform: scale(1.2); }
+    .vehicle-info { text-align: center; width: 250px; }
+    #vehicle-name { font-size: 24px; color: #00ff88; font-weight: bold; display: block; margin-bottom: 5px; }
+    #vehicle-desc { font-size: 14px; color: #aaa; line-height: 1.4; }
 
-        #hangar-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.8) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            padding: 50px 0;
-            box-sizing: border-box;
-        }
+    .start-btn {
+        background: linear-gradient(45deg, #ff0055, #aa0000); color: #fff; border: 2px solid #ff8888;
+        padding: 15px 60px; font-size: 24px; font-weight: bold; cursor: pointer; border-radius: 8px;
+        box-shadow: 0 0 20px rgba(255,0,85,0.5); transition: 0.2s; font-family: inherit;
+    }
+    .start-btn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,0,85,0.8); filter: brightness(1.2); }
 
-        .hangar-title {
-            font-size: 70px;
-            color: #fff;
-            font-weight: 900;
-            margin: 0;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            position: relative;
-            text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc;
-            animation: glitch-anim 0.3s infinite linear alternate-reverse;
-        }
+    #game-over-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(40, 0, 0, 0.85); color: #fff;
+        display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100;
+    }
+    .game-over-title { color: #ff4444; text-shadow: 0 0 30px rgba(255,0,0,0.8); font-size: 60px; margin-bottom: 5px; margin-top:0;}
+    #game-over-reason { font-size: 20px; color: #fff; margin-bottom: 20px; font-weight: bold; background: rgba(255,0,0,0.5); padding: 5px 15px; border-radius: 5px;}
+    .final-score { font-size: 28px; color: #00ff88; margin-bottom: 30px; font-weight: bold; }
+    .btn { background-color: #fff; color: #000; border: none; padding: 12px 40px; font-weight: bold; font-size: 18px; cursor: pointer; border-radius: 4px; font-family: inherit; }
+    .btn:hover { background-color: #ddd; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
 
-        @keyframes glitch-anim {
-            0% {
-                text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc;
-                transform: translate(0);
-            }
+    #stats-panel {
+        position: absolute; top: 10px; left: 10px; background-color: rgba(20, 25, 30, 0.85); color: #fff;
+        padding: 15px; border-radius: 8px; font-size: 12px; line-height: 1.5; pointer-events: none; border: 1px solid #444; display:none;
+    }
+    .stat-green { color: #00ff88; } .stat-red { color: #ff4444; font-weight: bold; font-size: 14px; margin-top:5px; }
+    .stat-gold { color: #ffb800; font-weight: bold; font-size: 14px; margin-bottom: 5px;}
 
-            20% {
-                text-shadow: -4px 4px 0px #ff0055, 4px -4px 0px #00ffcc;
-                transform: translate(-2px, 2px);
-            }
+    #hud-speedometer {
+        position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+        width: 50px; height: 300px; background: rgba(10, 15, 20, 0.8); border: 2px solid #555;
+        border-radius: 8px; display: none; flex-direction: column; align-items: center; justify-content: flex-end;
+        box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    }
+    .speed-text-top { color: #aaa; font-size: 11px; font-weight: bold; margin-top: 10px; text-align: center; width: 100%;}
+    .speed-bar-container {
+        position: relative; width: 24px; height: 220px; background: rgba(255,255,255,0.1);
+        margin: 10px 0; border-radius: 4px; overflow: hidden;
+    }
+    #speed-fill {
+        position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+        background: linear-gradient(to top, #ff2222, #ffb800, #00ff88, #00d4ff);
+        transition: height 0.1s linear; box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    .stall-zone { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.5); z-index: 1; }
+    .takeoff-line { position: absolute; left: -5px; width: 34px; height: 3px; background: #fff; z-index: 2; box-shadow: 0 0 5px #fff; }
+    #speed-value { color: #fff; font-size: 16px; font-weight: 900; margin-bottom: 10px; text-shadow: 0 0 5px #00ff88;}
 
-            40% {
-                text-shadow: 4px -4px 0px #ff0055, -4px 4px 0px #00ffcc;
-                transform: translate(2px, -2px);
-            }
+    #center-warning {
+        position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);
+        color: #ff4444; font-size: 40px; font-weight: 900; text-shadow: 0 0 20px #f00;
+        display: none; pointer-events: none; z-index: 10; text-align: center;
+    }
+    #altitude-warning {
+        position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%);
+        color: #ffaa00; font-size: 30px; font-weight: 900; text-shadow: 0 0 20px #f00;
+        display: none; pointer-events: none; z-index: 10; text-align: center;
+    }
+    #takeoff-guide {
+        position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #000; animation: blink 1s infinite; pointer-events: none; display: none; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 8px; text-align:center;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-            60% {
-                text-shadow: -4px -4px 0px #ff0055, 4px 4px 0px #00ffcc;
-                transform: translate(-2px, -2px);
-            }
-
-            80% {
-                text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #00ffcc;
-                transform: translate(2px, 2px);
-            }
-
-            100% {
-                text-shadow: -4px 4px 0px #ff0055, 4px -4px 0px #00ffcc;
-                transform: translate(0);
-            }
-        }
-
-        .hangar-subtitle {
-            font-size: 18px;
-            color: #ffaa00;
-            margin-top: -10px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
-        }
-
-        .selector-container {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            background: rgba(10, 15, 25, 0.8);
-            padding: 15px 30px;
-            border-radius: 10px;
-            border: 2px solid #555;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-        }
-
-        .arrow-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 40px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .arrow-btn:hover {
-            color: #00ff88;
-            transform: scale(1.2);
-        }
-
-        .vehicle-info {
-            text-align: center;
-            width: 250px;
-        }
-
-        #vehicle-name {
-            font-size: 24px;
-            color: #00ff88;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        #vehicle-desc {
-            font-size: 14px;
-            color: #aaa;
-            line-height: 1.4;
-        }
-
-        .start-btn {
-            background: linear-gradient(45deg, #ff0055, #aa0000);
-            color: #fff;
-            border: 2px solid #ff8888;
-            padding: 15px 60px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
-            transition: 0.2s;
-            font-family: inherit;
-        }
-
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.8);
-            filter: brightness(1.2);
-        }
-
-        #game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(40, 0, 0, 0.85);
-            color: #fff;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .game-over-title {
-            color: #ff4444;
-            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
-            font-size: 60px;
-            margin-bottom: 5px;
-            margin-top: 0;
-        }
-
-        #game-over-reason {
-            font-size: 20px;
-            color: #fff;
-            margin-bottom: 20px;
-            font-weight: bold;
-            background: rgba(255, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
-        }
-
-        .final-score {
-            font-size: 28px;
-            color: #00ff88;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-
-        .btn {
-            background-color: #fff;
-            color: #000;
-            border: none;
-            padding: 12px 40px;
-            font-weight: bold;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        .btn:hover {
-            background-color: #ddd;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
-
-        #stats-panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(20, 25, 30, 0.85);
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 12px;
-            line-height: 1.5;
-            pointer-events: none;
-            border: 1px solid #444;
-            display: none;
-        }
-
-        .stat-green {
-            color: #00ff88;
-        }
-
-        .stat-red {
-            color: #ff4444;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .stat-gold {
-            color: #ffb800;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        #hud-speedometer {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 300px;
-            background: rgba(10, 15, 20, 0.8);
-            border: 2px solid #555;
-            border-radius: 8px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-        }
-
-        .speed-text-top {
-            color: #aaa;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .speed-bar-container {
-            position: relative;
-            width: 24px;
-            height: 220px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 10px 0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        #speed-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 0%;
-            background: linear-gradient(to top, #ff2222, #ffb800, #00ff88, #00d4ff);
-            transition: height 0.1s linear;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .stall-zone {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 0, 0, 0.5);
-            z-index: 1;
-        }
-
-        .takeoff-line {
-            position: absolute;
-            left: -5px;
-            width: 34px;
-            height: 3px;
-            background: #fff;
-            z-index: 2;
-            box-shadow: 0 0 5px #fff;
-        }
-
-        #speed-value {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 900;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #00ff88;
-        }
-
-        #center-warning {
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff4444;
-            font-size: 40px;
-            font-weight: 900;
-            text-shadow: 0 0 20px #f00;
-            display: none;
-            pointer-events: none;
-            z-index: 10;
-            text-align: center;
-        }
-
-        #altitude-warning {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffaa00;
-            font-size: 30px;
-            font-weight: 900;
-            text-shadow: 0 0 20px #f00;
-            display: none;
-            pointer-events: none;
-            z-index: 10;
-            text-align: center;
-        }
-
-        #takeoff-guide {
-            position: absolute;
-            top: 75%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 20px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #000;
-            animation: blink 1s infinite;
-            pointer-events: none;
-            display: none;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgba(0, 255, 136, 0.5);
-            font-size: 24px;
-            pointer-events: none;
-            display: none;
-        }
-
-        .hud-line {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 255, 136, 0.2);
-            pointer-events: none;
-            display: none;
-        }
-
-        #warning-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-shadow: inset 0 0 150px rgba(255, 0, 0, 0);
-            pointer-events: none;
-            transition: box-shadow 0.2s;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(0, 255, 136, 0.5); font-size: 24px; pointer-events: none; display:none;}
+    .hud-line { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 255, 136, 0.2); pointer-events: none; display:none;}
+    #warning-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 150px rgba(255, 0, 0, 0); pointer-events: none; transition: box-shadow 0.2s; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-
 <body>
 
-    <div id="hangar-screen">
-        <h1 class="hangar-title">FLIGHT GLITCH</h1>
-        <div class="hangar-subtitle">System Error: Tactical maneuvers outside designated zones are restricted.</div>
-
-        <div class="selector-container">
-            <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
-            <div class="vehicle-info">
-                <span id="vehicle-name">Light Aircraft</span>
-                <span id="vehicle-desc">Standard and stable aircraft.</span>
-            </div>
-            <button class="arrow-btn" onclick="changeVehicle(1)">▶</button>
+<div id="hangar-screen">
+    <h1 class="hangar-title">FLIGHT GLITCH</h1>
+    <div class="hangar-subtitle">ZONE EXPANDED: Wider operational space authorized. Avoid perimeter breach.</div>
+    
+    <div class="selector-container">
+        <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
+        <div class="vehicle-info">
+            <span id="vehicle-name">Light Aircraft</span>
+            <span id="vehicle-desc">Standard and stable aircraft.</span>
         </div>
-        <button class="start-btn" onclick="startGame()">🚀 ACCESS SYSTEM (START)</button>
+        <button class="arrow-btn" onclick="changeVehicle(1)">▶</button>
     </div>
+    <button class="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
+</div>
 
-    <div id="game-over-screen">
-        <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
-        <div id="game-over-reason">Collided with an obstacle.</div>
-        <div class="final-score">Travel Distance: <span id="final-distance">0</span> m</div>
-        <button class="btn" onclick="returnToHangar()">REBOOT SYSTEM</button>
+<div id="game-over-screen">
+    <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
+    <div id="game-over-reason">You hit an obstacle.</div>
+    <div class="final-score">Survival Distance: <span id="final-distance">0</span> m</div>
+    <button class="btn" onclick="returnToHangar()">REBOOT SYSTEM</button>
+</div>
+
+<div id="warning-overlay"></div>
+<div id="center-warning"></div>
+<div id="altitude-warning">⚠️ CEILING REACHED: DESCEND NOW! ⚠️</div>
+
+<div id="hud-speedometer" class="ingame-ui">
+    <div class="speed-text-top">AIRSPEED</div>
+    <div class="speed-bar-container">
+        <div class="stall-zone"></div>
+        <div class="takeoff-line"></div>
+        <div id="speed-fill"></div>
     </div>
+    <div id="speed-value">0</div>
+</div>
 
-    <div id="warning-overlay"></div>
-    <div id="center-warning"></div>
-    <div id="altitude-warning">⚠️ MAX ALTITUDE REACHED: DESCEND! ⚠️</div>
+<div id="stats-panel">
+    <div class="stat-gold">Distance: <span id="score">0</span> m</div>
+    <div class="stat-green">Biome: <span id="biome-name">Plains</span></div>
+    <div class="stat-red">🔥 Danger Level: <span id="difficulty">1</span></div>
+    <br>
+    <div>Altitude: <span id="altitude">0</span> ft</div>
+    <br>
+    <div style="color:#aaa;">[S] Pitch UP (Takeoff/Slow)</div>
+    <div style="color:#aaa;">[W] Pitch DOWN (Dive/Accel)</div>
+    <div style="color:#aaa;">[A/D] Turn Left/Right</div>
+    <div style="color:#00ff88; font-weight:bold; margin-top:5px;">[SHIFT] BOOST 💨</div>
+</div>
 
-    <div id="hud-speedometer" class="ingame-ui">
-        <div class="speed-text-top">AIRSPEED</div>
-        <div class="speed-bar-container">
-            <div class="stall-zone"></div>
-            <div class="takeoff-line"></div>
-            <div id="speed-fill"></div>
-        </div>
-        <div id="speed-value">0</div>
-    </div>
+<div id="crosshair" class="ingame-ui">✛</div>
+<div class="hud-line ingame-ui" style="width: 150px; height: 1px; margin-top: 20px;"></div>
+<div class="hud-line ingame-ui" style="width: 100px; height: 1px; margin-top: -20px;"></div>
 
-    <div id="stats-panel">
-        <div class="stat-gold">Distance: <span id="score">0</span> m</div>
-        <div class="stat-green">Biome: <span id="biome-name">Plains</span></div>
-        <div class="stat-red">🔥 Danger Level: <span id="difficulty">1</span></div>
-        <br>
-        <div>Altitude: <span id="altitude">0</span> ft</div>
-        <br>
-        <div style="color:#aaa;">[S] Pitch UP (Takeoff / Decelerate)</div>
-        <div style="color:#aaa;">[W] Pitch DOWN (Descend / Accelerate)</div>
-        <div style="color:#aaa;">[A/D] Turn Left/Right</div>
-        <div style="color:#00ff88; font-weight:bold; margin-top:5px;">[SHIFT] BOOST 💨</div>
-    </div>
+<div id="takeoff-guide">Accelerate past the WHITE LINE<br>then press [S] to TAKE OFF!</div>
 
-    <div id="crosshair" class="ingame-ui">✛</div>
-    <div class="hud-line ingame-ui" style="width: 150px; height: 1px; margin-top: 20px;"></div>
-    <div class="hud-line ingame-ui" style="width: 100px; height: 1px; margin-top: -20px;"></div>
+<script>
+// ─── 1. Scene Setup ───
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 4000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
 
-    <div id="takeoff-guide">When the airspeed passes the white line, press [S] to takeoff!</div>
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+dirLight.position.set(200, 500, 300); dirLight.castShadow = true; scene.add(dirLight);
 
-    <script>
-        // ─── 1. 씬 및 조명 ───
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 4000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
+const spotLight = new THREE.SpotLight(0xffb800, 1);
+spotLight.position.set(0, 50, 0); spotLight.angle = Math.PI/4; spotLight.penumbra = 0.5; scene.add(spotLight);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
-        dirLight.position.set(200, 500, 300); dirLight.castShadow = true; scene.add(dirLight);
+// ─── 2. Biomes & Materials ───
+const mats = {
+    treeLeaf: new THREE.MeshLambertMaterial({ color: 0x2d8a2d }),
+    treeTrunk: new THREE.MeshLambertMaterial({ color: 0x5c4033 }),
+    mountain: new THREE.MeshLambertMaterial({ color: 0x555555 }),
+    snow: new THREE.MeshLambertMaterial({ color: 0xffffff }),
+    castle: new THREE.MeshLambertMaterial({ color: 0x888888 }),
+    castleRoof: new THREE.MeshLambertMaterial({ color: 0x222288 }),
+    building: new THREE.MeshLambertMaterial({ color: 0xcccccc }),
+    buildingRoof: new THREE.MeshLambertMaterial({ color: 0x8b0000 }),
+    balloon: new THREE.MeshLambertMaterial({ color: 0xff3366 }),
+    oceanLeviathan: new THREE.MeshLambertMaterial({ color: 0x111122 }) 
+};
 
-        const spotLight = new THREE.SpotLight(0xffb800, 1);
-        spotLight.position.set(0, 50, 0); spotLight.angle = Math.PI / 4; spotLight.penumbra = 0.5; scene.add(spotLight);
+const themes = [
+    { name: "Green Plains", sky: 0x87CEEB, ground: 0x3d7342, c: { leaf: 0x2d8a2d, trunk: 0x5c4033, mount: 0x555555, snow: 0xffffff, cast: 0x888888, croof: 0x222288, bldg: 0xcccccc, broof: 0x8b0000, bal: 0xff3366 } },
+    { name: "Red Canyon", sky: 0xf4a460, ground: 0xb34700, c: { leaf: 0xcc6600, trunk: 0x4a2e15, mount: 0x8b3a00, snow: 0xcc7733, cast: 0xd2b48c, croof: 0x8b4513, bldg: 0xe6c280, broof: 0x5c2e00, bal: 0x00ffcc } },
+    { name: "Snow Tundra", sky: 0xd0e0e0, ground: 0xeeeeee, c: { leaf: 0xaabbcc, trunk: 0x777777, mount: 0xbbccdd, snow: 0xffffff, cast: 0x99aacc, croof: 0x556688, bldg: 0xdddddd, broof: 0x778899, bal: 0xffaa00 } },
+    { name: "Neon Cyber", sky: 0x050515, ground: 0x100520, c: { leaf: 0x00ffcc, trunk: 0x220044, mount: 0x111133, snow: 0xff00ff, cast: 0x222222, croof: 0x00ffff, bldg: 0x111111, broof: 0xff0055, bal: 0xff00ff } },
+    { name: "Leviathan Deep", sky: 0x0a1a3a, ground: 0x002244, c: { leaf: 0x00ffcc, trunk: 0x004488, mount: 0x002266, snow: 0x88aacc, cast: 0x001144, croof: 0x000022, bldg: 0x002244, broof: 0xcc0044, bal: 0xff00ff } }
+];
+let currentTheme = 0;
+let previousTheme = 0; 
+scene.background = new THREE.Color(themes[0].sky);
+scene.fog = new THREE.Fog(themes[0].sky, 100, 2000);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshLambertMaterial({ color: themes[0].ground }));
+ground.rotation.x = -Math.PI / 2; scene.add(ground);
 
-        // ─── 2. 테마 & 머티리얼 (바이옴) ───
-        const mats = {
-            treeLeaf: new THREE.MeshLambertMaterial({ color: 0x2d8a2d }),
-            treeTrunk: new THREE.MeshLambertMaterial({ color: 0x5c4033 }),
-            mountain: new THREE.MeshLambertMaterial({ color: 0x555555 }),
-            snow: new THREE.MeshLambertMaterial({ color: 0xffffff }),
-            castle: new THREE.MeshLambertMaterial({ color: 0x888888 }),
-            castleRoof: new THREE.MeshLambertMaterial({ color: 0x222288 }),
-            building: new THREE.MeshLambertMaterial({ color: 0xcccccc }),
-            buildingRoof: new THREE.MeshLambertMaterial({ color: 0x8b0000 }),
-            balloon: new THREE.MeshLambertMaterial({ color: 0xff3366 }),
-            oceanLeviathan: new THREE.MeshLambertMaterial({ color: 0x111122 })
-        };
+// ─── 3. Runway ───
+const runwayGroup = new THREE.Group(); scene.add(runwayGroup);
+const asphalt = new THREE.Mesh(new THREE.BoxGeometry(60, 0.2, 2000), new THREE.MeshLambertMaterial({ color: 0x333333 }));
+asphalt.position.set(0, 0.1, 800); runwayGroup.add(asphalt);
 
-        const themes = [
-            { name: "Green Plains", sky: 0x87CEEB, ground: 0x3d7342, c: { leaf: 0x2d8a2d, trunk: 0x5c4033, mount: 0x555555, snow: 0xffffff, cast: 0x888888, croof: 0x222288, bldg: 0xcccccc, broof: 0x8b0000, bal: 0xff3366 } },
-            { name: "Red Canyon", sky: 0xf4a460, ground: 0xb34700, c: { leaf: 0xcc6600, trunk: 0x4a2e15, mount: 0x8b3a00, snow: 0xcc7733, cast: 0xd2b48c, croof: 0x8b4513, bldg: 0xe6c280, broof: 0x5c2e00, bal: 0x00ffcc } },
-            { name: "Snow Tundra", sky: 0xd0e0e0, ground: 0xeeeeee, c: { leaf: 0xaabbcc, trunk: 0x777777, mount: 0xbbccdd, snow: 0xffffff, cast: 0x99aacc, croof: 0x556688, bldg: 0xdddddd, broof: 0x778899, bal: 0xffaa00 } },
-            { name: "Neon Cyber", sky: 0x050515, ground: 0x100520, c: { leaf: 0x00ffcc, trunk: 0x220044, mount: 0x111133, snow: 0xff00ff, cast: 0x222222, croof: 0x00ffff, bldg: 0x111111, broof: 0xff0055, bal: 0xff00ff } },
-            { name: "Leviathan Deep", sky: 0x0a1a3a, ground: 0x002244, c: { leaf: 0x00ffcc, trunk: 0x004488, mount: 0x002266, snow: 0x88aacc, cast: 0x001144, croof: 0x000022, bldg: 0x002244, broof: 0xcc0044, bal: 0xff00ff } }
-        ];
-        let currentTheme = 0;
-        let previousTheme = 0;
-        scene.background = new THREE.Color(themes[0].sky);
-        scene.fog = new THREE.Fog(themes[0].sky, 100, 2000);
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshLambertMaterial({ color: themes[0].ground }));
-        ground.rotation.x = -Math.PI / 2; scene.add(ground);
+for(let i=-3; i<3; i++){
+    const mat = new THREE.MeshLambertMaterial({color: Math.abs(i)%2===0 ? 0xff2222 : 0xeeeeee});
+    const block = new THREE.Mesh(new THREE.BoxGeometry(10, 0.25, 20), mat);
+    block.position.set(i*10 + 5, 0.15, 1790); 
+    runwayGroup.add(block);
+}
 
-        // ─── 3. 활주로 생성 ───
-        const runwayGroup = new THREE.Group(); scene.add(runwayGroup);
-        const asphalt = new THREE.Mesh(new THREE.BoxGeometry(60, 0.2, 2000), new THREE.MeshLambertMaterial({ color: 0x333333 }));
-        asphalt.position.set(0, 0.1, 800); runwayGroup.add(asphalt);
+// ─── 4. Ground Obstacles (Increased Density) ───
+const groundObstacles = [];
+for(let i=0; i<150; i++) groundObstacles.push(createTree());
+for(let i=0; i<80; i++) groundObstacles.push(createBuilding());
+for(let i=0; i<80; i++) groundObstacles.push(createMountain());
+for(let i=0; i<20; i++) groundObstacles.push(createCastle());
 
-        for (let i = -3; i < 3; i++) {
-            const mat = new THREE.MeshLambertMaterial({ color: Math.abs(i) % 2 === 0 ? 0xff2222 : 0xeeeeee });
-            const block = new THREE.Mesh(new THREE.BoxGeometry(10, 0.25, 20), mat);
-            block.position.set(i * 10 + 5, 0.15, 1790);
-            runwayGroup.add(block);
+groundObstacles.forEach(obs => {
+    scene.add(obs);
+    repositionGroundObstacle(obs, new THREE.Vector3(0,0,0), new THREE.Quaternion(), 4000); 
+});
+
+function repositionGroundObstacle(obs, pPos, pQuat, spawnWidth) {
+    const forward = new THREE.Vector3(0,0,1).applyQuaternion(pQuat);
+    const right = new THREE.Vector3(1,0,0).applyQuaternion(pQuat);
+    let x, z;
+    do {
+        const forwardOffset = 800 + Math.random() * 2200; 
+        const rightOffset = (Math.random() - 0.5) * spawnWidth;
+        const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
+        x = newPos.x; z = newPos.z;
+    } while (Math.abs(x) < 100 && z > -200 && z < 2000); 
+    
+    obs.position.set(x, 0, z);
+    if (Math.random() < 0.08) {
+        const giantScale = 3 + Math.random() * 3;
+        obs.scale.set(giantScale, giantScale * 1.2, giantScale); 
+    } else {
+        obs.scale.set(1, 1, 1);
+    }
+}
+
+function createTree() {
+    const g = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 15, 5), mats.treeTrunk); trunk.position.y = 7.5; g.add(trunk);
+    const leaves = new THREE.Mesh(new THREE.ConeGeometry(12, 30, 5), mats.treeLeaf); leaves.position.y = 25; g.add(leaves);
+    return g;
+}
+function createMountain() {
+    const g = new THREE.Group();
+    const h = 150 + Math.random() * 250, r = 80 + Math.random() * 100;
+    const base = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), mats.mountain); base.position.y = h/2; g.add(base);
+    const snow = new THREE.Mesh(new THREE.ConeGeometry(r*0.35, h*0.35, 6), mats.snow); snow.position.y = h - (h*0.35)/2 + 0.5; g.add(snow);
+    return g;
+}
+function createCastle() {
+    const g = new THREE.Group();
+    const base = new THREE.Mesh(new THREE.BoxGeometry(40, 30, 40), mats.castle); base.position.y = 15; g.add(base);
+    [[20,20], [20,-20], [-20,20], [-20,-20]].forEach(p => {
+        const tower = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 50, 6), mats.castle); tower.position.set(p[0], 25, p[1]); g.add(tower);
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(8, 20, 6), mats.castleRoof); roof.position.set(p[0], 60, p[1]); g.add(roof);
+    });
+    return g;
+}
+function createBuilding() {
+    const g = new THREE.Group();
+    const h = 30 + Math.random() * 50, w = 20 + Math.random() * 20;
+    const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), mats.building); base.position.y = h/2; g.add(base);
+    if (Math.random() > 0.3) {
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(w*0.8, 20, 4), mats.buildingRoof);
+        roof.position.y = h + 10; roof.rotation.y = Math.PI/4; g.add(roof);
+    }
+    return g;
+}
+
+// ─── 5. Sky Hazards ───
+const skyHazards = [];
+for(let i=0; i<10; i++) { const h = createEnemyPlane(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0,0,0), new THREE.Quaternion()); }
+for(let i=0; i<6; i++) { const h = createRocket(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0,0,0), new THREE.Quaternion()); }
+for(let i=0; i<12; i++) { const h = createBalloon(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0,0,0), new THREE.Quaternion()); }
+
+function createEnemyPlane() {
+    const g = new THREE.Group(); const mat = new THREE.MeshLambertMaterial({ color: 0xaa2222 });
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(3, 3, 15), mat));
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 4), mat); wing.position.set(0, 0, 2); g.add(wing);
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 3), mat); tail.position.set(0, 2, -6); g.add(tail);
+    g.type = 'plane'; return g;
+}
+function createRocket() {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 10, 8), new THREE.MeshLambertMaterial({ color: 0x444444 }));
+    body.rotation.x = Math.PI / 2; g.add(body);
+    const head = new THREE.Mesh(new THREE.ConeGeometry(1.5, 4, 8), new THREE.MeshLambertMaterial({ color: 0xffaa00 }));
+    head.rotation.x = Math.PI / 2; head.position.z = 7; g.add(head);
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(1, 6, 4), new THREE.MeshBasicMaterial({color: 0xff5500}));
+    flame.rotation.x = -Math.PI / 2; flame.position.z = -8; g.add(flame);
+    g.type = 'rocket'; return g;
+}
+function createBalloon() {
+    const g = new THREE.Group();
+    const balloon = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 2), mats.balloon);
+    balloon.position.y = 25; g.add(balloon);
+    const basket = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), mats.treeTrunk);
+    g.add(basket);
+    for(let i=0; i<4; i++){
+        const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 15), new THREE.MeshBasicMaterial({color:0xffffff}));
+        rope.position.set(i%2===0?4:-4, 10, i<2?4:-4);
+        g.add(rope);
+    }
+    g.type = 'balloon'; return g;
+}
+
+function resetSkyHazard(h, pPos, pQuat) {
+    const forward = new THREE.Vector3(0,0,1).applyQuaternion(pQuat);
+    const right = new THREE.Vector3(1,0,0).applyQuaternion(pQuat);
+    const spawnDist = 2000 + Math.random() * 3000; 
+
+    if (h.type === 'plane') {
+        h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random()-0.5)*3000));
+        h.position.y = 50 + Math.random() * 800; 
+        h.lookAt(pPos.clone().add(new THREE.Vector3((Math.random()-0.5)*1000, (Math.random()-0.5)*200, 0)));
+        h.speed = 10 + Math.random() * 8;
+    } else if (h.type === 'rocket') {
+        if (Math.random() > 0.4) { 
+            h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist * 0.6)).add(right.clone().multiplyScalar((Math.random()-0.5)*1500));
+            h.position.y = -10; 
+            h.lookAt(pPos.x, pPos.y + 300 + Math.random()*400, pPos.z);
+            h.speed = 14 + Math.random() * 10; 
+        } else {
+            h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random()-0.5)*1000));
+            h.position.y = pPos.y + (Math.random()-0.5)*300;
+            h.lookAt(pPos);
+            h.speed = 18 + Math.random() * 12; 
         }
+    } else if (h.type === 'balloon') {
+        h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random()-0.5)*3500));
+        h.position.y = 100 + Math.random() * 1000;
+        h.lookAt(pPos);
+        h.speed = 0.5 + Math.random() * 1.5; 
+        if (Math.random() < 0.1) h.scale.set(3, 3, 3);
+        else h.scale.set(1, 1, 1);
+    }
+    h.visible = true; 
+}
 
-        // ─── 4. 지상 장애물 ───
-        function createTree() {
-            const g = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 15, 5), mats.treeTrunk); trunk.position.y = 7.5; g.add(trunk);
-            const leaves = new THREE.Mesh(new THREE.ConeGeometry(12, 30, 5), mats.treeLeaf); leaves.position.y = 25; g.add(leaves);
-            return g;
+// ─── 6. Leviathans ───
+const oceanLeviathans = [];
+for(let i=0; i<3; i++) {
+    const h = createOceanLeviathan(); h.visible = false; 
+    scene.add(h); oceanLeviathans.push(h);
+}
+
+function createOceanLeviathan() {
+    const g = new THREE.Group();
+    const bodyMat = mats.oceanLeviathan;
+    const body = new THREE.Mesh(new THREE.ConeGeometry(30, 150, 6), bodyMat);
+    body.rotation.x = Math.PI / 2; g.add(body);
+    const tailMat = new THREE.MeshLambertMaterial({ color: 0xcc0044 });
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(15, 60, 3), tailMat);
+    tail.rotation.x = Math.PI / 2; tail.position.z = -100; g.add(tail);
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 30, 40), tailMat);
+    fin.position.set(0, 15, 0); g.add(fin);
+    const eyeMat = new THREE.MeshLambertMaterial({ color: 0xff4444, emissive: 0xff0000 });
+    const eye1 = new THREE.Mesh(new THREE.SphereGeometry(3, 8, 8), eyeMat);
+    eye1.position.set(15, 10, 60); g.add(eye1);
+    const eye2 = eye1.clone(); eye2.position.x = -15; g.add(eye2);
+    const mouth = new THREE.Mesh(new THREE.BoxGeometry(40, 40, 30), new THREE.MeshLambertMaterial({color:0x000000}));
+    mouth.position.z = 70; g.add(mouth);
+    g.type = 'leviathan'; return g;
+}
+
+function resetOceanLeviathan(h, pPos, pQuat) {
+    const forward = new THREE.Vector3(0,0,1).applyQuaternion(pQuat);
+    const right = new THREE.Vector3(1,0,0).applyQuaternion(pQuat);
+    const spawnDist = 3000 + Math.random() * 1500; 
+    h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random()-0.5)*1500)); 
+    h.position.y = -300; 
+    const targetPos = pPos.clone().add(new THREE.Vector3(0, 1500 + Math.random()*1000, 0));
+    h.lookAt(targetPos); 
+    h.speed = 3.5 + Math.random() * 2.5; 
+    const s = 4 + Math.random() * 4; 
+    h.scale.set(s, s, s); 
+    h.visible = true; 
+}
+
+const clouds = [];
+const cloudGeo = new THREE.IcosahedronGeometry(1, 0);
+const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+for(let i=0; i<30; i++) {
+    const c = new THREE.Group();
+    for(let j=0; j<4; j++) {
+        const puff = new THREE.Mesh(cloudGeo, cloudMat);
+        puff.position.set(Math.random()*40-20, Math.random()*20-10, Math.random()*40-20);
+        puff.scale.setScalar(20 + Math.random()*40); c.add(puff);
+    }
+    c.position.set((Math.random()-0.5)*8000, 300+Math.random()*700, (Math.random()-0.5)*8000);
+    scene.add(c); clouds.push(c);
+}
+
+// ─── 7. Hangar & Player ───
+const planeGroup = new THREE.Group(); scene.add(planeGroup);
+let activeRotors = []; 
+
+const vehicleList = [
+    { id: 'light', name: 'Light Aircraft', desc: 'Standard and stable aircraft.', speedMulti: 1.0 },
+    { id: 'vintage', name: 'Vintage Fighter', desc: 'Classic design with high agility.', speedMulti: 1.2 },
+    { id: 'modern', name: 'Stealth Jet', desc: 'Insane acceleration! Hard to control.', speedMulti: 1.5 },
+    { id: 'heli', name: 'Tactical Heli', desc: 'Low stall speed. Easy handling.', speedMulti: 0.8 }
+];
+let currentVid = 0;
+
+function buildVehicle(index) {
+    while(planeGroup.children.length > 0) planeGroup.remove(planeGroup.children[0]); 
+    activeRotors = []; 
+    const vType = vehicleList[index].id;
+    const wheelGeo = new THREE.CylinderGeometry(0.8, 0.8, 1, 10);
+    const wheelMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+    const strutMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
+
+    function addWheel(x, y, z) {
+        const wGroup = new THREE.Group();
+        const w = new THREE.Mesh(wheelGeo, wheelMat); w.rotation.z = Math.PI / 2; wGroup.add(w);
+        const strut = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.5, 0.4), strutMat); strut.position.set(0, 1.2, 0); wGroup.add(strut);
+        wGroup.position.set(x, y, z); planeGroup.add(wGroup);
+    }
+
+    if (vType === 'light') {
+        const bodyMat = new THREE.MeshLambertMaterial({ color: 0xeeeeee }), darkMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+        planeGroup.add(new THREE.Mesh(new THREE.BoxGeometry(4, 4, 20), bodyMat));
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(2.5, 8, 4), darkMat); nose.rotation.x = Math.PI/2; nose.position.set(0, 0, 14); planeGroup.add(nose);
+        const wing = new THREE.Mesh(new THREE.BoxGeometry(30, 0.5, 6), bodyMat); wing.position.set(0, 2, 2); planeGroup.add(wing); 
+        const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 5), darkMat); tailFin.position.set(0, 3, -8); planeGroup.add(tailFin);
+        const tailWing = new THREE.Mesh(new THREE.BoxGeometry(12, 0.5, 4), bodyMat); tailWing.position.set(0, 0, -8); planeGroup.add(tailWing);
+        const prop = new THREE.Mesh(new THREE.BoxGeometry(12, 0.5, 0.5), new THREE.MeshBasicMaterial({color:0x111111})); prop.position.set(0, 0, 18); planeGroup.add(prop);
+        activeRotors.push({mesh: prop, axis: 'z', speed: 20});
+        addWheel(0, -3.5, 10); addWheel(4, -3.5, -2); addWheel(-4, -3.5, -2);
+    } else if (vType === 'vintage') {
+        const camoMat = new THREE.MeshLambertMaterial({ color: 0x4a5d23 });
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(3, 2, 20, 8), camoMat); body.rotation.x = Math.PI/2; planeGroup.add(body);
+        const cockpit = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 5), new THREE.MeshLambertMaterial({ color: 0x88ccff })); cockpit.position.set(0, 2.5, 0); planeGroup.add(cockpit);
+        const wing = new THREE.Mesh(new THREE.BoxGeometry(26, 0.5, 5), camoMat); wing.position.set(0, -1, 4); planeGroup.add(wing);
+        const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), camoMat); tailFin.position.set(0, 2, -9); planeGroup.add(tailFin);
+        const tailWing = new THREE.Mesh(new THREE.BoxGeometry(10, 0.5, 3), camoMat); tailWing.position.set(0, 0, -9); planeGroup.add(tailWing);
+        const prop = new THREE.Mesh(new THREE.BoxGeometry(14, 0.8, 0.5), new THREE.MeshBasicMaterial({color:0xdddddd})); prop.position.set(0, 0, 10.5); planeGroup.add(prop);
+        activeRotors.push({mesh: prop, axis: 'z', speed: 25});
+        addWheel(3.5, -3.5, 6); addWheel(-3.5, -3.5, 6); addWheel(0, -2.5, -8); 
+    } else if (vType === 'modern') {
+        const stealthMat = new THREE.MeshLambertMaterial({ color: 0x333344 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 22), stealthMat); planeGroup.add(body);
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(2, 12, 4), stealthMat); nose.rotation.x = Math.PI/2; nose.position.set(0, 0, 17); planeGroup.add(nose);
+        const wing = new THREE.Mesh(new THREE.CylinderGeometry(15, 0.1, 0.5, 3), stealthMat); wing.position.set(0, 0, -2); wing.scale.set(1, 1, 0.5); planeGroup.add(wing);
+        const tail1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), stealthMat); tail1.position.set(2, 2.5, -9); tail1.rotation.z = -0.3; planeGroup.add(tail1);
+        const tail2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), stealthMat); tail2.position.set(-2, 2.5, -9); tail2.rotation.z = 0.3; planeGroup.add(tail2);
+        addWheel(0, -3.5, 12); addWheel(3, -3.5, -2); addWheel(-3, -3.5, -2);
+    } else if (vType === 'heli') {
+        const heliMat = new THREE.MeshLambertMaterial({ color: 0x224488 }), windowMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 10), heliMat); planeGroup.add(body);
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(5.8, 5.8, 4), windowMat); nose.position.set(0,0,7); planeGroup.add(nose);
+        const tail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 15), heliMat); tail.position.set(0, 1, -12); planeGroup.add(tail);
+        const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 2), heliMat); tailFin.position.set(0, 2.5, -19); planeGroup.add(tailFin);
+        const rotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2, 8), heliMat); rotorHub.position.set(0, 4, 0); planeGroup.add(rotorHub);
+        const mainRotor = new THREE.Mesh(new THREE.BoxGeometry(30, 0.2, 2), new THREE.MeshBasicMaterial({color:0x111111})); mainRotor.position.set(0, 5, 0); planeGroup.add(mainRotor);
+        activeRotors.push({mesh: mainRotor, axis: 'y', speed: 20});
+        const tailRotor = new THREE.Mesh(new THREE.BoxGeometry(0.2, 6, 1), new THREE.MeshBasicMaterial({color:0x111111})); tailRotor.position.set(1, 2.5, -19); planeGroup.add(tailRotor);
+        activeRotors.push({mesh: tailRotor, axis: 'x', speed: 25});
+        const skidGeo = new THREE.BoxGeometry(0.4, 0.4, 14), skidMat = new THREE.MeshLambertMaterial({ color: 0x777777 });
+        const skid1 = new THREE.Mesh(skidGeo, skidMat); skid1.position.set(3, -3.5, 2); planeGroup.add(skid1);
+        const skid2 = new THREE.Mesh(skidGeo, skidMat); skid2.position.set(-3, -3.5, 2); planeGroup.add(skid2);
+        [ [3,5], [3,-1], [-3,5], [-3,-1] ].forEach(pos => {
+            const s = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2, 0.4), skidMat); s.position.set(pos[0], -2.5, pos[1]); planeGroup.add(s);
+        });
+    }
+    document.getElementById('vehicle-name').innerText = vehicleList[index].name;
+    document.getElementById('vehicle-desc').innerText = vehicleList[index].desc;
+}
+
+function changeVehicle(dir) {
+    currentVid += dir;
+    if (currentVid < 0) currentVid = vehicleList.length - 1;
+    if (currentVid >= vehicleList.length) currentVid = 0;
+    buildVehicle(currentVid);
+}
+
+// ─── 8. Game Physics & State ───
+let isEngineOn = false, hasTakenOff = false, isGameOver = false;
+let currentSpeed = 0, baseTargetSpeed = 4.5; 
+let pitch = 0, roll = 0, yaw = 0;
+let diffLevel = 1, distanceTraveled = 0; 
+const keys = { w:false, a:false, s:false, d:false, shift:false };
+const FLOOR_HEIGHT = 4.0; 
+const MAX_ALTITUDE = 600.0; 
+
+let audioCtx, engineOsc, engineGain;
+
+function startGame() {
+    document.getElementById('hangar-screen').style.display = 'none';
+    document.getElementById('stats-panel').style.display = 'block';
+    document.querySelectorAll('.ingame-ui').forEach(el => el.style.display = 'flex');
+    document.getElementById('takeoff-guide').style.display = 'block';
+    
+    if(!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        engineOsc = audioCtx.createOscillator(); engineOsc.type = 'sawtooth'; engineOsc.frequency.value = 30; 
+        engineGain = audioCtx.createGain(); engineGain.gain.value = 0.0; 
+        engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination); engineOsc.start();
+    }
+    isEngineOn = true;
+    resetPlayer();
+}
+
+function returnToHangar() {
+    isEngineOn = false;
+    document.getElementById('game-over-screen').style.display = 'none';
+    document.getElementById('hangar-screen').style.display = 'flex';
+    document.getElementById('stats-panel').style.display = 'none';
+    document.getElementById('center-warning').style.display = 'none';
+    document.getElementById('altitude-warning').style.display = 'none'; 
+    document.querySelectorAll('.ingame-ui').forEach(el => el.style.display = 'none');
+    if(engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+    planeGroup.position.set(0, FLOOR_HEIGHT, 0);
+    pitch = 0; roll = 0; yaw = 0;
+    planeGroup.rotation.set(0,0,0);
+    planeGroup.visible = true; 
+    explosionParticles.forEach(p => scene.remove(p.mesh)); 
+    explosionParticles.length = 0;
+    oceanLeviathans.forEach(h => h.visible = false);
+}
+
+function triggerGameOver(reasonStr) {
+    if(isGameOver) return;
+    isGameOver = true;
+    planeGroup.visible = false;
+    document.getElementById('game-over-title').innerText = "💥 CRASHED!";
+    document.getElementById('game-over-reason').innerText = reasonStr;
+    document.getElementById('center-warning').style.display = 'none'; 
+    const expColors = [0xff0000, 0xff8800, 0xffff00, 0x555555];
+    for(let i=0; i<150; i++) {
+        const p = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), new THREE.MeshBasicMaterial({ color: expColors[Math.floor(Math.random()*expColors.length)] }));
+        p.position.copy(planeGroup.position);
+        scene.add(p);
+        explosionParticles.push({ mesh: p, velocity: new THREE.Vector3((Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80), life: 1.0 });
+    }
+    if(engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+    if(audioCtx){
+        const expOsc = audioCtx.createOscillator(); expOsc.type = 'square';
+        expOsc.frequency.setValueAtTime(150, audioCtx.currentTime); expOsc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        const expGain = audioCtx.createGain(); expGain.gain.setValueAtTime(1, audioCtx.currentTime); expGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        expOsc.connect(expGain); expGain.connect(audioCtx.destination);
+        expOsc.start(); expOsc.stop(audioCtx.currentTime + 0.6);
+    }
+    document.getElementById('final-distance').innerText = Math.floor(distanceTraveled / 10);
+    setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 1000); 
+}
+
+function resetPlayer() {
+    isGameOver = false; hasTakenOff = false; planeGroup.visible = true;
+    planeGroup.position.set(0, FLOOR_HEIGHT, -100);
+    pitch = 0; roll = 0; yaw = 0; currentSpeed = 0; distanceTraveled = 0;
+    explosionParticles.forEach(p => scene.remove(p.mesh)); explosionParticles.length = 0;
+    groundObstacles.forEach(obs => repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, 4000));
+    skyHazards.forEach(h => { h.visible = false; resetSkyHazard(h, planeGroup.position, planeGroup.quaternion); });
+    oceanLeviathans.forEach(h => h.visible = false);
+    document.getElementById('takeoff-guide').style.display = 'block';
+    if(audioCtx) engineGain.gain.setTargetAtTime(0.1, audioCtx.currentTime, 0.5);
+}
+
+const particles = [];
+const explosionParticles = []; 
+const flameMatNormal = new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true });
+const flameMatBoost = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true });
+
+const speedLines = [];
+const lineGeo = new THREE.BoxGeometry(0.2, 0.2, 100);
+const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+for(let i=0; i<50; i++){
+    const line = new THREE.Mesh(lineGeo, lineMat); scene.add(line); speedLines.push({ mesh: line, active: false });
+}
+
+window.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if(k==='w') keys.w = true; if(k==='s') keys.s = true; if(k==='a') keys.a = true; if(k==='d') keys.d = true; if(e.key==='Shift') keys.shift = true;
+});
+window.addEventListener('keyup', e => {
+    const k = e.key.toLowerCase();
+    if(k==='w') keys.w = false; if(k==='s') keys.s = false; if(k==='a') keys.a = false; if(k==='d') keys.d = false; if(e.key==='Shift') keys.shift = false;
+});
+
+// ─── 9. Main Loop ───
+buildVehicle(0); 
+planeGroup.position.set(0, FLOOR_HEIGHT, 0); 
+const clock = new THREE.Clock();
+const colorHelper = new THREE.Color();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+
+    activeRotors.forEach(r => {
+        if(r.axis === 'x') r.mesh.rotation.x += r.speed * delta;
+        if(r.axis === 'y') r.mesh.rotation.y += r.speed * delta;
+        if(r.axis === 'z') r.mesh.rotation.z += r.speed * delta;
+    });
+
+    if(!isEngineOn) {
+        planeGroup.rotation.y += 0.5 * delta;
+        camera.position.lerp(new THREE.Vector3(20, 15, -30), 0.1);
+        camera.lookAt(new THREE.Vector3(0, 5, 0));
+        renderer.render(scene, camera);
+        return; 
+    }
+
+    if(isGameOver) {
+        for (let i = explosionParticles.length - 1; i >= 0; i--) {
+            const p = explosionParticles[i]; p.mesh.position.addScaledVector(p.velocity, delta); p.life -= delta * 0.8; p.mesh.scale.setScalar(p.life);
+            if (p.life <= 0) { scene.remove(p.mesh); explosionParticles.splice(i, 1); }
         }
-        function createMountain() {
-            const g = new THREE.Group();
-            const h = 150 + Math.random() * 250, r = 80 + Math.random() * 100;
-            const base = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), mats.mountain); base.position.y = h / 2; g.add(base);
-            const snow = new THREE.Mesh(new THREE.ConeGeometry(r * 0.35, h * 0.35, 6), mats.snow); snow.position.y = h - (h * 0.35) / 2 + 0.5; g.add(snow);
-            return g;
+        camera.lookAt(planeGroup.position);
+        renderer.render(scene, camera);
+        return; 
+    }
+
+    diffLevel = 1 + Math.floor(distanceTraveled / 2000);
+    let vSpeed = vehicleList[currentVid].speedMulti;
+    let takeoffSpeed = 2.8 * vSpeed;
+    let stallSpeed = 2.0 * vSpeed;
+    let maxGaugeSpeed = 10.0 * vSpeed;
+
+    let dynamicTargetSpeed = (baseTargetSpeed + (diffLevel * 0.7) + (pitch * 3.5)) * vSpeed;
+    if (keys.shift) dynamicTargetSpeed += 6.0 * vSpeed; 
+    currentSpeed += (dynamicTargetSpeed - currentSpeed) * 1.2 * delta;
+    currentSpeed = Math.max(0, currentSpeed); 
+
+    if (keys.w) pitch += 2.0 * delta; if (keys.s) pitch -= 2.0 * delta; 
+    if (keys.a) { roll += 3.0 * delta; yaw += 1.5 * delta; }
+    if (keys.d) { roll -= 3.0 * delta; yaw -= 1.5 * delta; }
+    if (!keys.w && !keys.s) pitch += (0 - pitch) * 2 * delta;
+    if (!keys.a && !keys.d) { roll += (0 - roll) * 2 * delta; yaw += (0 - yaw) * 1.0 * delta; }
+
+    pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, pitch));
+    roll = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, roll));
+    yaw = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, yaw)); 
+
+    if (planeGroup.position.y >= MAX_ALTITUDE) {
+        planeGroup.position.y = MAX_ALTITUDE;
+        if (pitch < 0) pitch = 0; 
+    }
+
+    let isStalling = hasTakenOff && currentSpeed < stallSpeed;
+    // ★ 작전 구역 범위 확대 적용 (Wider Range)
+    let isOutOfBoundsWarning = Math.abs(planeGroup.position.x) > 1500;
+    let isOutOfBoundsDeath = Math.abs(planeGroup.position.x) > 2200;
+    
+    const warningEl = document.getElementById('center-warning');
+    let warningMsg = "";
+    if (isStalling && !isGameOver) {
+        warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Nose down or use BOOST!</span>";
+    } else if (isOutOfBoundsWarning && hasTakenOff && !isGameOver) {
+        warningMsg = "⚠️ OUT OF BOUNDS ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Return to center immediately!</span>";
+    } else if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1 && keys.s && currentSpeed < takeoffSpeed && !hasTakenOff) {
+        warningMsg = "⚠️ LOW SPEED ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Reach the WHITE LINE to takeoff!</span>";
+    }
+    if (warningMsg !== "") { warningEl.style.display = 'block'; warningEl.innerHTML = warningMsg; } 
+    else { warningEl.style.display = 'none'; }
+
+    if (isOutOfBoundsDeath && hasTakenOff && !isGameOver) {
+        triggerGameOver("System Failure: Aircraft destroyed for leaving mission area."); return;
+    }
+
+    if (planeGroup.position.y >= MAX_ALTITUDE) document.getElementById('altitude-warning').style.display = 'block';
+    else document.getElementById('altitude-warning').style.display = 'none';
+
+    if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
+        if (hasTakenOff && !isGameOver) { triggerGameOver("Fatal Crash: Ground impact!"); return; }
+        planeGroup.position.y = FLOOR_HEIGHT; roll = 0; if (pitch > 0) pitch = 0; 
+        if (keys.s && currentSpeed >= takeoffSpeed) {
+            hasTakenOff = true; document.getElementById('takeoff-guide').style.display = 'none';
         }
-        function createCastle() {
-            const g = new THREE.Group();
-            const base = new THREE.Mesh(new THREE.BoxGeometry(40, 30, 40), mats.castle); base.position.y = 15; g.add(base);
-            [[20, 20], [20, -20], [-20, 20], [-20, -20]].forEach(p => {
-                const tower = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 50, 6), mats.castle); tower.position.set(p[0], 25, p[1]); g.add(tower);
-                const roof = new THREE.Mesh(new THREE.ConeGeometry(8, 20, 6), mats.castleRoof); roof.position.set(p[0], 60, p[1]); g.add(roof);
-            });
-            return g;
-        }
-        function createBuilding() {
-            const g = new THREE.Group();
-            const h = 30 + Math.random() * 50, w = 20 + Math.random() * 20;
-            const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), mats.building); base.position.y = h / 2; g.add(base);
-            if (Math.random() > 0.3) {
-                const roof = new THREE.Mesh(new THREE.ConeGeometry(w * 0.8, 20, 4), mats.buildingRoof);
-                roof.position.y = h + 10; roof.rotation.y = Math.PI / 4; g.add(roof);
+    }
+
+    if (isStalling && !isGameOver) {
+        planeGroup.position.y -= (stallSpeed - currentSpeed) * 15 * delta;
+        pitch = Math.min(pitch + 1.5 * delta, 0.3); 
+    }
+
+    let fillPct = Math.min(100, (currentSpeed / maxGaugeSpeed) * 100);
+    document.getElementById('speed-fill').style.height = fillPct + '%';
+    document.getElementById('speed-value').innerText = Math.floor(currentSpeed * 40);
+    document.querySelector('.stall-zone').style.height = ((stallSpeed / maxGaugeSpeed) * 100) + '%';
+    document.querySelector('.takeoff-line').style.bottom = ((takeoffSpeed / maxGaugeSpeed) * 100) + '%';
+
+    planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
+    planeGroup.translateZ(currentSpeed);
+    
+    if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Aircraft Stalled: Ground collision!"); return; }
+    if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
+
+    // Collision Detection
+    if (hasTakenOff && !isGameOver) {
+        let isHit = false;
+        let crashReason = "";
+        const planeBox = new THREE.Box3().setFromObject(planeGroup);
+        planeBox.expandByScalar(-1.5); 
+
+        if(themes[currentTheme].name !== "Leviathan Deep") {
+            for (let obs of groundObstacles) {
+                if (obs.visible && Math.abs(obs.position.x - planeGroup.position.x) < 400 && Math.abs(obs.position.z - planeGroup.position.z) < 400) {
+                    const obsBox = new THREE.Box3().setFromObject(obs);
+                    const size = new THREE.Vector3(); obsBox.getSize(size);
+                    obsBox.expandByVector(new THREE.Vector3(-size.x * 0.35, -size.y * 0.1, -size.z * 0.35)); 
+                    if (planeBox.intersectsBox(obsBox)) { 
+                        isHit = true; crashReason = "Obstacle collision detected!"; break; 
+                    }
+                }
             }
-            return g;
         }
+        if (!isHit) {
+            for (let h of skyHazards) {
+                if (!h.visible) continue;
+                let hitRadius = (h.type === 'balloon' ? 18 : 6) * h.scale.x; 
+                const hazardSphere = new THREE.Sphere(h.position, hitRadius);
+                if (planeBox.intersectsSphere(hazardSphere)) { 
+                    isHit = true; crashReason = h.type === 'rocket' ? "Intercepted by enemy missile!" : "Mid-air collision!"; break; 
+                }
+            }
+            if(!isHit && themes[currentTheme].name === "Leviathan Deep") {
+                for (let h of oceanLeviathans) {
+                    if(h.visible && planeBox.intersectsSphere(new THREE.Sphere(h.position, 35 * h.scale.x))) { 
+                        isHit = true; crashReason = "Consumed by the Leviathan!"; break;
+                    }
+                }
+            }
+        }
+        if (isHit) { triggerGameOver(crashReason); return; }
+    }
 
-        const groundObstacles = [];
-        for (let i = 0; i < 150; i++) groundObstacles.push(createTree());
-        for (let i = 0; i < 80; i++) groundObstacles.push(createBuilding());
-        for (let i = 0; i < 80; i++) groundObstacles.push(createMountain());
-        for (let i = 0; i < 20; i++) groundObstacles.push(createCastle());
+    camera.position.lerp(new THREE.Vector3(0, 15, -45).applyMatrix4(planeGroup.matrixWorld).add(new THREE.Vector3((keys.shift? (Math.random()-0.5)*0.8 : 0), (keys.shift? (Math.random()-0.5)*0.8 : 0), 0)), 0.1);
+    camera.lookAt(planeGroup.position);
+
+    // Effects
+    if (currentSpeed > 0.5 && vehicleList[currentVid].id !== 'heli') { 
+        for(let i=0; i<(keys.shift?3:1); i++) {
+            const flame = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), keys.shift ? flameMatBoost.clone() : flameMatNormal.clone());
+            flame.position.copy(new THREE.Vector3(0, 0, -10).applyMatrix4(planeGroup.matrixWorld));
+            scene.add(flame); particles.push({ mesh: flame, life: 1.0 });
+        }
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]; p.life -= delta * 2.5;
+        if (p.life <= 0) { scene.remove(p.mesh); particles.splice(i, 1); } 
+        else { p.mesh.scale.setScalar(p.life); p.mesh.position.y += delta * 6; p.mesh.material.opacity = p.life; }
+    }
+
+    if (keys.shift && hasTakenOff) {
+        speedLines.forEach(line => {
+            if (!line.active && Math.random() < 0.15) {
+                line.mesh.position.copy(planeGroup.position).add(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion).multiplyScalar(200)).add(new THREE.Vector3((Math.random()-0.5)*400, (Math.random()-0.5)*400, 0).applyQuaternion(planeGroup.quaternion));
+                line.mesh.quaternion.copy(planeGroup.quaternion); line.active = true;
+            }
+            if (line.active) {
+                line.mesh.translateZ(-currentSpeed * 6);
+                if (line.mesh.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -50) line.active = false;
+            }
+        });
+    }
+
+    if (audioCtx && audioCtx.state === 'running') {
+        engineOsc.frequency.setTargetAtTime((vehicleList[currentVid].id==='heli' ? 20 : 40) + (currentSpeed * 8) + (keys.shift?50:0), audioCtx.currentTime, 0.1);
+        let vol = (hasTakenOff ? 0.3 : 0.1);
+        if(isStalling || planeGroup.position.y >= MAX_ALTITUDE || isOutOfBoundsWarning) vol = 0.5 + Math.sin(clock.elapsedTime * 20) * 0.3;
+        engineGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
+    }
+
+    // ★ 넓어진 스폰 폭 적용
+    const spawnWidth = Math.max(1500, 5000 - (diffLevel * 400)); 
+
+    distanceTraveled += currentSpeed;
+    currentTheme = Math.floor(distanceTraveled / 15000) % themes.length;
+    if (currentTheme !== previousTheme) {
+        if (themes[currentTheme].name === "Leviathan Deep" && hasTakenOff) {
+            oceanLeviathans.forEach((h, idx) => setTimeout(() => { if(!isGameOver && hasTakenOff) resetOceanLeviathan(h, planeGroup.position, planeGroup.quaternion); }, idx * 800));
+        }
+        previousTheme = currentTheme;
+    }
+
+    if(themes[currentTheme].name === "Leviathan Deep") {
+        groundObstacles.forEach(obs => obs.visible = false);
+        oceanLeviathans.forEach(h => {
+            if(!h.visible && Math.random() < 0.015 && hasTakenOff) resetOceanLeviathan(h, planeGroup.position, planeGroup.quaternion);
+            if(h.visible) { h.translateZ(h.speed * delta * 60); h.rotateX(-0.15 * delta); if(h.position.y < -600) h.visible = false; }
+        });
+    } else {
         groundObstacles.forEach(obs => {
-            scene.add(obs);
-            repositionGroundObstacle(obs, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(), 2000);
+            obs.visible = true;
+            if (obs.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, spawnWidth);
         });
+        oceanLeviathans.forEach(h => h.visible = false);
+    }
 
-        function repositionGroundObstacle(obs, pPos, pQuat, spawnWidth) {
-            const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
-            let x, z;
-            do {
-                const forwardOffset = 800 + Math.random() * 2200;
-                const rightOffset = (Math.random() - 0.5) * spawnWidth;
-                const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
-                x = newPos.x; z = newPos.z;
-            } while (Math.abs(x) < 100 && z > -200 && z < 2000);
-
-            obs.position.set(x, 0, z);
-            if (Math.random() < 0.08) {
-                const giantScale = 3 + Math.random() * 3;
-                obs.scale.set(giantScale, giantScale * 1.2, giantScale);
-            } else {
-                obs.scale.set(1, 1, 1);
+    if (hasTakenOff) {
+        skyHazards.forEach(h => {
+            if (!h.visible) h.visible = true;
+            if (h.type === 'rocket' && diffLevel >= 3) {
+                const dummy = h.clone(); dummy.lookAt(planeGroup.position); h.quaternion.slerp(dummy.quaternion, delta * 3.0); 
             }
-        }
-
-        // ─── 5. 하늘 장애물 생성 ───
-        const skyHazards = [];
-        function createEnemyPlane() {
-            const g = new THREE.Group(); const mat = new THREE.MeshLambertMaterial({ color: 0xaa2222 });
-            g.add(new THREE.Mesh(new THREE.BoxGeometry(3, 3, 15), mat));
-            const wing = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 4), mat); wing.position.set(0, 0, 2); g.add(wing);
-            const tail = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 3), mat); tail.position.set(0, 2, -6); g.add(tail);
-            g.type = 'plane'; return g;
-        }
-        function createRocket() {
-            const g = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 10, 8), new THREE.MeshLambertMaterial({ color: 0x444444 }));
-            body.rotation.x = Math.PI / 2; g.add(body);
-            const head = new THREE.Mesh(new THREE.ConeGeometry(1.5, 4, 8), new THREE.MeshLambertMaterial({ color: 0xffaa00 }));
-            head.rotation.x = Math.PI / 2; head.position.z = 7; g.add(head);
-            const flame = new THREE.Mesh(new THREE.ConeGeometry(1, 6, 4), new THREE.MeshBasicMaterial({ color: 0xff5500 }));
-            flame.rotation.x = -Math.PI / 2; flame.position.z = -8; g.add(flame);
-            g.type = 'rocket'; return g;
-        }
-        function createBalloon() {
-            const g = new THREE.Group();
-            const balloon = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 2), mats.balloon);
-            balloon.position.y = 25; g.add(balloon);
-            const basket = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), mats.treeTrunk);
-            g.add(basket);
-            for (let i = 0; i < 4; i++) {
-                const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 15), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                rope.position.set(i % 2 === 0 ? 4 : -4, 10, i < 2 ? 4 : -4);
-                g.add(rope);
-            }
-            g.type = 'balloon'; return g;
-        }
-
-        for (let i = 0; i < 10; i++) { const h = createEnemyPlane(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
-        for (let i = 0; i < 6; i++) { const h = createRocket(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
-        for (let i = 0; i < 12; i++) { const h = createBalloon(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
-
-        function resetSkyHazard(h, pPos, pQuat) {
-            const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
-            const spawnDist = 2000 + Math.random() * 3000;
-
-            if (h.type === 'plane') {
-                h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 2000));
-                h.position.y = 50 + Math.random() * 800;
-                h.lookAt(pPos.clone().add(new THREE.Vector3((Math.random() - 0.5) * 1000, (Math.random() - 0.5) * 200, 0)));
-                h.speed = 10 + Math.random() * 8;
-            } else if (h.type === 'rocket') {
-                if (Math.random() > 0.4) {
-                    h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist * 0.6)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 1000));
-                    h.position.y = -10;
-                    h.lookAt(pPos.x, pPos.y + 300 + Math.random() * 400, pPos.z);
-                    h.speed = 14 + Math.random() * 10;
-                } else {
-                    h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 800));
-                    h.position.y = pPos.y + (Math.random() - 0.5) * 300;
-                    h.lookAt(pPos);
-                    h.speed = 18 + Math.random() * 12;
-                }
-            } else if (h.type === 'balloon') {
-                h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 2500));
-                h.position.y = 100 + Math.random() * 1000;
-                h.lookAt(pPos);
-                h.speed = 0.5 + Math.random() * 1.5;
-                if (Math.random() < 0.1) h.scale.set(3, 3, 3);
-                else h.scale.set(1, 1, 1);
-            }
-        }
-
-        // ─── 6. 바다 괴물(Ocean Leviathan) ───
-        const oceanLeviathans = [];
-        function createOceanLeviathan() {
-            const g = new THREE.Group();
-            const bodyMat = mats.oceanLeviathan;
-            const body = new THREE.Mesh(new THREE.ConeGeometry(30, 150, 6), bodyMat);
-            body.rotation.x = Math.PI / 2; g.add(body);
-            const tailMat = new THREE.MeshLambertMaterial({ color: 0xcc0044 });
-            const tail = new THREE.Mesh(new THREE.ConeGeometry(15, 60, 3), tailMat);
-            tail.rotation.x = Math.PI / 2; tail.position.z = -100; g.add(tail);
-            const fin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 30, 40), tailMat);
-            fin.position.set(0, 15, 0); g.add(fin);
-
-            const eyeMat = new THREE.MeshLambertMaterial({ color: 0xff4444, emissive: 0xff0000 });
-            const eye1 = new THREE.Mesh(new THREE.SphereGeometry(3, 8, 8), eyeMat);
-            eye1.position.set(15, 10, 60); g.add(eye1);
-            const eye2 = eye1.clone(); eye2.position.x = -15; g.add(eye2);
-
-            const mouth = new THREE.Mesh(new THREE.BoxGeometry(40, 40, 30), new THREE.MeshLambertMaterial({ color: 0x000000 }));
-            mouth.position.z = 70; g.add(mouth);
-            g.type = 'leviathan'; return g;
-        }
-
-        for (let i = 0; i < 3; i++) {
-            const h = createOceanLeviathan(); h.visible = false;
-            scene.add(h); oceanLeviathans.push(h);
-        }
-
-        function resetOceanLeviathan(h, pPos, pQuat) {
-            const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
-            const spawnDist = 3000 + Math.random() * 1500;
-
-            h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 800));
-            h.position.y = -300;
-
-            const targetPos = pPos.clone().add(new THREE.Vector3(0, 1500 + Math.random() * 1000, 0));
-            h.lookAt(targetPos);
-
-            h.speed = 3.5 + Math.random() * 2.5;
-            const s = 4 + Math.random() * 4;
-            h.scale.set(s, s, s);
-            h.visible = true;
-        }
-
-        const clouds = [];
-        const cloudGeo = new THREE.IcosahedronGeometry(1, 0);
-        const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
-        for (let i = 0; i < 30; i++) {
-            const c = new THREE.Group();
-            for (let j = 0; j < 4; j++) {
-                const puff = new THREE.Mesh(cloudGeo, cloudMat);
-                puff.position.set(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20);
-                puff.scale.setScalar(20 + Math.random() * 40); c.add(puff);
-            }
-            c.position.set((Math.random() - 0.5) * 6000, 300 + Math.random() * 700, (Math.random() - 0.5) * 6000);
-            scene.add(c); clouds.push(c);
-        }
-
-        // ─── 7. 기체(Vehicles) ───
-        const planeGroup = new THREE.Group(); scene.add(planeGroup);
-        let activeRotors = [];
-
-        const vehicleList = [
-            { id: 'light', name: 'Light Aircraft', desc: 'Standard and stable aircraft.', speedMulti: 1.0 },
-            { id: 'vintage', name: 'Vintage Prop', desc: 'Classic style with high agility.', speedMulti: 1.2 },
-            { id: 'modern', name: 'Stealth Fighter', desc: 'Extreme acceleration! Difficult to control.', speedMulti: 1.5 },
-            { id: 'heli', name: 'Helicopter', desc: 'Low takeoff and stall speed. Easy to fly.', speedMulti: 0.8 }
-        ];
-        let currentVid = 0;
-
-        function buildVehicle(index) {
-            while (planeGroup.children.length > 0) planeGroup.remove(planeGroup.children[0]);
-            activeRotors = [];
-
-            const vType = vehicleList[index].id;
-            const wheelGeo = new THREE.CylinderGeometry(0.8, 0.8, 1, 10);
-            const wheelMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
-            const strutMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
-
-            function addWheel(x, y, z) {
-                const wGroup = new THREE.Group();
-                const w = new THREE.Mesh(wheelGeo, wheelMat); w.rotation.z = Math.PI / 2; wGroup.add(w);
-                const strut = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.5, 0.4), strutMat); strut.position.set(0, 1.2, 0); wGroup.add(strut);
-                wGroup.position.set(x, y, z); planeGroup.add(wGroup);
-            }
-
-            if (vType === 'light') {
-                const bodyMat = new THREE.MeshLambertMaterial({ color: 0xeeeeee }), darkMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
-                planeGroup.add(new THREE.Mesh(new THREE.BoxGeometry(4, 4, 20), bodyMat));
-                const nose = new THREE.Mesh(new THREE.ConeGeometry(2.5, 8, 4), darkMat); nose.rotation.x = Math.PI / 2; nose.position.set(0, 0, 14); planeGroup.add(nose);
-                const wing = new THREE.Mesh(new THREE.BoxGeometry(30, 0.5, 6), bodyMat); wing.position.set(0, 2, 2); planeGroup.add(wing);
-                const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 5), darkMat); tailFin.position.set(0, 3, -8); planeGroup.add(tailFin);
-                const tailWing = new THREE.Mesh(new THREE.BoxGeometry(12, 0.5, 4), bodyMat); tailWing.position.set(0, 0, -8); planeGroup.add(tailWing);
-
-                const prop = new THREE.Mesh(new THREE.BoxGeometry(12, 0.5, 0.5), new THREE.MeshBasicMaterial({ color: 0x111111 })); prop.position.set(0, 0, 18); planeGroup.add(prop);
-                activeRotors.push({ mesh: prop, axis: 'z', speed: 20 });
-                addWheel(0, -3.5, 10); addWheel(4, -3.5, -2); addWheel(-4, -3.5, -2);
-            }
-            else if (vType === 'vintage') {
-                const camoMat = new THREE.MeshLambertMaterial({ color: 0x4a5d23 });
-                const body = new THREE.Mesh(new THREE.CylinderGeometry(3, 2, 20, 8), camoMat); body.rotation.x = Math.PI / 2; planeGroup.add(body);
-                const cockpit = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 5), new THREE.MeshLambertMaterial({ color: 0x88ccff })); cockpit.position.set(0, 2.5, 0); planeGroup.add(cockpit);
-                const wing = new THREE.Mesh(new THREE.BoxGeometry(26, 0.5, 5), camoMat); wing.position.set(0, -1, 4); planeGroup.add(wing);
-                const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), camoMat); tailFin.position.set(0, 2, -9); planeGroup.add(tailFin);
-                const tailWing = new THREE.Mesh(new THREE.BoxGeometry(10, 0.5, 3), camoMat); tailWing.position.set(0, 0, -9); planeGroup.add(tailWing);
-
-                const prop = new THREE.Mesh(new THREE.BoxGeometry(14, 0.8, 0.5), new THREE.MeshBasicMaterial({ color: 0xdddddd })); prop.position.set(0, 0, 10.5); planeGroup.add(prop);
-                activeRotors.push({ mesh: prop, axis: 'z', speed: 25 });
-                addWheel(3.5, -3.5, 6); addWheel(-3.5, -3.5, 6); addWheel(0, -2.5, -8);
-            }
-            else if (vType === 'modern') {
-                const stealthMat = new THREE.MeshLambertMaterial({ color: 0x333344 });
-                const body = new THREE.Mesh(new THREE.BoxGeometry(4, 2.5, 22), stealthMat); planeGroup.add(body);
-                const nose = new THREE.Mesh(new THREE.ConeGeometry(2, 12, 4), stealthMat); nose.rotation.x = Math.PI / 2; nose.position.set(0, 0, 17); planeGroup.add(nose);
-                const wing = new THREE.Mesh(new THREE.CylinderGeometry(15, 0.1, 0.5, 3), stealthMat); wing.position.set(0, 0, -2); wing.scale.set(1, 1, 0.5); planeGroup.add(wing);
-                const tail1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), stealthMat); tail1.position.set(2, 2.5, -9); tail1.rotation.z = -0.3; planeGroup.add(tail1);
-                const tail2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 4), stealthMat); tail2.position.set(-2, 2.5, -9); tail2.rotation.z = 0.3; planeGroup.add(tail2);
-                addWheel(0, -3.5, 12); addWheel(3, -3.5, -2); addWheel(-3, -3.5, -2);
-            }
-            else if (vType === 'heli') {
-                const heliMat = new THREE.MeshLambertMaterial({ color: 0x224488 }), windowMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
-                const body = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 10), heliMat); planeGroup.add(body);
-                const nose = new THREE.Mesh(new THREE.BoxGeometry(5.8, 5.8, 4), windowMat); nose.position.set(0, 0, 7); planeGroup.add(nose);
-                const tail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 15), heliMat); tail.position.set(0, 1, -12); planeGroup.add(tail);
-                const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 5, 2), heliMat); tailFin.position.set(0, 2.5, -19); planeGroup.add(tailFin);
-
-                const rotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2, 8), heliMat); rotorHub.position.set(0, 4, 0); planeGroup.add(rotorHub);
-                const mainRotor = new THREE.Mesh(new THREE.BoxGeometry(30, 0.2, 2), new THREE.MeshBasicMaterial({ color: 0x111111 })); mainRotor.position.set(0, 5, 0); planeGroup.add(mainRotor);
-                activeRotors.push({ mesh: mainRotor, axis: 'y', speed: 20 });
-                const tailRotor = new THREE.Mesh(new THREE.BoxGeometry(0.2, 6, 1), new THREE.MeshBasicMaterial({ color: 0x111111 })); tailRotor.position.set(1, 2.5, -19); planeGroup.add(tailRotor);
-                activeRotors.push({ mesh: tailRotor, axis: 'x', speed: 25 });
-
-                const skidGeo = new THREE.BoxGeometry(0.4, 0.4, 14), skidMat = new THREE.MeshLambertMaterial({ color: 0x777777 });
-                const skid1 = new THREE.Mesh(skidGeo, skidMat); skid1.position.set(3, -3.5, 2); planeGroup.add(skid1);
-                const skid2 = new THREE.Mesh(skidGeo, skidMat); skid2.position.set(-3, -3.5, 2); planeGroup.add(skid2);
-                [[3, 5], [3, -1], [-3, 5], [-3, -1]].forEach(pos => {
-                    const s = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2, 0.4), skidMat); s.position.set(pos[0], -2.5, pos[1]); planeGroup.add(s);
-                });
-            }
-
-            document.getElementById('vehicle-name').innerText = vehicleList[index].name;
-            document.getElementById('vehicle-desc').innerText = vehicleList[index].desc;
-        }
-
-        function changeVehicle(dir) {
-            currentVid += dir;
-            if (currentVid < 0) currentVid = vehicleList.length - 1;
-            if (currentVid >= vehicleList.length) currentVid = 0;
-            buildVehicle(currentVid);
-        }
-
-        // ─── 8. 게임 상태, 물리, 오디오 ───
-        let isEngineOn = false, hasTakenOff = false, isGameOver = false;
-        let currentSpeed = 0, baseTargetSpeed = 4.5;
-        let pitch = 0, roll = 0, yaw = 0;
-        let diffLevel = 1, distanceTraveled = 0;
-        const keys = { w: false, a: false, s: false, d: false, shift: false };
-        const FLOOR_HEIGHT = 4.0;
-        const MAX_ALTITUDE = 600.0;
-
-        let audioCtx, engineOsc, engineGain;
-
-        window.addEventListener('keydown', e => {
-            const k = e.key.toLowerCase();
-            if (k === 'w') keys.w = true; if (k === 's') keys.s = true; if (k === 'a') keys.a = true; if (k === 'd') keys.d = true; if (e.key === 'Shift') keys.shift = true;
+            h.translateZ((h.speed + (diffLevel*0.5)) * delta * 60); 
+            if (h.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
         });
-        window.addEventListener('keyup', e => {
-            const k = e.key.toLowerCase();
-            if (k === 'w') keys.w = false; if (k === 's') keys.s = false; if (k === 'a') keys.a = false; if (k === 'd') keys.d = false; if (e.key === 'Shift') keys.shift = false;
-        });
+    } else { skyHazards.forEach(h => h.visible = false); }
 
-        function startGame() {
-            document.getElementById('hangar-screen').style.display = 'none';
-            document.getElementById('stats-panel').style.display = 'block';
-            document.querySelectorAll('.ingame-ui').forEach(el => el.style.display = 'flex');
-            document.getElementById('takeoff-guide').style.display = 'block';
-
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                engineOsc = audioCtx.createOscillator(); engineOsc.type = 'sawtooth'; engineOsc.frequency.value = 30;
-                engineGain = audioCtx.createGain(); engineGain.gain.value = 0.0;
-                engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination); engineOsc.start();
-            }
-            isEngineOn = true;
-            resetPlayer();
+    clouds.forEach(c => {
+        if (c.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -500) {
+            c.position.copy(planeGroup.position).add(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion).multiplyScalar(4000)).add(new THREE.Vector3((Math.random()-0.5)*8000, 300+Math.random()*700, 0).applyQuaternion(planeGroup.quaternion));
         }
-
-        function returnToHangar() {
-            isEngineOn = false;
-            document.getElementById('game-over-screen').style.display = 'none';
-            document.getElementById('hangar-screen').style.display = 'flex';
-            document.getElementById('stats-panel').style.display = 'none';
-            document.getElementById('center-warning').style.display = 'none';
-            document.getElementById('altitude-warning').style.display = 'none';
-            document.querySelectorAll('.ingame-ui').forEach(el => el.style.display = 'none');
-
-            if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
-
-            planeGroup.position.set(0, FLOOR_HEIGHT, 0);
-            pitch = 0; roll = 0; yaw = 0;
-            planeGroup.rotation.set(0, 0, 0);
-            planeGroup.visible = true;
-
-            explosionParticles.forEach(p => scene.remove(p.mesh));
-            explosionParticles.length = 0;
-            oceanLeviathans.forEach(h => h.visible = false);
-        }
-
-        const particles = [];
-        const explosionParticles = [];
-        const flameMatNormal = new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true });
-        const flameMatBoost = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true });
-
-        function triggerGameOver(reasonStr) {
-            if (isGameOver) return;
-            isGameOver = true;
-            planeGroup.visible = false;
-
-            document.getElementById('game-over-title').innerText = "💥 CRASHED!";
-            document.getElementById('game-over-reason').innerText = reasonStr;
-            document.getElementById('center-warning').style.display = 'none';
-            document.getElementById('altitude-warning').style.display = 'none';
-
-            const expColors = [0xff0000, 0xff8800, 0xffff00, 0x555555];
-            for (let i = 0; i < 150; i++) {
-                const p = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial({ color: expColors[Math.floor(Math.random() * expColors.length)] }));
-                p.position.copy(planeGroup.position);
-                scene.add(p);
-                explosionParticles.push({ mesh: p, velocity: new THREE.Vector3((Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80), life: 1.0 });
-            }
-
-            if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
-
-            if (audioCtx) {
-                const expOsc = audioCtx.createOscillator(); expOsc.type = 'square';
-                expOsc.frequency.setValueAtTime(150, audioCtx.currentTime); expOsc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                const expGain = audioCtx.createGain(); expGain.gain.setValueAtTime(1, audioCtx.currentTime); expGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                expOsc.connect(expGain); expGain.connect(audioCtx.destination);
-                expOsc.start(); expOsc.stop(audioCtx.currentTime + 0.6);
-            }
-
-            document.getElementById('final-distance').innerText = Math.floor(distanceTraveled / 10);
-            setTimeout(() => { document.getElementById('game-over-screen').style.display = 'flex'; }, 1000);
-        }
-
-        function resetPlayer() {
-            isGameOver = false; hasTakenOff = false; planeGroup.visible = true;
-            planeGroup.position.set(0, FLOOR_HEIGHT, -100);
-            pitch = 0; roll = 0; yaw = 0; currentSpeed = 0; distanceTraveled = 0;
-
-            explosionParticles.forEach(p => scene.remove(p.mesh)); explosionParticles.length = 0;
-
-            groundObstacles.forEach(obs => repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, 4000));
-            skyHazards.forEach(h => resetSkyHazard(h, planeGroup.position, planeGroup.quaternion));
-            oceanLeviathans.forEach(h => h.visible = false);
-
-            document.getElementById('takeoff-guide').style.display = 'block';
-            document.getElementById('center-warning').style.display = 'none';
-            document.getElementById('altitude-warning').style.display = 'none';
-            if (audioCtx) engineGain.gain.setTargetAtTime(0.1, audioCtx.currentTime, 0.5);
-        }
-
-        const speedLines = [];
-        const lineGeo = new THREE.BoxGeometry(0.2, 0.2, 100);
-        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
-        for (let i = 0; i < 50; i++) {
-            const line = new THREE.Mesh(lineGeo, lineMat); scene.add(line); speedLines.push({ mesh: line, active: false });
-        }
-
-        // ─── 9. 메인 애니메이션 루프 ───
-        buildVehicle(0);
-        planeGroup.position.set(0, FLOOR_HEIGHT, 0);
-        const clock = new THREE.Clock();
-        const colorHelper = new THREE.Color();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = clock.getDelta();
-
-            activeRotors.forEach(r => {
-                if (r.axis === 'x') r.mesh.rotation.x += r.speed * delta;
-                if (r.axis === 'y') r.mesh.rotation.y += r.speed * delta;
-                if (r.axis === 'z') r.mesh.rotation.z += r.speed * delta;
-            });
-
-            if (!isEngineOn) {
-                planeGroup.rotation.y += 0.5 * delta;
-                camera.position.lerp(new THREE.Vector3(20, 15, -30), 0.1);
-                camera.lookAt(new THREE.Vector3(0, 5, 0));
-                renderer.render(scene, camera);
-                return;
-            }
-
-            if (isGameOver) {
-                for (let i = explosionParticles.length - 1; i >= 0; i--) {
-                    const p = explosionParticles[i]; p.mesh.position.addScaledVector(p.velocity, delta); p.life -= delta * 0.8; p.mesh.scale.setScalar(p.life);
-                    if (p.life <= 0) { scene.remove(p.mesh); explosionParticles.splice(i, 1); }
-                }
-                camera.lookAt(planeGroup.position);
-                renderer.render(scene, camera);
-                return;
-            }
-
-            diffLevel = 1 + Math.floor(distanceTraveled / 2000);
-            let vSpeed = vehicleList[currentVid].speedMulti;
-
-            let takeoffSpeed = 2.8 * vSpeed;
-            let stallSpeed = 2.0 * vSpeed;
-            let maxGaugeSpeed = 10.0 * vSpeed;
-
-            let pitchEffect = pitch * 3.5;
-            let dynamicTargetSpeed = (baseTargetSpeed + (diffLevel * 0.7) + pitchEffect) * vSpeed;
-            if (keys.shift) dynamicTargetSpeed += 6.0 * vSpeed;
-
-            currentSpeed += (dynamicTargetSpeed - currentSpeed) * 1.2 * delta;
-            currentSpeed = Math.max(0, currentSpeed);
-
-            if (keys.w) pitch += 2.0 * delta; if (keys.s) pitch -= 2.0 * delta;
-            if (keys.a) { roll += 3.0 * delta; yaw += 1.5 * delta; }
-            if (keys.d) { roll -= 3.0 * delta; yaw -= 1.5 * delta; }
-
-            if (!keys.w && !keys.s) pitch += (0 - pitch) * 2 * delta;
-            if (!keys.a && !keys.d) {
-                roll += (0 - roll) * 2 * delta;
-                yaw += (0 - yaw) * 1.0 * delta;
-            }
-
-            pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch));
-            roll = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, roll));
-            yaw = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, yaw));
-
-            if (planeGroup.position.y >= MAX_ALTITUDE) {
-                planeGroup.position.y = MAX_ALTITUDE;
-                if (pitch < 0) pitch = 0;
-                document.getElementById('altitude-warning').style.display = 'block';
-            } else {
-                document.getElementById('altitude-warning').style.display = 'none';
-            }
-
-            let isStalling = hasTakenOff && currentSpeed < stallSpeed;
-            let isOutOfBoundsWarning = Math.abs(planeGroup.position.x) > 800;
-            let isOutOfBoundsDeath = Math.abs(planeGroup.position.x) > 1200;
-            const warningEl = document.getElementById('center-warning');
-
-            let warningMsg = "";
-            if (isStalling && !isGameOver) {
-                warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Pitch down to accelerate or use BOOST!</span>";
-            } else if (isOutOfBoundsWarning && hasTakenOff && !isGameOver) {
-                warningMsg = "⚠️ OUT OF BOUNDS ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Return to center or be terminated!</span>";
-            } else if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1 && keys.s && currentSpeed < takeoffSpeed && !hasTakenOff) {
-                warningMsg = "⚠️ LOW SPEED ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Accelerate past the white line!</span>";
-            }
-
-            if (warningMsg !== "") {
-                warningEl.style.display = 'block'; warningEl.innerHTML = warningMsg;
-            } else {
-                warningEl.style.display = 'none';
-            }
-
-            if (isOutOfBoundsDeath && hasTakenOff && !isGameOver) {
-                triggerGameOver("Executed by the system for unauthorized zone departure!"); return;
-            }
-
-            if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
-                if (hasTakenOff && !isGameOver) { triggerGameOver("Crashed into the ground!"); return; }
-                planeGroup.position.y = FLOOR_HEIGHT; roll = 0; if (pitch > 0) pitch = 0;
-                if (keys.s && currentSpeed >= takeoffSpeed) {
-                    hasTakenOff = true; document.getElementById('takeoff-guide').style.display = 'none'; warningEl.style.display = 'none';
-                }
-            }
-
-            if (isStalling && !isGameOver) {
-                planeGroup.position.y -= (stallSpeed - currentSpeed) * 15 * delta;
-                pitch = Math.min(pitch + 1.5 * delta, 0.3);
-            }
-
-            let fillPct = Math.min(100, (currentSpeed / maxGaugeSpeed) * 100);
-            document.getElementById('speed-fill').style.height = fillPct + '%';
-            document.getElementById('speed-value').innerText = Math.floor(currentSpeed * 40);
-            document.querySelector('.stall-zone').style.height = ((stallSpeed / maxGaugeSpeed) * 100) + '%';
-            document.querySelector('.takeoff-line').style.bottom = ((takeoffSpeed / maxGaugeSpeed) * 100) + '%';
-
-            planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
-            planeGroup.translateZ(currentSpeed);
-
-            if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Stalled and crashed into the ground!"); return; }
-            if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("Runway Overrun! Failed to reach takeoff speed."); return; }
-
-            // ── ★ 정밀한 충돌 판정 (Hitbox Optimization) ★ ──
-            if (hasTakenOff && !isGameOver) {
-                let isHit = false;
-                let crashReason = "";
-
-                const planeBox = new THREE.Box3().setFromObject(planeGroup);
-                planeBox.expandByScalar(-1.5);
-
-                // 1. 지상 장애물 충돌
-                if (themes[currentTheme].name !== "Leviathan Deep") {
-                    for (let obs of groundObstacles) {
-                        if (obs.visible && Math.abs(obs.position.x - planeGroup.position.x) < 300 && Math.abs(obs.position.z - planeGroup.position.z) < 300) {
-                            const obsBox = new THREE.Box3().setFromObject(obs);
-
-                            // ★ 억울한 충돌 방지: 산/나무 형태의 텅 빈 박스 모서리를 35%씩 크게 깎아냅니다.
-                            const size = new THREE.Vector3();
-                            obsBox.getSize(size);
-                            obsBox.expandByVector(new THREE.Vector3(-size.x * 0.35, -size.y * 0.1, -size.z * 0.35));
-
-                            if (planeBox.intersectsBox(obsBox)) {
-                                isHit = true;
-                                crashReason = obs.scale.y > 2 ? "Collided with a giant mutated obstacle!" : "Collided with a ground obstacle!";
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // 2. 하늘 장애물 & 레비아탄 충돌 (구형 정밀 판정 적용)
-                if (!isHit) {
-                    for (let h of skyHazards) {
-                        if (!h.visible) continue;
-                        // 기체 크기에 비례한 구형 판정 박스 생성
-                        let hitRadius = (h.type === 'balloon' ? 18 : 6) * h.scale.x;
-                        const hazardSphere = new THREE.Sphere(h.position, hitRadius);
-
-                        if (planeBox.intersectsSphere(hazardSphere)) {
-                            isHit = true;
-                            if (h.type === 'rocket') crashReason = "Shot down by an enemy missile!";
-                            else if (h.type === 'balloon') crashReason = "Collided with a no-fly zone balloon!";
-                            else crashReason = "Collision with an enemy craft!";
-                            break;
-                        }
-                    }
-                    if (!isHit && themes[currentTheme].name === "Leviathan Deep") {
-                        for (let h of oceanLeviathans) {
-                            if (h.visible) {
-                                const leviSphere = new THREE.Sphere(h.position, 35 * h.scale.x);
-                                if (planeBox.intersectsSphere(leviSphere)) {
-                                    isHit = true; crashReason = "Devoured by the Ocean Leviathan!"; break;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (isHit) { triggerGameOver(crashReason); return; }
-            }
-
-            const relativeOffset = new THREE.Vector3(0, 15, -45);
-            const cameraTarget = relativeOffset.applyMatrix4(planeGroup.matrixWorld);
-            if (keys.shift && hasTakenOff) {
-                const shake = 0.8; cameraTarget.x += (Math.random() - 0.5) * shake; cameraTarget.y += (Math.random() - 0.5) * shake;
-            }
-            camera.position.lerp(cameraTarget, 0.1); camera.lookAt(planeGroup.position);
-
-            if (currentSpeed > 0.5 && vehicleList[currentVid].id !== 'heli') {
-                for (let i = 0; i < (keys.shift ? 3 : 1); i++) {
-                    const flame = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), keys.shift ? flameMatBoost.clone() : flameMatNormal.clone());
-                    flame.position.copy(new THREE.Vector3(0, 0, -10).applyMatrix4(planeGroup.matrixWorld));
-                    scene.add(flame); particles.push({ mesh: flame, life: 1.0 });
-                }
-            }
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i]; p.life -= delta * 2.5;
-                if (p.life <= 0) { scene.remove(p.mesh); particles.splice(i, 1); }
-                else { p.mesh.scale.setScalar(p.life); p.mesh.position.y += delta * 6; p.mesh.material.opacity = p.life; }
-            }
-
-            if (keys.shift && hasTakenOff) {
-                speedLines.forEach(line => {
-                    if (!line.active && Math.random() < 0.15) {
-                        const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion);
-                        const rgt = new THREE.Vector3(1, 0, 0).applyQuaternion(planeGroup.quaternion);
-                        const up = new THREE.Vector3(0, 1, 0).applyQuaternion(planeGroup.quaternion);
-                        line.mesh.position.copy(planeGroup.position).add(fwd.clone().multiplyScalar(200)).add(rgt.clone().multiplyScalar((Math.random() - 0.5) * 200)).add(up.clone().multiplyScalar((Math.random() - 0.5) * 200));
-                        line.mesh.quaternion.copy(planeGroup.quaternion); line.active = true;
-                    }
-                    if (line.active) {
-                        line.mesh.translateZ(-currentSpeed * 6);
-                        if (line.mesh.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion)) < -50) line.active = false;
-                    }
-                });
-            } else { speedLines.forEach(line => { line.mesh.position.y = -1000; line.active = false; }); }
-
-            if (audioCtx && audioCtx.state === 'running') {
-                let targetFreq = (vehicleList[currentVid].id === 'heli' ? 20 : 40) + (currentSpeed * 8);
-                if (keys.shift) targetFreq += 50;
-                engineOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
-
-                let targetVol = 0.1;
-                if (hasTakenOff) targetVol = 0.3;
-                if (isStalling || planeGroup.position.y >= MAX_ALTITUDE || isOutOfBoundsWarning) {
-                    targetVol = 0.5 + Math.sin(clock.elapsedTime * 20) * 0.3;
-                }
-                engineGain.gain.setTargetAtTime(targetVol, audioCtx.currentTime, 0.1);
-            }
-
-            const forwardVec = new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion);
-            const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(planeGroup.quaternion);
-            const spawnWidth = Math.max(800, 4000 - (diffLevel * 600));
-
-            distanceTraveled += currentSpeed;
-            const biomeLength = 15000;
-            currentTheme = Math.floor(distanceTraveled / biomeLength) % themes.length;
-
-            if (currentTheme !== previousTheme) {
-                if (themes[currentTheme].name === "Leviathan Deep") {
-                    oceanLeviathans.forEach((h, idx) => {
-                        setTimeout(() => {
-                            if (!isGameOver && isEngineOn) {
-                                resetOceanLeviathan(h, planeGroup.position, planeGroup.quaternion);
-                            }
-                        }, idx * 800);
-                    });
-                }
-                previousTheme = currentTheme;
-            }
-
-            if (themes[currentTheme].name === "Leviathan Deep") {
-                groundObstacles.forEach(obs => obs.visible = false);
-                oceanLeviathans.forEach((h, idx) => {
-                    if (!h.visible && Math.random() < 0.015) {
-                        resetOceanLeviathan(h, planeGroup.position, planeGroup.quaternion);
-                    }
-                    if (h.visible) {
-                        h.translateZ(h.speed * delta * 60);
-                        h.rotateX(-0.15 * delta);
-                        if (h.position.y < -600 || h.position.clone().sub(planeGroup.position).dot(forwardVec) < -500) {
-                            h.visible = false;
-                        }
-                    }
-                });
-            } else {
-                groundObstacles.forEach(obs => {
-                    obs.visible = true;
-                    if (obs.position.clone().sub(planeGroup.position).dot(forwardVec) < -300) {
-                        repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, spawnWidth);
-                    }
-                });
-                oceanLeviathans.forEach(h => h.visible = false);
-            }
-
-            let threatClose = false;
-            skyHazards.forEach(h => {
-                if (h.visible && h.type === 'rocket') {
-                    const dummy = h.clone();
-                    dummy.lookAt(planeGroup.position);
-                    h.quaternion.slerp(dummy.quaternion, delta * 3.0);
-                }
-
-                h.translateZ((h.speed + (diffLevel * 0.5)) * delta * 60);
-                const toH = h.position.clone().sub(planeGroup.position);
-                if (toH.length() < 400 && toH.dot(forwardVec) > 0) threatClose = true;
-                if (toH.dot(forwardVec) < -300 || h.position.y > 1500 || h.position.y < -10) {
-                    resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
-                }
-            });
-
-            document.getElementById('warning-overlay').style.boxShadow = threatClose ? 'inset 0 0 150px rgba(255, 0, 0, 0.6)' : 'inset 0 0 150px rgba(255, 0, 0, 0)';
-
-            clouds.forEach(c => {
-                if (c.position.clone().sub(planeGroup.position).dot(forwardVec) < -500) {
-                    c.position.copy(planeGroup.position).add(forwardVec.clone().multiplyScalar(4000)).add(rightVec.clone().multiplyScalar((Math.random() - 0.5) * 6000));
-                    c.position.y = 400 + Math.random() * 600;
-                }
-            });
-
-            ground.position.x = planeGroup.position.x; ground.position.z = planeGroup.position.z;
-
-            let nextTheme = (currentTheme + 1) % themes.length;
-            let lerpT = 0;
-            if ((distanceTraveled % biomeLength) > biomeLength - 3000) lerpT = ((distanceTraveled % biomeLength) - (biomeLength - 3000)) / 3000;
-
-            colorHelper.setHex(themes[currentTheme].sky).lerp(new THREE.Color(themes[nextTheme].sky), lerpT);
-            scene.background.copy(colorHelper); scene.fog.color.copy(colorHelper);
-            colorHelper.setHex(themes[currentTheme].ground).lerp(new THREE.Color(themes[nextTheme].ground), lerpT);
-            ground.material.color.copy(colorHelper);
-
-            const curC = themes[currentTheme].c, nxtC = themes[nextTheme].c;
-            mats.treeLeaf.color.setHex(curC.leaf).lerp(new THREE.Color(nxtC.leaf), lerpT);
-            mats.treeTrunk.color.setHex(curC.trunk).lerp(new THREE.Color(nxtC.trunk), lerpT);
-            mats.mountain.color.setHex(curC.mount).lerp(new THREE.Color(nxtC.mount), lerpT);
-            mats.snow.color.setHex(curC.snow).lerp(new THREE.Color(nxtC.snow), lerpT);
-            mats.castle.color.setHex(curC.cast).lerp(new THREE.Color(nxtC.cast), lerpT);
-            mats.castleRoof.color.setHex(curC.croof).lerp(new THREE.Color(nxtC.croof), lerpT);
-            mats.building.color.setHex(curC.bldg).lerp(new THREE.Color(nxtC.bldg), lerpT);
-            mats.buildingRoof.color.setHex(curC.broof).lerp(new THREE.Color(nxtC.broof), lerpT);
-            mats.balloon.color.setHex(curC.bal).lerp(new THREE.Color(nxtC.bal), lerpT);
-            mats.oceanLeviathan.color.setHex(0x111122).lerp(new THREE.Color(0x000000), lerpT);
-
-            document.getElementById('score').innerText = Math.floor(distanceTraveled / 10);
-            document.getElementById('difficulty').innerText = diffLevel;
-            document.getElementById('biome-name').innerText = themes[currentTheme].name;
-            document.getElementById('altitude').innerText = Math.floor((planeGroup.position.y - FLOOR_HEIGHT) * 3.28);
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-    </script>
+    });
+
+    ground.position.x = planeGroup.position.x; ground.position.z = planeGroup.position.z;
+
+    let nextTheme = (currentTheme + 1) % themes.length;
+    let lerpT = Math.max(0, ((distanceTraveled % 15000) - 12000) / 3000);
+    colorHelper.setHex(themes[currentTheme].sky).lerp(new THREE.Color(themes[nextTheme].sky), lerpT);
+    scene.background.copy(colorHelper); scene.fog.color.copy(colorHelper);
+    colorHelper.setHex(themes[currentTheme].ground).lerp(new THREE.Color(themes[nextTheme].ground), lerpT);
+    ground.material.color.copy(colorHelper);
+
+    document.getElementById('score').innerText = Math.floor(distanceTraveled / 10);
+    document.getElementById('difficulty').innerText = diffLevel;
+    document.getElementById('biome-name').innerText = themes[currentTheme].name;
+    document.getElementById('altitude').innerText = Math.floor((planeGroup.position.y - FLOOR_HEIGHT) * 3.28); 
+
+    renderer.render(scene, camera);
+}
+
+animate();
+</script>
 </body>
-
 </html>
