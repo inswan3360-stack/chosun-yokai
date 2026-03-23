@@ -1,5 +1,5 @@
-const translations = {};
-let currentLanguage = 'ko';
+﻿const translations = {};
+let currentLanguage = 'en';
 
 async function loadTranslations(lang) {
     const response = await fetch(`data/${lang}.json`);
