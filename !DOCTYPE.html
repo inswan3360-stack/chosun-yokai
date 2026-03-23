@@ -43,12 +43,47 @@
     #vehicle-name { font-size: 24px; color: #00ff88; font-weight: bold; display: block; margin-bottom: 5px; }
     #vehicle-desc { font-size: 14px; color: #aaa; line-height: 1.4; }
 
+    /* ─── Difficulty Selector ─── */
+    .diff-container {
+        display: flex; flex-direction: column; align-items: center; gap: 12px;
+        background: rgba(10, 15, 25, 0.85); padding: 18px 30px; border-radius: 12px;
+        border: 2px solid #444; box-shadow: 0 0 20px rgba(0,255,204,0.15);
+    }
+    .diff-label { font-size: 13px; color: #aaa; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
+    .diff-pills { display: flex; gap: 12px; }
+    .diff-pill {
+        padding: 10px 28px; font-size: 15px; font-weight: 900; cursor: pointer;
+        border-radius: 50px; border: 2px solid transparent; font-family: inherit;
+        transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .diff-pill.casual {
+        background: rgba(0,180,100,0.15); color: #00d080; border-color: #00d080;
+    }
+    .diff-pill.casual.active, .diff-pill.casual:hover {
+        background: linear-gradient(135deg, #00d080, #007040); color: #fff;
+        box-shadow: 0 0 20px rgba(0,200,100,0.6); transform: scale(1.05);
+    }
+    .diff-pill.extreme {
+        background: rgba(255,0,85,0.1); color: #ff4488; border-color: #ff0055;
+    }
+    .diff-pill.extreme.active, .diff-pill.extreme:hover {
+        background: linear-gradient(135deg, #ff0055, #880000); color: #fff;
+        box-shadow: 0 0 20px rgba(255,0,85,0.7); transform: scale(1.05);
+        animation: pill-glitch 0.4s infinite alternate;
+    }
+    @keyframes pill-glitch {
+        0% { text-shadow: 2px 0 #ff0055; } 50% { text-shadow: -2px 0 #00ffcc; } 100% { text-shadow: 2px 0 #ff0055; }
+    }
+    #diff-desc { font-size: 12px; color: #888; text-align: center; max-width: 280px; line-height: 1.5; min-height: 36px; transition: 0.3s; }
+
     .start-btn {
         background: linear-gradient(45deg, #ff0055, #aa0000); color: #fff; border: 2px solid #ff8888;
         padding: 15px 60px; font-size: 24px; font-weight: bold; cursor: pointer; border-radius: 8px;
         box-shadow: 0 0 20px rgba(255,0,85,0.5); transition: 0.2s; font-family: inherit;
     }
     .start-btn:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,0,85,0.8); filter: brightness(1.2); }
+    .start-btn.casual-start { background: linear-gradient(45deg, #00b060, #005030); border-color: #00ff99; box-shadow: 0 0 20px rgba(0,200,100,0.5); }
+    .start-btn.casual-start:hover { box-shadow: 0 0 30px rgba(0,255,150,0.8); }
 
     #game-over-screen {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -123,7 +158,17 @@
         </div>
         <button class="arrow-btn" onclick="changeVehicle(1)">▶</button>
     </div>
-    <button class="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
+
+    <div class="diff-container">
+        <div class="diff-label">⚙️ Difficulty</div>
+        <div class="diff-pills">
+            <button class="diff-pill casual active" id="pill-casual" onclick="setDifficulty('casual')">🌿 Casual</button>
+            <button class="diff-pill extreme" id="pill-extreme" onclick="setDifficulty('extreme')">💀 EXTREME</button>
+        </div>
+        <div id="diff-desc">Relaxed physics · Fewer hazards · Wider airspace · Great for learning the controls!</div>
+    </div>
+
+    <button class="start-btn casual-start" id="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
 </div>
 
 <div id="game-over-screen">
@@ -501,8 +546,64 @@ let currentSpeed = 0, baseTargetSpeed = 4.5;
 let pitch = 0, roll = 0, yaw = 0;
 let diffLevel = 1, distanceTraveled = 0; 
 const keys = { w:false, a:false, s:false, d:false, shift:false };
-const FLOOR_HEIGHT = 4.0; 
-const MAX_ALTITUDE = 600.0; 
+const FLOOR_HEIGHT = 4.0;
+
+// ─── Difficulty Settings ───
+let selectedDiff = 'casual'; // 'casual' | 'extreme'
+
+const DIFF_CONFIGS = {
+    casual: {
+        baseSpeed: 3.5,
+        speedScalePerLevel: 0.4,
+        stallSpeedMulti: 0.6,       // relative to takeoffSpeed
+        maxAltitude: 900,
+        boundsWarn: 2000,
+        boundsDeath: 3000,
+        hazardSpeedMult: 0.7,
+        homingLevel: 6,             // rockets home only at diffLevel >= 6
+        spawnWidthBase: 6000,
+        obstacleCountMult: 0.6,
+        skyHazardCount: { plane:7, rocket:4, balloon:9 },
+        diffScalePerDist: 3000,     // distanceTraveled per diffLevel tick
+        boostExtra: 4.0,
+    },
+    extreme: {
+        baseSpeed: 6.0,
+        speedScalePerLevel: 1.2,
+        stallSpeedMulti: 0.85,
+        maxAltitude: 420,
+        boundsWarn: 900,
+        boundsDeath: 1400,
+        hazardSpeedMult: 1.5,
+        homingLevel: 1,             // rockets home immediately
+        spawnWidthBase: 3500,
+        obstacleCountMult: 1.4,
+        skyHazardCount: { plane:14, rocket:10, balloon:16 },
+        diffScalePerDist: 1200,
+        boostExtra: 9.0,
+    }
+};
+
+function getDC() { return DIFF_CONFIGS[selectedDiff]; }
+
+function setDifficulty(diff) {
+    selectedDiff = diff;
+    document.getElementById('pill-casual').classList.toggle('active', diff === 'casual');
+    document.getElementById('pill-extreme').classList.toggle('active', diff === 'extreme');
+    const btn = document.getElementById('start-btn');
+    const desc = document.getElementById('diff-desc');
+    if (diff === 'casual') {
+        desc.textContent = 'Relaxed physics · Fewer hazards · Wider airspace · Great for learning the controls!';
+        btn.className = 'start-btn casual-start';
+        btn.textContent = '🚀 SYSTEM LOGIN (START)';
+    } else {
+        desc.textContent = '💀 MAX SPEED · Homing missiles · Tight boundaries · Only for the brave. Good luck.';
+        btn.className = 'start-btn';
+        btn.textContent = '☠️ ENTER HELL (START)';
+    }
+}
+
+let MAX_ALTITUDE = getDC().maxAltitude;
 
 let audioCtx, engineOsc, engineGain;
 
@@ -634,16 +735,17 @@ function animate() {
         return; 
     }
 
-    diffLevel = 1 + Math.floor(distanceTraveled / 2000);
+    const dc = getDC();
+    diffLevel = 1 + Math.floor(distanceTraveled / dc.diffScalePerDist);
     let vSpeed = vehicleList[currentVid].speedMulti;
     let takeoffSpeed = 2.8 * vSpeed;
-    let stallSpeed = 2.0 * vSpeed;
-    let maxGaugeSpeed = 10.0 * vSpeed;
+    let stallSpeed = takeoffSpeed * dc.stallSpeedMulti;
+    let maxGaugeSpeed = 12.0 * vSpeed;
 
-    let dynamicTargetSpeed = (baseTargetSpeed + (diffLevel * 0.7) + (pitch * 3.5)) * vSpeed;
-    if (keys.shift) dynamicTargetSpeed += 6.0 * vSpeed; 
+    let dynamicTargetSpeed = (dc.baseSpeed + (diffLevel * dc.speedScalePerLevel) + (pitch * 3.5)) * vSpeed;
+    if (keys.shift) dynamicTargetSpeed += dc.boostExtra * vSpeed; 
     currentSpeed += (dynamicTargetSpeed - currentSpeed) * 1.2 * delta;
-    currentSpeed = Math.max(0, currentSpeed); 
+    currentSpeed = Math.max(0, currentSpeed);
 
     if (keys.w) pitch += 2.0 * delta; if (keys.s) pitch -= 2.0 * delta; 
     if (keys.a) { roll += 3.0 * delta; yaw += 1.5 * delta; }
@@ -660,10 +762,11 @@ function animate() {
         if (pitch < 0) pitch = 0; 
     }
 
+    // Update MAX_ALTITUDE dynamically from difficulty config
+    MAX_ALTITUDE = dc.maxAltitude;
     let isStalling = hasTakenOff && currentSpeed < stallSpeed;
-    // ★ 작전 구역 범위 확대 적용 (Wider Range)
-    let isOutOfBoundsWarning = Math.abs(planeGroup.position.x) > 1500;
-    let isOutOfBoundsDeath = Math.abs(planeGroup.position.x) > 2200;
+    let isOutOfBoundsWarning = Math.abs(planeGroup.position.x) > dc.boundsWarn;
+    let isOutOfBoundsDeath = Math.abs(planeGroup.position.x) > dc.boundsDeath;
     
     const warningEl = document.getElementById('center-warning');
     let warningMsg = "";
@@ -785,8 +888,7 @@ function animate() {
         engineGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
     }
 
-    // ★ 넓어진 스폰 폭 적용
-    const spawnWidth = Math.max(1500, 5000 - (diffLevel * 400)); 
+    const spawnWidth = Math.max(dc.boundsWarn * 0.5, dc.spawnWidthBase - (diffLevel * 300));
 
     distanceTraveled += currentSpeed;
     currentTheme = Math.floor(distanceTraveled / 15000) % themes.length;
@@ -814,10 +916,13 @@ function animate() {
     if (hasTakenOff) {
         skyHazards.forEach(h => {
             if (!h.visible) h.visible = true;
-            if (h.type === 'rocket' && diffLevel >= 3) {
-                const dummy = h.clone(); dummy.lookAt(planeGroup.position); h.quaternion.slerp(dummy.quaternion, delta * 3.0); 
+            if (h.type === 'rocket' && diffLevel >= dc.homingLevel) {
+                const dummy = h.clone(); dummy.lookAt(planeGroup.position); 
+                const homingStr = selectedDiff === 'extreme' ? 6.0 : 3.0;
+                h.quaternion.slerp(dummy.quaternion, delta * homingStr);
             }
-            h.translateZ((h.speed + (diffLevel*0.5)) * delta * 60); 
+            const hazardSpeedBonus = selectedDiff === 'extreme' ? diffLevel * 1.2 : diffLevel * 0.4;
+            h.translateZ((h.speed * dc.hazardSpeedMult + hazardSpeedBonus) * delta * 60);
             if (h.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0,0,1).applyQuaternion(planeGroup.quaternion)) < -300) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
         });
     } else { skyHazards.forEach(h => h.visible = false); }
