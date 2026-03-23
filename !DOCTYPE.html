@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -414,7 +414,7 @@
 
     <div id="hangar-screen">
         <h1 class="hangar-title">FLIGHT GLITCH</h1>
-        <div class="hangar-subtitle">시스템 오류: 정면 돌파 외의 우회 경로(꼼수)는 통제됩니다.</div>
+        <div class="hangar-subtitle">System Error: Tactical maneuvers outside designated zones are restricted.</div>
 
         <div class="selector-container">
             <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
@@ -429,14 +429,14 @@
 
     <div id="game-over-screen">
         <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
-        <div id="game-over-reason">장애물과 충돌했습니다.</div>
-        <div class="final-score">생존 거리: <span id="final-distance">0</span> m</div>
-        <button class="btn" onclick="returnToHangar()">시스템 재부팅</button>
+        <div id="game-over-reason">Collided with an obstacle.</div>
+        <div class="final-score">Travel Distance: <span id="final-distance">0</span> m</div>
+        <button class="btn" onclick="returnToHangar()">REBOOT SYSTEM</button>
     </div>
 
     <div id="warning-overlay"></div>
     <div id="center-warning"></div>
-    <div id="altitude-warning">⚠️ 최대 고도 도달: 강하하십시오! ⚠️</div>
+    <div id="altitude-warning">⚠️ MAX ALTITUDE REACHED: DESCEND! ⚠️</div>
 
     <div id="hud-speedometer" class="ingame-ui">
         <div class="speed-text-top">AIRSPEED</div>
@@ -455,8 +455,8 @@
         <br>
         <div>Altitude: <span id="altitude">0</span> ft</div>
         <br>
-        <div style="color:#aaa;">[S] Pitch UP (이륙/감속)</div>
-        <div style="color:#aaa;">[W] Pitch DOWN (강하/가속)</div>
+        <div style="color:#aaa;">[S] Pitch UP (Takeoff / Decelerate)</div>
+        <div style="color:#aaa;">[W] Pitch DOWN (Descend / Accelerate)</div>
         <div style="color:#aaa;">[A/D] Turn Left/Right</div>
         <div style="color:#00ff88; font-weight:bold; margin-top:5px;">[SHIFT] BOOST 💨</div>
     </div>
@@ -465,7 +465,7 @@
     <div class="hud-line ingame-ui" style="width: 150px; height: 1px; margin-top: 20px;"></div>
     <div class="hud-line ingame-ui" style="width: 100px; height: 1px; margin-top: -20px;"></div>
 
-    <div id="takeoff-guide">속도계가 흰색 선을 넘으면 [S] 키를 눌러 이륙하세요!</div>
+    <div id="takeoff-guide">When the airspeed passes the white line, press [S] to takeoff!</div>
 
     <script>
         // ─── 1. 씬 및 조명 ───
@@ -720,10 +720,10 @@
         let activeRotors = [];
 
         const vehicleList = [
-            { id: 'light', name: '경비행기', desc: '표준적이고 안정적인 기체입니다.', speedMulti: 1.0 },
-            { id: 'vintage', name: '프로펠러기', desc: '클래식한 멋과 민첩함을 자랑합니다.', speedMulti: 1.2 },
-            { id: 'modern', name: '스텔스 전투기', desc: '무서운 가속도! 컨트롤이 어렵습니다.', speedMulti: 1.5 },
-            { id: 'heli', name: '헬리콥터', desc: '이륙 속도와 실속 제한이 낮아 조종이 쉽습니다.', speedMulti: 0.8 }
+            { id: 'light', name: 'Light Aircraft', desc: 'Standard and stable aircraft.', speedMulti: 1.0 },
+            { id: 'vintage', name: 'Vintage Prop', desc: 'Classic style with high agility.', speedMulti: 1.2 },
+            { id: 'modern', name: 'Stealth Fighter', desc: 'Extreme acceleration! Difficult to control.', speedMulti: 1.5 },
+            { id: 'heli', name: 'Helicopter', desc: 'Low takeoff and stall speed. Easy to fly.', speedMulti: 0.8 }
         ];
         let currentVid = 0;
 
@@ -1004,11 +1004,11 @@
 
             let warningMsg = "";
             if (isStalling && !isGameOver) {
-                warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 내려 가속하거나 부스터를 켜세요!</span>";
+                warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Pitch down to accelerate or use BOOST!</span>";
             } else if (isOutOfBoundsWarning && hasTakenOff && !isGameOver) {
-                warningMsg = "⚠️ 작전 구역 이탈 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 중앙으로 돌리지 않으면 격추됩니다!</span>";
+                warningMsg = "⚠️ OUT OF BOUNDS ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Return to center or be terminated!</span>";
             } else if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1 && keys.s && currentSpeed < takeoffSpeed && !hasTakenOff) {
-                warningMsg = "⚠️ 속도 부족 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>흰색 선을 넘겨 가속하세요!</span>";
+                warningMsg = "⚠️ LOW SPEED ⚠️<br><span style='font-size:20px; color:#ffaa00;'>Accelerate past the white line!</span>";
             }
 
             if (warningMsg !== "") {
@@ -1018,11 +1018,11 @@
             }
 
             if (isOutOfBoundsDeath && hasTakenOff && !isGameOver) {
-                triggerGameOver("작전 구역을 무단 이탈하여 시스템에 의해 격추되었습니다!"); return;
+                triggerGameOver("Executed by the system for unauthorized zone departure!"); return;
             }
 
             if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
-                if (hasTakenOff && !isGameOver) { triggerGameOver("지면에 추락했습니다!"); return; }
+                if (hasTakenOff && !isGameOver) { triggerGameOver("Crashed into the ground!"); return; }
                 planeGroup.position.y = FLOOR_HEIGHT; roll = 0; if (pitch > 0) pitch = 0;
                 if (keys.s && currentSpeed >= takeoffSpeed) {
                     hasTakenOff = true; document.getElementById('takeoff-guide').style.display = 'none'; warningEl.style.display = 'none';
@@ -1043,8 +1043,8 @@
             planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
             planeGroup.translateZ(currentSpeed);
 
-            if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("실속하여 지면에 추락했습니다!"); return; }
-            if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("활주로 이탈! 이륙 속도에 도달하지 못했습니다."); return; }
+            if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Stalled and crashed into the ground!"); return; }
+            if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("Runway Overrun! Failed to reach takeoff speed."); return; }
 
             // ── ★ 정밀한 충돌 판정 (Hitbox Optimization) ★ ──
             if (hasTakenOff && !isGameOver) {
@@ -1067,7 +1067,7 @@
 
                             if (planeBox.intersectsBox(obsBox)) {
                                 isHit = true;
-                                crashReason = obs.scale.y > 2 ? "거대 돌연변이 장애물과 충돌했습니다!" : "지상 장애물에 충돌했습니다!";
+                                crashReason = obs.scale.y > 2 ? "Collided with a giant mutated obstacle!" : "Collided with a ground obstacle!";
                                 break;
                             }
                         }
@@ -1084,9 +1084,9 @@
 
                         if (planeBox.intersectsSphere(hazardSphere)) {
                             isHit = true;
-                            if (h.type === 'rocket') crashReason = "적 미사일에 격추당했습니다!";
-                            else if (h.type === 'balloon') crashReason = "비행금지구역 열기구와 충돌했습니다!";
-                            else crashReason = "적기와 충돌했습니다!";
+                            if (h.type === 'rocket') crashReason = "Shot down by an enemy missile!";
+                            else if (h.type === 'balloon') crashReason = "Collided with a no-fly zone balloon!";
+                            else crashReason = "Collision with an enemy craft!";
                             break;
                         }
                     }
@@ -1095,7 +1095,7 @@
                             if (h.visible) {
                                 const leviSphere = new THREE.Sphere(h.position, 35 * h.scale.x);
                                 if (planeBox.intersectsSphere(leviSphere)) {
-                                    isHit = true; crashReason = "바다의 괴물 레비아탄에게 잡아먹혔습니다!"; break;
+                                    isHit = true; crashReason = "Devoured by the Ocean Leviathan!"; break;
                                 }
                             }
                         }
