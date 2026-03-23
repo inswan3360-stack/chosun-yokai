@@ -34,7 +34,6 @@
             box-sizing: border-box;
         }
 
-        /* ★ Flight Glitch 전용 네온 글리치 효과 ★ */
         .hangar-title {
             font-size: 70px;
             color: #fff;
@@ -419,7 +418,7 @@
 
     <div id="hangar-screen">
         <h1 class="hangar-title">FLIGHT GLITCH</h1>
-        <div class="hangar-subtitle">시스템 오류 경고: 전방에 확인되지 않은 생명체 및 구조물 감지됨</div>
+        <div class="hangar-subtitle">시스템 오류: 제한 구역 이탈을 엄격히 금지합니다.</div>
 
         <div class="selector-container">
             <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
@@ -440,7 +439,6 @@
     </div>
 
     <div id="warning-overlay"></div>
-
     <div id="center-warning"></div>
     <div id="altitude-warning">⚠️ 최대 고도 도달: 강하하십시오! ⚠️</div>
 
@@ -500,7 +498,7 @@
             building: new THREE.MeshLambertMaterial({ color: 0xcccccc }),
             buildingRoof: new THREE.MeshLambertMaterial({ color: 0x8b0000 }),
             balloon: new THREE.MeshLambertMaterial({ color: 0xff3366 }),
-            oceanLeviathan: new THREE.MeshLambertMaterial({ color: 0x1a3355 }) // 덜 어두운 색으로 변경
+            oceanLeviathan: new THREE.MeshLambertMaterial({ color: 0x111122 })
         };
 
         const themes = [
@@ -511,7 +509,7 @@
             { name: "Leviathan Deep", sky: 0x0a1a3a, ground: 0x002244, c: { leaf: 0x00ffcc, trunk: 0x004488, mount: 0x002266, snow: 0x88aacc, cast: 0x001144, croof: 0x000022, bldg: 0x002244, broof: 0xcc0044, bal: 0xff00ff } }
         ];
         let currentTheme = 0;
-        let previousTheme = 0; // ★ 테마 전환 감지용 변수 추가
+        let previousTheme = 0;
         scene.background = new THREE.Color(themes[0].sky);
         scene.fog = new THREE.Fog(themes[0].sky, 100, 2000);
         const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshLambertMaterial({ color: themes[0].ground }));
@@ -529,7 +527,7 @@
             runwayGroup.add(block);
         }
 
-        // ─── 4. 지상 장애물 생성 ───
+        // ─── 4. 지상 장애물 ───
         function createTree() {
             const g = new THREE.Group();
             const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 15, 5), mats.treeTrunk); trunk.position.y = 7.5; g.add(trunk);
@@ -662,7 +660,7 @@
             }
         }
 
-        // ─── ★ 6. 거대 괴물 물고기(Ocean Leviathan) 생성 ★ ───
+        // ─── 6. 바다 괴물(Ocean Leviathan) ───
         const oceanLeviathans = [];
         function createOceanLeviathan() {
             const g = new THREE.Group();
@@ -675,7 +673,6 @@
             const fin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 30, 40), tailMat);
             fin.position.set(0, 15, 0); g.add(fin);
 
-            // ★ 눈 발광 효과 추가 (더 무섭게)
             const eyeMat = new THREE.MeshLambertMaterial({ color: 0xff4444, emissive: 0xff0000 });
             const eye1 = new THREE.Mesh(new THREE.SphereGeometry(3, 8, 8), eyeMat);
             eye1.position.set(15, 10, 60); g.add(eye1);
@@ -691,26 +688,23 @@
             scene.add(h); oceanLeviathans.push(h);
         }
 
-        // ★ 물고기가 플레이어 코앞에서 수직 도약하도록 스폰 수정
         function resetOceanLeviathan(h, pPos, pQuat) {
             const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
-            const spawnDist = 1000 + Math.random() * 500; // 훨씬 가까운 곳에서 튀어나옴
+            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
+            const spawnDist = 3000 + Math.random() * 1500;
 
-            h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist));
-            h.position.y = -500; // 바다 아주 깊은 곳에서 출발
+            h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 800));
+            h.position.y = -300;
 
-            // 플레이어의 현재 고도보다 약간 높은 곳을 향해 솟구침 (점프 공격)
-            h.lookAt(pPos.x, pPos.y + 400, pPos.z);
+            const targetPos = pPos.clone().add(new THREE.Vector3(0, 1500 + Math.random() * 1000, 0));
+            h.lookAt(targetPos);
 
-            h.speed = 25 + Math.random() * 10; // 기존보다 2배 이상 빠른 돌진
-
-            // 크기를 기존보다 무조건 더 크게
-            const s = 2 + Math.random() * 3;
+            h.speed = 3.5 + Math.random() * 2.5;
+            const s = 4 + Math.random() * 4;
             h.scale.set(s, s, s);
             h.visible = true;
         }
 
-        // 구름
         const clouds = [];
         const cloudGeo = new THREE.IcosahedronGeometry(1, 0);
         const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
@@ -873,7 +867,6 @@
 
             explosionParticles.forEach(p => scene.remove(p.mesh));
             explosionParticles.length = 0;
-
             oceanLeviathans.forEach(h => h.visible = false);
         }
 
@@ -923,7 +916,6 @@
 
             groundObstacles.forEach(obs => repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, 4000));
             skyHazards.forEach(h => resetSkyHazard(h, planeGroup.position, planeGroup.quaternion));
-
             oceanLeviathans.forEach(h => h.visible = false);
 
             document.getElementById('takeoff-guide').style.display = 'block';
@@ -993,55 +985,63 @@
             if (keys.d) { roll -= 3.0 * delta; yaw -= 1.5 * delta; }
 
             if (!keys.w && !keys.s) pitch += (0 - pitch) * 2 * delta;
-            if (!keys.a && !keys.d) roll += (0 - roll) * 2 * delta;
+
+            // ★ 꼼수 방지: 기수 자동 복원(정면 보기) 및 회전각 한계
+            if (!keys.a && !keys.d) {
+                roll += (0 - roll) * 2 * delta;
+                yaw += (0 - yaw) * 1.0 * delta;
+            }
 
             pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch));
             roll = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, roll));
+            yaw = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, yaw));
 
             if (planeGroup.position.y >= MAX_ALTITUDE) {
                 planeGroup.position.y = MAX_ALTITUDE;
                 if (pitch < 0) pitch = 0;
-                document.getElementById('altitude-warning').style.display = 'block';
-            } else {
-                document.getElementById('altitude-warning').style.display = 'none';
             }
 
             let isStalling = hasTakenOff && currentSpeed < stallSpeed;
+            let isOutOfBounds = Math.abs(planeGroup.position.x) > 1500;
             const warningEl = document.getElementById('center-warning');
 
+            let warningMsg = "";
+            if (isStalling && !isGameOver) {
+                warningMsg = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 내려 가속하거나 부스터를 켜세요!</span>";
+            } else if (isOutOfBounds && hasTakenOff && !isGameOver) {
+                warningMsg = "⚠️ 작전 구역 이탈 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>가운데로 복귀하지 않으면 격추됩니다!</span>";
+            } else if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1 && keys.s && currentSpeed < takeoffSpeed && !hasTakenOff) {
+                warningMsg = "⚠️ 속도 부족 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>흰색 선을 넘겨 가속하세요!</span>";
+            }
+
+            if (warningMsg !== "") {
+                warningEl.style.display = 'block';
+                warningEl.innerHTML = warningMsg;
+            } else {
+                warningEl.style.display = 'none';
+            }
+
+            // ★ 꼼수 방지: 강제 폭파 구역
+            if (Math.abs(planeGroup.position.x) > 2000 && hasTakenOff && !isGameOver) {
+                triggerGameOver("작전 구역을 무단 이탈하여 처형당했습니다.");
+                return;
+            }
+
+            // 고도 경고 UI
+            if (planeGroup.position.y >= MAX_ALTITUDE) document.getElementById('altitude-warning').style.display = 'block';
+            else document.getElementById('altitude-warning').style.display = 'none';
+
             if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
-
-                if (hasTakenOff && !isGameOver) {
-                    triggerGameOver("지면에 추락했습니다!");
-                    return;
-                }
-
-                planeGroup.position.y = FLOOR_HEIGHT;
-                roll = 0;
-                if (pitch > 0) pitch = 0;
-
-                if (keys.s) {
-                    if (currentSpeed >= takeoffSpeed) {
-                        hasTakenOff = true;
-                        document.getElementById('takeoff-guide').style.display = 'none';
-                        warningEl.style.display = 'none';
-                    } else {
-                        warningEl.style.display = 'block';
-                        warningEl.innerHTML = "⚠️ 속도 부족 ⚠️<br><span style='font-size:20px; color:#ffaa00;'>흰색 선을 넘겨 가속하세요!</span>";
-                        pitch = 0;
-                    }
-                } else {
-                    if (!isStalling) warningEl.style.display = 'none';
+                if (hasTakenOff && !isGameOver) { triggerGameOver("지면에 추락했습니다!"); return; }
+                planeGroup.position.y = FLOOR_HEIGHT; roll = 0; if (pitch > 0) pitch = 0;
+                if (keys.s && currentSpeed >= takeoffSpeed) {
+                    hasTakenOff = true; document.getElementById('takeoff-guide').style.display = 'none'; warningEl.style.display = 'none';
                 }
             }
 
             if (isStalling && !isGameOver) {
-                warningEl.style.display = 'block';
-                warningEl.innerHTML = "⚠️ STALL WARNING ⚠️<br><span style='font-size:20px; color:#ffaa00;'>기수를 내려 가속하거나 부스터를 켜세요!</span>";
                 planeGroup.position.y -= (stallSpeed - currentSpeed) * 15 * delta;
                 pitch = Math.min(pitch + 1.5 * delta, 0.3);
-            } else if (hasTakenOff && planeGroup.position.y > FLOOR_HEIGHT + 0.1) {
-                warningEl.style.display = 'none';
             }
 
             let fillPct = Math.min(100, (currentSpeed / maxGaugeSpeed) * 100);
@@ -1053,15 +1053,8 @@
             planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
             planeGroup.translateZ(currentSpeed);
 
-            if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) {
-                triggerGameOver("실속하여 지면에 추락했습니다!");
-                return;
-            }
-
-            if (!hasTakenOff && distanceTraveled > 1800) {
-                triggerGameOver("활주로 이탈! 이륙 속도에 도달하지 못했습니다.");
-                return;
-            }
+            if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("실속하여 지면에 추락했습니다!"); return; }
+            if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("활주로 이탈! 이륙 속도에 도달하지 못했습니다."); return; }
 
             if (hasTakenOff && !isGameOver) {
                 let isHit = false;
@@ -1097,10 +1090,8 @@
                     }
                     if (!isHit && themes[currentTheme].name === "Leviathan Deep") {
                         for (let h of oceanLeviathans) {
-                            if (h.visible && h.position.distanceTo(planeGroup.position) < 50 * h.scale.x) {
-                                isHit = true;
-                                crashReason = "바다의 괴물 레비아탄에게 잡아먹혔습니다!";
-                                break;
+                            if (h.visible && h.position.distanceTo(planeGroup.position) < 45 * h.scale.x) {
+                                isHit = true; crashReason = "바다의 괴물 레비아탄에게 잡아먹혔습니다!"; break;
                             }
                         }
                     }
@@ -1151,7 +1142,7 @@
 
                 let targetVol = 0.1;
                 if (hasTakenOff) targetVol = 0.3;
-                if (isStalling || planeGroup.position.y >= MAX_ALTITUDE) {
+                if (isStalling || planeGroup.position.y >= MAX_ALTITUDE || isOutOfBounds) {
                     targetVol = 0.5 + Math.sin(clock.elapsedTime * 20) * 0.3;
                 }
                 engineGain.gain.setTargetAtTime(targetVol, audioCtx.currentTime, 0.1);
@@ -1161,15 +1152,12 @@
             const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(planeGroup.quaternion);
             const spawnWidth = Math.max(800, 6000 - (diffLevel * 600));
 
-            // ── ★ 테마(Biome) 변환 및 물고기 즉시 스폰 로직 ★ ──
             distanceTraveled += currentSpeed;
             const biomeLength = 15000;
             currentTheme = Math.floor(distanceTraveled / biomeLength) % themes.length;
 
-            // 테마가 바뀌는 순간을 감지
             if (currentTheme !== previousTheme) {
                 if (themes[currentTheme].name === "Leviathan Deep") {
-                    // 바다 진입 즉시 0.8초 간격으로 괴물 3마리를 강제 스폰시킵니다.
                     oceanLeviathans.forEach((h, idx) => {
                         setTimeout(() => {
                             if (!isGameOver && isEngineOn) {
@@ -1184,13 +1172,13 @@
             if (themes[currentTheme].name === "Leviathan Deep") {
                 groundObstacles.forEach(obs => obs.visible = false);
                 oceanLeviathans.forEach((h, idx) => {
-                    if (!h.visible && Math.random() < 0.02) { // 스폰 확률도 2배로 증가
+                    if (!h.visible && Math.random() < 0.015) {
                         resetOceanLeviathan(h, planeGroup.position, planeGroup.quaternion);
                     }
                     if (h.visible) {
-                        h.translateZ((h.speed + diffLevel * 0.5) * delta * 60);
-                        // 위로 솟구치거나 플레이어를 지나치면 숨김
-                        if (h.position.y > 1000 || h.position.clone().sub(planeGroup.position).dot(forwardVec) < -200) {
+                        h.translateZ(h.speed * delta * 60);
+                        h.rotateX(-0.15 * delta);
+                        if (h.position.y < -600 || h.position.clone().sub(planeGroup.position).dot(forwardVec) < -500) {
                             h.visible = false;
                         }
                     }
@@ -1207,6 +1195,13 @@
 
             let threatClose = false;
             skyHazards.forEach(h => {
+                // ★ 꼼수 방지: 유도탄 추적 로직 추가
+                if (h.visible && h.type === 'rocket') {
+                    const dummy = h.clone();
+                    dummy.lookAt(planeGroup.position);
+                    h.quaternion.slerp(dummy.quaternion, delta * 1.5); // 강력한 유도 성능
+                }
+
                 h.translateZ((h.speed + (diffLevel * 0.5)) * delta * 60);
                 const toH = h.position.clone().sub(planeGroup.position);
                 if (toH.length() < 400 && toH.dot(forwardVec) > 0) threatClose = true;
@@ -1245,6 +1240,7 @@
             mats.building.color.setHex(curC.bldg).lerp(new THREE.Color(nxtC.bldg), lerpT);
             mats.buildingRoof.color.setHex(curC.broof).lerp(new THREE.Color(nxtC.broof), lerpT);
             mats.balloon.color.setHex(curC.bal).lerp(new THREE.Color(nxtC.bal), lerpT);
+            mats.oceanLeviathan.color.setHex(0x111122).lerp(new THREE.Color(0x000000), lerpT);
 
             document.getElementById('score').innerText = Math.floor(distanceTraveled / 10);
             document.getElementById('difficulty').innerText = diffLevel;
