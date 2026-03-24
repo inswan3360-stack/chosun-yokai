@@ -3,61 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us | Registry of Chosun Mysteries</title>
+    <title>Philosophy | Registry of Chosun Mysteries</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@300;400;700;900&display=swap');
         :root {
-            --ink: #0a0c10;
+            --ink: #0a0c12;
             --paper: #e8d09a;
-            --gold: #b08a40;
-            --muted: #888888;
+            --gold: #c5a059;
+            --muted: #8a8d91;
+            --nav-height: 70px;
         }
         body {
             background: var(--ink);
             color: var(--paper);
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             line-height: 1.8;
-            padding: 40px 20px;
+            padding: 120px 20px 60px;
             max-width: 800px;
             margin: 0 auto;
         }
-        h1 { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 30px; }
-        h2 { color: var(--gold); margin-top: 40px; }
-        p { margin-bottom: 20px; color: #ccc; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: var(--gold); text-decoration: none; font-weight: bold; }
-        .back-link:hover { text-decoration: underline; }
-        footer { margin-top: 60px; border-top: 1px solid #333; padding-top: 20px; font-size: 14px; color: var(--muted); text-align: center; }
-        .mission { font-style: italic; font-size: 20px; color: var(--paper); text-align: center; border: 1px dashed var(--gold); padding: 20px; margin: 40px 0; }
+        nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--nav-height);
+            background: rgba(10, 12, 18, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; z-index: 1000;
+        }
+        .nav-logo { font-weight: 900; color: #f8d060; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; }
+        
+        h1 { 
+            font-size: 3.5rem; font-weight: 900; color: #fff; margin-bottom: 40px; 
+            background: linear-gradient(to bottom, #fff, #c5a059);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 { color: var(--gold); margin-top: 60px; font-weight: 700; font-size: 1.5rem; border-left: 4px solid var(--gold); padding-left: 20px; }
+        p { margin-bottom: 25px; color: #ccc; font-weight: 300; }
+        
+        .mission-callout { 
+            font-size: 1.4rem; color: #fff; text-align: center; 
+            padding: 40px; margin: 60px 0; background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px; border: 1px solid rgba(197, 160, 89, 0.2);
+            font-weight: 700;
+        }
+
+        footer { margin-top: 100px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 40px; text-align: center; color: var(--muted); font-size: 0.8rem; }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Registry</a>
-    <h1>About Us</h1>
-    <div class="mission">
-        "Preserving our ancestral legends through interactive digital storytelling."
+    <nav>
+        <a href="index.html" class="nav-logo">⛩️ Chosun Mysteries</a>
+        <div style="display: flex; gap: 20px;">
+            <a href="index.html" style="color: var(--paper); text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Home</a>
+        </div>
+    </nav>
+
+    <h1>The Philosophy of<br>Digital Simplicity</h1>
+    
+    <div class="mission-callout">
+        "Reclaiming the 'Playground' from the age of over-specification."
     </div>
     
-    <h2>Deep Mythology: The Core of Chosun Lore</h2>
-    <p>Our archive meticulously follows the folklore development throughout the 500-year history of the Choro-era. We integrate records from traditional texts such as the <em>Samguk Yusa</em> and the <em>Goryeo-sa</em>, interpreting them into digital visual art. This ensures that every Yokai listed in our registry is not just a character, but an historical entity that defined the fears and hopes of our ancestors.</p>
+    <h2>The Digital Fatigue Crisis</h2>
+    <p>In the contemporary digital era, we are bombarded by 'high-spec' expectations. Mobile applications and web platforms increasingly demand massive hardware resources, high-definition visual focus, and complex, time-consuming narrative commitments. What was once a 'game' has often transformed into a secondary career—requiring tutorials, grinding, and unrelenting attention.</p>
     
-    <h2>Historical Context: Why Chosun?</h2>
-    <p>The Chosun Dynasty provided a unique period of cultural isolation and internal growth. This led to a very distinct brand of mythology compared to our neighbors. While Japanese Yokai or Chinese spirit-lore are widely known, the subtle, often philosophical nature of Korean ghosts and creatures offers something profoundly different. Our Registry aims to highlight these subtle differences, such as the playful nature of the Dokkaebi compared to more malicious entities.</p>
+    <h2>Defining the Digital Playground</h2>
+    <p>The <em>Registry of Chosun Mysteries</em> takes a radical step backward. We define our platform not as a 'software suite', but as a <strong>Playground</strong>. A playground is characterized by immediate accessibility, intuitive rules, and the freedom to engage and disengage at will. By leveraging the elegant simplicity of traditional Korean folklore, we offer a respite from the spectacle-heavy trends of modern gaming.</p>
     
-    <h2>The Cultural Significance</h2>
-    <p>Mythology is more than just scary stories; it's a reflection of the social values and morality of a specific time. By preserving these mysteries, we are also preserving the collective psyche of our forebears. Each 'Rebirth' of a Yokai in our game represents a rediscovery of a lost cultural values in our modern, technological world.</p>
+    <h2>Substance Over Specification</h2>
+    <p>High resolution does not equate to high culture. We prioritize the 'Soul' of the interaction over the 'Pixels' of the display. Our games—<em>Yokai: Rebirth</em> and <em>Flight Glitch</em>—are intentionally designed for low-friction access. We return to the golden era of arcade and casual web gaming, where the satisfaction of a short session was the primary metric of success.</p>
 
-    <h2>Evolutionary Storytelling</h2>
-    <p>In our primary game, <em>Chosun Yokai: Rebirth</em>, we've implemented an evolution system that mirrors the natural development of legends over time. A soul starts as a simple, undefined energy, much like a rumor. As it gains 'Divine Energy' (through interaction and knowledge), it takes shape, eventually becoming a fully-fledged Yokai that is recognized by the population. This mirror of sociological myth-building is the cornerstone of our interactive experience.</p>
-    
-    <h2>The Games</h2>
-    <p>We feature two primary experiences:</p>
-    <ul>
-        <li><strong>Chosun Yokai: Rebirth</strong> - An evolution-based encyclopedia game where users collect and grow mythical creatures from souls into guardian spirits.</li>
-        <li><strong>Flight Glitch</strong> - A high-intensity survival flight game featuring ancient sea monsters and mystical aerial biomes.</li>
-    </ul>
+    <h2>Preserving Tradition Through Modern Accessibility</h2>
+    <p>Our expert researchers have translated centuries of Chosun lore into lightweight, interactive modules. By removing the barriers of high-spec gaming, we ensure that these ancestral stories can be 'played' and experienced by everyone, regardless of their device's processing power. This is digital preservation through accessibility.</p>
 
     <footer>
-        &copy; 2026 Registry of Chosun Mysteries. All rights reserved.
+        &copy; 2026 REGISTRY OF CHOSUN MYSTERIES. ALL RIGHTS RESERVED.
     </footer>
 </body>
 </html>
