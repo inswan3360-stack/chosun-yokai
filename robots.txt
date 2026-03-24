@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://chosun-yokai.pages.dev/sitemap.xml

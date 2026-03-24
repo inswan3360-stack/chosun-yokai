@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Registry of Chosun Mysteries</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        :root {
+            --ink: #0a0c10;
+            --paper: #e8d09a;
+            --gold: #b08a40;
+            --muted: #888888;
+        }
+        body {
+            background: var(--ink);
+            color: var(--paper);
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 30px; }
+        p { margin-bottom: 20px; color: #ccc; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--gold); text-decoration: none; font-weight: bold; }
+        .back-link:hover { text-decoration: underline; }
+        footer { margin-top: 60px; border-top: 1px solid #333; padding-top: 20px; font-size: 14px; color: var(--muted); text-align: center; }
+        form { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--gold); padding: 30px; border-radius: 8px; margin-top: 40px; }
+        .field { margin-bottom: 20px; text-align: left; }
+        .field label { display: block; font-weight: bold; color: var(--gold); margin-bottom: 8px; font-size: 14px; text-transform: uppercase; }
+        .field input, .field textarea { width: 100%; border: 1px solid #333; background: #111; color: #fff; padding: 12px; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .field input:focus, .field textarea:focus { border-color: var(--gold); outline: none; }
+        .submit-btn { width: 100%; padding: 15px; background: var(--gold); color: var(--ink); border: none; font-weight: 900; font-size: 16px; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        .submit-btn:hover { background: #d0a060; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← Back to Registry</a>
+    <h1>Contact Us</h1>
+    <p>Do you have a question about our mysteries? Or perhaps a suggestion for our archive? Please reach out to us using the form below.</p>
+    
+    <form onsubmit="event.preventDefault(); alert('Your message has been sent to the ancestors! (Demonstration only)');">
+        <div class="field">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required placeholder="PILOT / SCHOLAR">
+        </div>
+        <div class="field">
+            <label for="email">Your Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+        </div>
+        <div class="field">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" required>
+        </div>
+        <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn" disabled>SEND MESSAGE</button>
+        <p style="font-size: 11px; margin-top: 10px; color: var(--muted);">* Note: The send functionality is currently disabled in this demonstration.</p>
+    </form>
+
+    <footer>
+        &copy; 2026 Registry of Chosun Mysteries. All rights reserved.
+    </footer>
+</body>
+</html>
