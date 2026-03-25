@@ -90,6 +90,53 @@
       opacity: 1;
     }
 
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-login {
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-transform: uppercase;
+    }
+    .btn-login:hover {
+      background: var(--gold-bright);
+    }
+
+    #userProfile {
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+    }
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .btn-logout:hover {
+      border-color: var(--gold);
+      color: var(--paper);
+    }
+
     /* Hero Section */
     .hero {
       padding-top: calc(var(--nav-height) + 80px);
@@ -307,8 +354,14 @@
       <li><a href="#playground">Playground</a></li>
       <li><a href="yokai.html">Encyclopedia</a></li>
       <li><a href="about.html">Philosophy</a></li>
-      <li><a href="contact.html">Contact</a></li>
     </ul>
+    <div class="user-actions">
+      <button id="btnLogin" class="btn-login" onclick="loginWithGoogle()">Sign In</button>
+      <div id="userProfile">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
   </nav>
 
   <section class="hero">
@@ -580,6 +633,77 @@
       </div>
     </div>
   </section>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // IMPORTANT: Replace with your actual Firebase project config from Firebase Console
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // Export functions to global scope for button clicks
+    window.loginWithGoogle = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Login failed:", error);
+      }
+    };
+
+    window.logout = () => signOut(auth);
+
+    onAuthStateChanged(auth, async (user) => {
+      const btnLogin = document.getElementById('btnLogin');
+      const userProfile = document.getElementById('userProfile');
+      const userAvatar = document.getElementById('userAvatar');
+
+      if (user) {
+        btnLogin.style.display = 'none';
+        userProfile.style.display = 'flex';
+        userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
+        
+        // Save user info to Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName,
+          id: user.uid,
+          lastLogin: new Date()
+        }, { merge: true });
+        
+        console.log("Logged in as:", user.displayName);
+      } else {
+        btnLogin.style.display = 'block';
+        userProfile.style.display = 'none';
+      }
+    });
+
+    // Helper to send game results to Cloud
+    window.syncGameResult = async (gameId, score) => {
+      if (!auth.currentUser) return;
+      
+      const userRef = doc(db, "leaderboards", gameId, "rankings", auth.currentUser.uid);
+      await setDoc(userRef, {
+        playerName: auth.currentUser.displayName,
+        score: score,
+        photoURL: auth.currentUser.photoURL,
+        timestamp: new Date()
+      }, { merge: true });
+    };
+
+  </script>
 
   <footer>
     <div class="footer-links">
