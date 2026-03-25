@@ -1143,12 +1143,12 @@
             runwayGroup.add(block);
         }
 
-        // ─── 4. Ground Obstacles (Improved Visuals & Gates) ───
+        // ─── 4. Ground Obstacles (Building-centric as requested) ───
         const groundObstacles = [];
-        for (let i = 0; i < 120; i++) groundObstacles.push(createTree());
-        for (let i = 0; i < 100; i++) groundObstacles.push(createBuilding());
-        for (let i = 0; i < 120; i++) groundObstacles.push(createMountain());
-        for (let i = 0; i < 20; i++) groundObstacles.push(createCastle());
+        for (let i = 0; i < 50; i++) groundObstacles.push(createTree());
+        for (let i = 0; i < 280; i++) groundObstacles.push(createBuilding());
+        for (let i = 0; i < 40; i++) groundObstacles.push(createMountain());
+        for (let i = 0; i < 30; i++) groundObstacles.push(createCastle());
         for (let i = 0; i < 15; i++) {
             const gate = createGate();
             groundObstacles.push(gate);
@@ -1469,16 +1469,16 @@
             casual: {
                 baseSpeed: 3.5,
                 speedScalePerLevel: 0.4,
-                stallSpeedMulti: 0.6,       // relative to takeoffSpeed
+                stallSpeedMulti: 0.6,
                 maxAltitude: 900,
-                boundsWarn: 2000,
-                boundsDeath: 3000,
-                hazardSpeedMult: 0.7,
-                homingLevel: 6,             // rockets home only at diffLevel >= 6
-                spawnWidthBase: 6000,
-                obstacleCountMult: 0.6,
-                skyHazardCount: { plane: 7, rocket: 4, balloon: 9 },
-                diffScalePerDist: 3000,     // distanceTraveled per diffLevel tick
+                boundsWarn: 2500,
+                boundsDeath: 3500,
+                hazardSpeedMult: 0.6,
+                homingLevel: 8,
+                spawnWidthBase: 8000,
+                obstacleCountMult: 0.4, // Map sparsity
+                skyHazardCount: { plane: 6, rocket: 2, balloon: 6 },
+                diffScalePerDist: 4000,
                 boostExtra: 4.0,
             },
             extreme: {
@@ -1785,7 +1785,7 @@
                 let isHit = false;
                 let crashReason = "";
                 const planeBox = new THREE.Box3().setFromObject(planeGroup);
-                planeBox.expandByScalar(-1.5);
+                planeBox.expandByScalar(-0.5); // Tighter hit box for plane
 
                 if (themes[currentTheme].name !== "Leviathan Deep") {
                     for (let obs of groundObstacles) {
@@ -1805,7 +1805,8 @@
                             }
                             const obsBox = new THREE.Box3().setFromObject(obs);
                             const size = new THREE.Vector3(); obsBox.getSize(size);
-                            obsBox.expandByVector(new THREE.Vector3(-size.x * 0.35, -size.y * 0.1, -size.z * 0.35));
+                            // Very tight collision for the real models
+                            obsBox.expandByVector(new THREE.Vector3(-size.x * 0.05, -size.y * 0.0, -size.z * 0.05));
                             if (planeBox.intersectsBox(obsBox)) {
                                 isHit = true; crashReason = "Obstacle collision detected!"; break;
                             }
