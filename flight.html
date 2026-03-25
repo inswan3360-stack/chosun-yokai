@@ -968,7 +968,17 @@
     </a>
 
     <div id="game-container">
-    <div id="hangar-screen">
+        <!-- New Mobile Controls Overlay -->
+        <div class="mobile-controls ingame-ui">
+            <div id="joystick" class="joystick-container">
+                <div id="joystick-knob"></div>
+            </div>
+            <div class="mobile-action-btns">
+                <div id="btn-boost" class="mobile-btn">Boost</div>
+            </div>
+        </div>
+
+        <div id="hangar-screen">
         <h1 class="hangar-title">FLIGHT GLITCH</h1>
         <div class="hangar-subtitle">ZONE EXPANDED: Wider operational space authorized. Avoid perimeter breach.</div>
 
@@ -1544,6 +1554,11 @@
             }
             isEngineOn = true;
             resetPlayer();
+
+            // Auto-fullscreen for mobile immersion
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
         }
 
         function returnToHangar() {
@@ -1658,11 +1673,13 @@
             knob.style.left = (50 + (px / 70 * 50)) + '%';
             knob.style.top = (50 + (py / 70 * 50)) + '%';
 
-            // Deadzone and mapping
+            // Deadzone and mapping (Inverted Flight Controls)
             keys.a = px < -20;
             keys.d = px > 20;
-            keys.w = py > 20; // Inverted for typical flight feel: Pull back (down) to climb
-            keys.s = py < -20; // Push forward (up) to descend
+            // PULL DOWN (Positive py) to PITCH UP (Takeoff/Climb) - S key
+            keys.s = py > 20; 
+            // PUSH UP (Negative py) to PITCH DOWN (Dive) - W key
+            keys.w = py < -20; 
         }
 
         btnBoost.addEventListener('touchstart', () => keys.shift = true);
@@ -1777,7 +1794,7 @@
             planeGroup.translateZ(currentSpeed);
 
             if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Aircraft Stalled: Ground collision!"); return; }
-            if (!hasTakenOff && distanceTraveled > 1800) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
+            if (!hasTakenOff && distanceTraveled > 2400) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
 
             // Collision Detection
             if (hasTakenOff && !isGameOver) {
@@ -1870,7 +1887,8 @@
 
             const spawnWidth = Math.max(dc.boundsWarn * 0.5, dc.spawnWidthBase - (diffLevel * 300));
 
-            distanceTraveled += currentSpeed;
+            // Frame-rate independent distance tracking
+            distanceTraveled += currentSpeed * 60 * delta;
             currentTheme = Math.floor(distanceTraveled / 15000) % themes.length;
             if (currentTheme !== previousTheme) {
                 if (themes[currentTheme].name === "Leviathan Deep" && hasTakenOff) {
