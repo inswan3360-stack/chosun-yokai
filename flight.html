@@ -440,9 +440,90 @@
             font-family: inherit;
         }
 
-        .btn:hover {
-            background-color: #ddd;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        /* ─── HUD Speedometer ─── */
+        #hud-speedometer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 4px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            padding: 5px;
+        }
+
+        .speed-text-top {
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: #00ffcc;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        .speed-bar-container {
+            position: relative;
+            width: 260px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        #speed-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffcc, #0088ff);
+            box-shadow: 0 0 15px #00ffcc;
+            transition: width 0.1s;
+        }
+
+        .stall-zone {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.4);
+            border-right: 1px solid #ff4444;
+        }
+
+        .takeoff-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+            z-index: 5;
+        }
+
+        #speed-value {
+            position: absolute;
+            top: -25px;
+            right: 0;
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffcc;
+            text-shadow: 0 0 15px #00ffcc;
+        }
+
+        #speed-value::after {
+            content: " KTS";
+            font-size: 10px;
+            opacity: 0.6;
         }
 
         /* ─── Name Entry Popup ─── */
@@ -1756,10 +1837,21 @@
             else document.getElementById('altitude-warning').style.display = 'none';
 
             if (planeGroup.position.y <= FLOOR_HEIGHT + 0.1) {
-                if (hasTakenOff && !isGameOver) { triggerGameOver("Fatal Crash: Ground impact!"); return; }
-                planeGroup.position.y = FLOOR_HEIGHT; roll = 0; if (pitch > 0) pitch = 0;
+                // If it was ALREADY in the air (y > FLOOR_HEIGHT + 5), then hitting ground is a crash.
+                // This prevents exploding when just starting to rotate.
+                if (hasTakenOff && !isGameOver && planeGroup.position.y < FLOOR_HEIGHT - 1.0) { 
+                     triggerGameOver("Fatal Crash: Ground impact!"); return; 
+                }
+                
+                planeGroup.position.y = FLOOR_HEIGHT; 
+                if (pitch > 0) roll *= 0.9; // Friction
+                if (pitch > 0) pitch = 0;
+
                 if (keys.s && currentSpeed >= takeoffSpeed) {
-                    hasTakenOff = true; document.getElementById('takeoff-guide').style.display = 'none';
+                    hasTakenOff = true; 
+                    document.getElementById('takeoff-guide').style.display = 'none';
+                    // Kick up the plane instantly by a small amount to clear the floor check
+                    planeGroup.position.y += 0.5;
                 }
             }
 
@@ -1769,10 +1861,10 @@
             }
 
             let fillPct = Math.min(100, (currentSpeed / maxGaugeSpeed) * 100);
-            document.getElementById('speed-fill').style.height = fillPct + '%';
+            document.getElementById('speed-fill').style.width = fillPct + '%';
             document.getElementById('speed-value').innerText = Math.floor(currentSpeed * 40);
-            document.querySelector('.stall-zone').style.height = ((stallSpeed / maxGaugeSpeed) * 100) + '%';
-            document.querySelector('.takeoff-line').style.bottom = ((takeoffSpeed / maxGaugeSpeed) * 100) + '%';
+            document.querySelector('.stall-zone').style.width = ((stallSpeed / maxGaugeSpeed) * 100) + '%';
+            document.querySelector('.takeoff-line').style.left = ((takeoffSpeed / maxGaugeSpeed) * 100) + '%';
 
             planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
             planeGroup.translateZ(currentSpeed);
