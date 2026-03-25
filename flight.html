@@ -994,9 +994,15 @@
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 4000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(480, 854); // Fixed size for the 'console' feel
+        renderer.setSize(window.innerWidth, window.innerHeight); 
         renderer.shadowMap.enabled = true;
         document.getElementById('game-container').appendChild(renderer.domElement);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
