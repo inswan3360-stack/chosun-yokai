@@ -1028,6 +1028,7 @@
     <!-- ─── Name Entry Popup ─── -->
     <div id="name-popup">
         <div class="name-popup-box">
+            <div id="popup-status" style="color:#ff4444; font-size:10px; font-weight:900; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">⚠️ SYSTEM FAILURE: MISSION TERMINATED</div>
             <div class="name-popup-title">✈️ PILOT LOG</div>
             <div class="name-popup-sub">Enter your pilot name to save your score.</div>
             <input id="pilot-name-input" type="text" maxlength="16" placeholder="PILOT" autocomplete="off" />
@@ -1157,7 +1158,7 @@
         for (let i = -3; i < 3; i++) {
             const mat = new THREE.MeshLambertMaterial({ color: Math.abs(i) % 2 === 0 ? 0xff2222 : 0xeeeeee });
             const block = new THREE.Mesh(new THREE.BoxGeometry(10, 0.25, 20), mat);
-            block.position.set(i * 10 + 5, 0.15, 1790);
+            block.position.set(i * 10 + 5, 0.15, 5990);
             runwayGroup.add(block);
         }
 
@@ -1196,7 +1197,7 @@
                     const rightOffset = (Math.random() - 0.5) * spawnWidth;
                     const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
                     x = newPos.x; z = newPos.z;
-                } while (Math.abs(x) < 250 && z > -200 && z < 2500); // Fairly clear central path
+                } while (Math.abs(x) < 250 && z > -500 && z < 7000); // Clear runway path
             }
 
             obs.position.set(x, y, z);
@@ -1693,7 +1694,9 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            const delta = clock.getDelta();
+            let delta = clock.getDelta();
+            // Cap delta to prevent logic jumps (e.g., during lag or startup)
+            delta = Math.min(delta, 0.1);
 
             activeRotors.forEach(r => {
                 if (r.axis === 'x') r.mesh.rotation.x += r.speed * delta;
@@ -1794,7 +1797,7 @@
             planeGroup.translateZ(currentSpeed);
 
             if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Aircraft Stalled: Ground collision!"); return; }
-            if (!hasTakenOff && distanceTraveled > 2400) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
+            if (!hasTakenOff && distanceTraveled > 6000) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
 
             // Collision Detection
             if (hasTakenOff && !isGameOver) {
