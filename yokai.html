@@ -28,18 +28,42 @@
     }
 
     body {
-      background: #0a0c12; /* Darker, matching the portal theme */
+      background: #0a0c12; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.1) 0%, transparent 80%),
-        url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        linear-gradient(rgba(10, 12, 18, 0.8), rgba(10, 12, 18, 0.8)),
+        url('assets/previews/yokai.png');
+      background-size: cover;
+      background-position: center;
       display: flex;
       justify-content: center;
-      align-items: center; /* Vertical centering */
+      align-items: center; 
       min-height: 100vh;
       margin: 0;
       padding: 20px;
       font-family: 'Noto Sans KR', sans-serif;
-      overflow: hidden; /* Keep the playground focus */
+      overflow: hidden; 
+    }
+
+    /* Fullscreen Toggle */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100000;
+      color: var(--gold);
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--gold);
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+    .fullscreen-btn:hover {
+      background: rgba(200, 144, 10, 0.2);
+      transform: scale(1.1);
     }
 
     /* Back Button */
@@ -7591,6 +7615,28 @@
       &copy; 2026 Registry of Chosun Mysteries. All rights reserved.
     </div>
   </footer>
+  <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+  </button>
+
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Auto fullscreen on first interaction (optional but helpful)
+    document.addEventListener('mousedown', function initialFullscreen() {
+      // document.documentElement.requestFullscreen(); // Browser often blocks this unless it's a direct button click
+    }, { once: true });
+  </script>
 </body>
 
 </html>

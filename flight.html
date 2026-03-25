@@ -11,14 +11,40 @@
             margin: 0;
             background: #0a0c12;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.05) 0%, transparent 80%),
-                url('https://www.transparenttextures.com/patterns/dark-matter.png');
+                linear-gradient(rgba(10, 12, 18, 0.8), rgba(10, 12, 18, 0.8)),
+                url('assets/previews/flight.png');
+            background-size: cover;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             font-family: 'Outfit', 'Courier New', sans-serif;
             overflow: hidden;
+        }
+
+        /* Fullscreen Toggle */
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100000;
+            color: #00ffcc;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #00ffcc;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        .fullscreen-btn:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.4);
         }
 
         #game-container {
@@ -1907,6 +1933,23 @@
             &copy; 2026 Registry of Chosun Mysteries. All rights reserved.
         </div>
     </footer>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+
+    <script shadow>
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
