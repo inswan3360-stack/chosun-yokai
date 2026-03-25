@@ -16,6 +16,7 @@
             font-family: 'Montserrat', sans-serif;
             user-select: none;
             overflow: hidden;
+            touch-action: none;
         }
 
         /* Hide non-game elements as requested */
@@ -52,18 +53,65 @@
             left: 0;
             width: 480px;
             height: 720px;
-            background: linear-gradient(135deg, rgba(15,15,25,0.7) 0%, rgba(5,5,10,0.95) 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.05);
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        /* Mobile controls overlay */
+        .mobile-ui {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 180px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-ui { display: flex; justify-content: space-between; align-items: flex-end; }
+        }
+
+        .touch-btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            pointer-events: auto;
+            touch-action: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .touch-btn:active {
+            background: rgba(0, 115, 255, 0.4);
+            border-color: #0073ff;
+            transform: scale(0.95);
+        }
+
+        .nitro-btn {
+            width: 100px;
+            height: 60px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #ff1744;
+            border-color: #ff1744;
+        }
+        .nitro-btn:active {
+            background: rgba(255, 23, 68, 0.3);
+            border-color: #ff1744;
         }
 
         #mainScreen {
@@ -209,6 +257,7 @@
     </style>
 </head>
 <body>
+<body style="touch-action: none;">
     <a href="index.html" class="back-portal">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         PLAYGROUND
@@ -217,6 +266,13 @@
     <div id="gameContainer">
         <canvas id="gameCanvas" width="480" height="720"></canvas>
         
+        <!-- Mobile UI -->
+        <div class="mobile-ui">
+            <div id="btnLeft" class="touch-btn">◀</div>
+            <div id="btnNitro" class="touch-btn nitro-btn">Nitro</div>
+            <div id="btnRight" class="touch-btn">▶</div>
+        </div>
+
         <div id="gameUI">
             <div class="boost-container">
                 <div class="boost-text">NITRO BOOST</div>
@@ -431,6 +487,21 @@
         ];
 
         let keys = { ArrowLeft: false, ArrowRight: false, Space: false };
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        // Mobile touch handling
+        const touchMappings = [
+            { id: 'btnLeft', key: 'ArrowLeft' },
+            { id: 'btnRight', key: 'ArrowRight' },
+            { id: 'btnNitro', key: 'Space' }
+        ];
+
+        touchMappings.forEach(map => {
+            const el = document.getElementById(map.id);
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[map.key] = true; });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); keys[map.key] = false; });
+        });
         document.addEventListener("keydown", e => {
             if(e.key === "ArrowLeft") keys.ArrowLeft = true;
             if(e.key === "ArrowRight") keys.ArrowRight = true;
