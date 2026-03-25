@@ -28,18 +28,68 @@
     }
 
     body {
-      background: #1a1008;
+      background: #0a0c12; /* Darker, matching the portal theme */
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(197, 160, 89, 0.1) 0%, transparent 80%),
+        url('https://www.transparenttextures.com/patterns/dark-matter.png');
       display: flex;
       justify-content: center;
+      align-items: center; /* Vertical centering */
       min-height: 100vh;
-      padding: 10px 0;
+      margin: 0;
+      padding: 20px;
       font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden; /* Keep the playground focus */
+    }
+
+    /* Back Button */
+    .back-portal {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100000;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.6);
+      padding: 8px 15px;
+      border-radius: 50px;
+      border: 1px solid var(--gold);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-portal:hover {
+      background: rgba(200, 144, 10, 0.2);
+      transform: scale(1.05);
     }
 
     #app {
       width: 100%;
       max-width: 480px;
+      height: auto;
+      aspect-ratio: 9 / 16; /* Mobile-like aspect ratio */
+      max-height: 90vh;
       position: relative;
+      background: #1a1008;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(197, 160, 89, 0.1);
+      border: 4px solid #4a2e0a;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Scrollable content within the centered app if needed */
+    .screen {
+      height: 100%;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold) transparent;
     }
 
     .screen {
@@ -1995,6 +2045,11 @@
 </head>
 
 <body>
+  <a href="index.html" class="back-portal">
+    <span>⛩️</span>
+    <span id="backToPortalTxt">Playground</span>
+  </a>
+
   <!-- 언어 선택 버튼 (모든 화면에서 항상 표시) -->
   <div id="langSwitch">
     <button class="lang-btn active" id="btnLangKo" onclick="setLang('ko')">한국어</button>
@@ -2902,6 +2957,7 @@
         imgTitle: '조선 요괴 전생기',
         imgSub: '나의 전생 요괴는 무엇인가?',
         imgBadge: '당신만의 조선 요괴를 찾아보세요',
+        backToPlayground: '⛩️ 놀이터로 돌아가기'
       },
       en: {
         gameDesc: '🎮 About This Game',
@@ -2952,6 +3008,7 @@
         imgTitle: 'Chosun Yokai: Rebirth',
         imgSub: 'What was your past life yokai?',
         imgBadge: 'Discover your own Chosun Yokai',
+        backToPlayground: '⛩️ Back to Playground',
         yokai: {
           gumiho: { name: "Gumiho", region: "Jeolla Province", trait: "Magic", desc: "A nine-tailed fox spirit, master of illusion and charm.", pers: "In your past life, you saw the world through intuition and emotion." },
           dokkaebi: { name: "Dokkaebi", region: "Nationwide", trait: "Strength", desc: "A mischievous trickster wielding a magical club.", pers: "In your past life, you were an energetic adventurer full of life." },
@@ -3047,6 +3104,10 @@
 
     function applyLang() {
       var T = L[currentLang] || L.ko;
+      // 상단 놀이터로 돌아가기
+      var bPortal = document.getElementById('backToPortalTxt');
+      if(bPortal) bPortal.innerText = T.backToPlayground.replace('⛩️ ', '');
+      
       // 타이틀 카드
       _el('ldGameDesc', T.gameDesc);
       _el('ldC1T', T.c1t); _el('ldC1D', T.c1d);

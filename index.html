@@ -321,22 +321,241 @@
   </section>
 
   <section id="playground" class="playground-grid">
-    <a href="yokai.html" class="play-card" style="background-image: url('https://images.unsplash.com/photo-1542332213-31f87348057f?auto=format&fit=crop&q=80&w=800'); background-size: cover; background-position: center;">
+    <div class="play-card" onclick="showGameInfo('yokai')" style="background-image: url('assets/previews/yokai.png'); background-size: cover; background-position: center; cursor: pointer;">
       <div class="card-content">
         <span class="card-tag">Simulation</span>
         <h2 class="card-title">Yokai: Rebirth</h2>
         <p class="card-desc">Experience the subtle evolution of ancestral spirits. No complex mechanics, just the natural flow of folklore.</p>
       </div>
-    </a>
+    </div>
 
-    <a href="flight.html" class="play-card" style="background-image: url('https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&q=80&w=800'); background-size: cover; background-position: center;">
+    <div class="play-card" onclick="showGameInfo('flight')" style="background-image: url('assets/previews/flight.png'); background-size: cover; background-position: center; cursor: pointer;">
       <div class="card-content">
         <span class="card-tag">Arcade</span>
         <h2 class="card-title">Flight Glitch</h2>
         <p class="card-desc">Pure, high-intensity survival. A return to the arcade era where skill and focus were the only specifications that mattered.</p>
       </div>
-    </a>
+    </div>
+
+    <div class="play-card" onclick="showGameInfo('highway')" style="background-image: url('assets/previews/highway.png'); background-size: cover; background-position: center; cursor: pointer;">
+      <div class="card-content">
+        <span class="card-tag">Racing</span>
+        <h2 class="card-title">Highway Chase</h2>
+        <p class="card-desc">A high-speed adrenaline rush through neon-lit streets. Outrun the law and master the asphalt.</p>
+      </div>
+    </div>
   </section>
+
+  <!-- Game Info Modal Overlay -->
+  <div id="gameModal" class="modal-overlay">
+    <div class="modal-container">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div id="modalHero" class="modal-hero"></div>
+      <div class="modal-body">
+        <div class="modal-header">
+          <span id="modalTag" class="badge" style="margin-bottom: 10px;">Category</span>
+          <h2 id="modalTitle" class="section-title" style="margin-bottom: 15px;">Game Title</h2>
+        </div>
+        <p id="modalDesc" class="philosophy-text" style="font-size: 1rem; margin-bottom: 30px;">
+          Game description goes here.
+        </p>
+        <div class="controls-info">
+          <h4 style="color: var(--gold-bright); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Controls</h4>
+          <p id="modalControls" style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">Control instructions...</p>
+        </div>
+        <div class="modal-actions">
+          <a id="playBtn" href="#" class="play-now-btn">PLAY NOW</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.4s;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-container {
+      background: var(--ink);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 800px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(197, 160, 89, 0.1);
+      transform: translateY(30px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: translateY(0);
+    }
+
+    .modal-hero {
+      width: 100%;
+      height: 350px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .modal-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; width: 100%; height: 50%;
+      background: linear-gradient(to bottom, transparent, var(--ink));
+    }
+
+    .modal-body {
+      padding: 40px;
+      padding-top: 0;
+      margin-top: -60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 3000;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: rotate(90deg);
+    }
+
+    .play-now-btn {
+      display: inline-block;
+      padding: 18px 50px;
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+      color: #000;
+      text-decoration: none;
+      font-weight: 900;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      box-shadow: 0 10px 25px rgba(197, 160, 89, 0.3);
+    }
+
+    .play-now-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(197, 160, 89, 0.5);
+    }
+
+    .controls-info {
+      background: rgba(255,255,255,0.03);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 3px solid var(--gold);
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .modal-hero { height: 200px; }
+      .modal-body { padding: 25px; margin-top: -30px; }
+      .modal-container { margin-top: 50px; }
+    }
+  </style>
+
+  <script>
+    const gameData = {
+      yokai: {
+        title: "요괴: 환생",
+        tag: "Simulation",
+        desc: "조상신과 정령들이 깃든 신비로운 세상을 탐험하세요. 당신의 요괴를 선택하고 시대를 거쳐 성장시키며 환생의 비밀을 밝혀보세요. 단순한 조작 속에 담긴 깊은 동양적 철학을 경험할 수 있습니다.",
+        controls: "• 마우스 클릭 또는 화면 터치로 요괴와 상호작용합니다.<br>• 엽전을 모아 진화를 돕고 새로운 능력을 얻으세요.",
+        image: "assets/previews/yokai.png",
+        link: "yokai.html"
+      },
+      flight: {
+        title: "플라이트 글리치",
+        tag: "Arcade",
+        desc: "디지털 하늘에서 펼쳐지는 극한의 생존 비행. 끊임없이 몰려드는 기하학적 장애물과 적들을 피하며 당신의 반응 속도 한계에 도전하세요. 고전 아케이드의 강렬한 쾌감을 재현합니다.",
+        controls: "• 키보드 방향키 또는 화면 드래그로 기체를 조종합니다.<br>• 장애물에 부딪히지 않고 최대한 오래 생존하여 높은 점수를 기록하세요.",
+        image: "assets/previews/flight.png",
+        link: "flight.html"
+      },
+      highway: {
+        title: "하이웨이 체이스",
+        tag: "Racing",
+        desc: "가로등이 빛나는 네온 시티를 배경으로 한 숨막히는 추격전. 다양한 차량 중 원하는 것을 선택하고 경찰의 포위망을 뚫고 질주하세요. 도로 위 최고의 레이서가 되어 리더보드에 이름을 올리세요.",
+        controls: "• 방향키: 차량 이동 및 조향<br>• 스페이스바: 니트로 부스터 사용<br>• 가까스로 차를 피하면 점수가 대폭 상승합니다.",
+        image: "assets/previews/highway.png",
+        link: "HIGHWAY CHASE.html"
+      }
+    };
+
+    function showGameInfo(gameId) {
+      const data = gameData[gameId];
+      if (!data) return;
+
+      document.getElementById('modalTitle').innerText = data.title;
+      document.getElementById('modalTag').innerText = data.tag;
+      document.getElementById('modalDesc').innerText = data.desc;
+      document.getElementById('modalControls').innerHTML = data.controls;
+      document.getElementById('modalHero').style.backgroundImage = `url(${data.image})`;
+      document.getElementById('playBtn').href = data.link;
+
+      const modal = document.getElementById('gameModal');
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scroll
+      }, 10);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('gameModal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scroll
+      }, 400);
+    }
+
+    // Close on backdrop click
+    window.onclick = function(event) {
+      const modal = document.getElementById('gameModal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+  </script>
 
   <section class="philosophy">
     <div class="container">
