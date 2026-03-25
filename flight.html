@@ -447,14 +447,14 @@
 
         /* ─── Name Entry Popup ─── */
         #name-popup {
-            position: fixed;
+            position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(10, 15, 30, 0.45); /* Lighter, less 'black-screen' feel */
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 200;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(4px);
         }
 
         .name-popup-box {
@@ -979,124 +979,105 @@
         </div>
 
         <div id="hangar-screen">
-        <h1 class="hangar-title">FLIGHT GLITCH</h1>
-        <div class="hangar-subtitle">ZONE EXPANDED: Wider operational space authorized. Avoid perimeter breach.</div>
+            <h1 class="hangar-title">FLIGHT GLITCH</h1>
+            <div class="hangar-subtitle">ZONE EXPANDED: Wider operational space authorized. Avoid perimeter breach.</div>
 
-        <div class="selector-container">
-            <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
-            <div class="vehicle-info">
-                <span id="vehicle-name">Light Aircraft</span>
-                <span id="vehicle-desc">Standard and stable aircraft.</span>
+            <div class="selector-container">
+                <button class="arrow-btn" onclick="changeVehicle(-1)">◀</button>
+                <div class="vehicle-info">
+                    <span id="vehicle-name">Light Aircraft</span>
+                    <span id="vehicle-desc">Standard and stable aircraft.</span>
+                </div>
+                <button class="arrow-btn" onclick="changeVehicle(1)">▶</button>
             </div>
-            <button class="arrow-btn" onclick="changeVehicle(1)">▶</button>
-        </div>
 
-        <div class="diff-container">
-            <div class="diff-label">⚙️ Difficulty</div>
-            <div class="diff-pills">
-                <button class="diff-pill casual active" id="pill-casual" onclick="setDifficulty('casual')">🌿
-                    Casual</button>
-                <button class="diff-pill extreme" id="pill-extreme" onclick="setDifficulty('extreme')">💀
-                    EXTREME</button>
+            <div class="diff-container">
+                <div class="diff-label">⚙️ Difficulty</div>
+                <div class="diff-pills">
+                    <button class="diff-pill casual active" id="pill-casual" onclick="setDifficulty('casual')">🌿
+                        Casual</button>
+                    <button class="diff-pill extreme" id="pill-extreme" onclick="setDifficulty('extreme')">💀
+                        EXTREME</button>
+                </div>
+                <div id="diff-desc">Relaxed physics · Fewer hazards · Wider airspace · Great for learning the controls!
+                </div>
             </div>
-            <div id="diff-desc">Relaxed physics · Fewer hazards · Wider airspace · Great for learning the controls!
+
+            <button class="start-btn casual-start" id="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
+            <button class="lb-toggle-btn" style="position:relative;" onclick="toggleLeaderboard()">🏆 RANKINGS</button>
+        </div>
+
+        <div id="game-over-screen">
+            <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
+            <div id="game-over-reason">You hit an obstacle.</div>
+            <div class="final-score">Survival Distance: <span id="final-distance">0</span> m <span id="go-new-record"
+                    style="display:none;color:#ffd700;font-size:18px;">⭐ NEW RECORD!</span></div>
+            <div class="go-lb-mini">
+                <div class="lb-title" style="font-size:12px;">🏆 LOCAL RANKINGS — <span id="go-diff-label">CASUAL</span>
+                </div>
+                <div id="go-lb-list" class="lb-list" style="margin-top:6px;"></div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn" onclick="returnToHangar()">✈️ REBOOT SYSTEM</button>
+                <button class="btn" style="background:#222;color:#00ffcc;border:1px solid #00ffcc;"
+                    onclick="toggleLeaderboard()">🏆 FULL RANKINGS</button>
             </div>
         </div>
 
-        <button class="start-btn casual-start" id="start-btn" onclick="startGame()">🚀 SYSTEM LOGIN (START)</button>
-        <button class="lb-toggle-btn" style="position:relative;" onclick="toggleLeaderboard()">🏆 RANKINGS</button>
-    </div>
-
-    <div id="game-over-screen">
-        <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
-        <div id="game-over-reason">You hit an obstacle.</div>
-        <div class="final-score">Survival Distance: <span id="final-distance">0</span> m <span id="go-new-record"
-                style="display:none;color:#ffd700;font-size:18px;">⭐ NEW RECORD!</span></div>
-        <!-- Mini leaderboard inside game-over -->
-        <div class="go-lb-mini">
-            <div class="lb-title" style="font-size:12px;">🏆 LOCAL RANKINGS — <span id="go-diff-label">CASUAL</span>
+        <!-- ─── Name Entry Popup ─── -->
+        <div id="name-popup">
+            <div class="name-popup-box">
+                <div id="popup-status" style="color:#ff4444; font-size:10px; font-weight:900; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">⚠️ SYSTEM FAILURE: MISSION TERMINATED</div>
+                <div class="name-popup-title">✈️ PILOT LOG</div>
+                <div class="name-popup-sub">Enter your pilot name to save your score.</div>
+                <input id="pilot-name-input" type="text" maxlength="16" placeholder="PILOT" autocomplete="off" />
+                <button class="name-confirm-btn" onclick="confirmPilotName()">&#10003; SAVE TO RANKINGS</button>
             </div>
-            <div id="go-lb-list" class="lb-list" style="margin-top:6px;"></div>
         </div>
-        <div style="display:flex;gap:12px;margin-top:16px;">
-            <button class="btn" onclick="returnToHangar()">✈️ REBOOT SYSTEM</button>
-            <button class="btn" style="background:#222;color:#00ffcc;border:1px solid #00ffcc;"
-                onclick="toggleLeaderboard()">🏆 FULL RANKINGS</button>
+
+        <div id="warning-overlay"></div>
+        <div id="center-warning"></div>
+        <div id="altitude-warning">⚠️ CEILING REACHED: DESCEND NOW! ⚠️</div>
+
+        <div id="hud-speedometer" class="ingame-ui">
+            <div class="speed-text-top">AIRSPEED</div>
+            <div class="speed-bar-container">
+                <div class="stall-zone"></div>
+                <div class="takeoff-line"></div>
+                <div id="speed-fill"></div>
+            </div>
+            <div id="speed-value">0</div>
         </div>
+
+        <div id="stats-panel">
+            <div class="stat-gold">MISSION DATA</div>
+            <div id="biome-name" style="color:#aaa; margin-bottom:10px; font-size:10px; letter-spacing:1px;">--</div>
+            <div>DIST: <span id="score" class="stat-green">0</span> m</div>
+            <div>LEVEL: <span id="difficulty" class="stat-green">1</span></div>
+            <div>ALT: <span id="altitude" class="stat-green">0</span> ft</div>
+            <div id="v-stall-warn" class="stat-red" style="display:none; font-size:10px;">⚠️ STALL WARNING</div>
+        </div>
+
+        <div id="takeoff-guide">
+            <div style="font-size: 28px; margin-bottom: 10px;">⏫ PULL DOWN TO TAKEOFF</div>
+            <div style="font-size: 14px; opacity: 0.8;">(Move Joystick DOWN or press 'S' key)</div>
+        </div>
+
+        <!-- ─── Leaderboard Panel ─── -->
+        <div id="leaderboard-panel" class="hangar-mode">
+            <div class="lb-title">🏆 LOCAL RANKINGS</div>
+            <div class="lb-tabs">
+                <button class="lb-tab casual active" onclick="switchLbTab('casual')">🌿 Casual</button>
+                <button class="lb-tab extreme" onclick="switchLbTab('extreme')">💀 Extreme</button>
+            </div>
+            <div id="lb-list" class="lb-list"></div>
+            <div style="text-align:center;margin-top:4px;">
+                <button onclick="clearScores()" style="background:none;border:none;color:#444;font-size:10px;cursor:pointer;font-family:inherit;">⚠ Clear All Records</button>
+            </div>
+        </div>
+
+        <div id="crosshair" class="ingame-ui">＋</div>
     </div>
-
-    <!-- ─── Name Entry Popup ─── -->
-    <div id="name-popup">
-        <div class="name-popup-box">
-            <div id="popup-status" style="color:#ff4444; font-size:10px; font-weight:900; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">⚠️ SYSTEM FAILURE: MISSION TERMINATED</div>
-            <div class="name-popup-title">✈️ PILOT LOG</div>
-            <div class="name-popup-sub">Enter your pilot name to save your score.</div>
-            <input id="pilot-name-input" type="text" maxlength="16" placeholder="PILOT" autocomplete="off" />
-            <button class="name-confirm-btn" onclick="confirmPilotName()">&#10003; SAVE TO RANKINGS</button>
-        </div>
-    </div>
-
-    <div id="warning-overlay"></div>
-    <div id="center-warning"></div>
-    <div id="altitude-warning">⚠️ CEILING REACHED: DESCEND NOW! ⚠️</div>
-
-    <div id="hud-speedometer" class="ingame-ui">
-        <div class="speed-text-top">AIRSPEED</div>
-        <div class="speed-bar-container">
-            <div class="stall-zone"></div>
-            <div class="takeoff-line"></div>
-            <div id="speed-fill"></div>
-        </div>
-        <div id="speed-value">0</div>
-    </div>
-
-    <div id="stats-panel">
-        <div class="stat-gold">Distance: <span id="score">0</span> m</div>
-        <div class="stat-green">Biome: <span id="biome-name">Plains</span></div>
-        <div class="stat-red">🔥 Danger Level: <span id="difficulty">1</span></div>
-        <br>
-        <div id="hud-stats" class="ingame-ui">
-            Distance: <span id="dist-val">0</span>m | Altitude: <span id="alt-val">0</span>m | Level: <span
-                id="lvl-val">1</span>
-        </div>
-        <br>
-        <div style="color:#aaa;">[S] Pitch UP (Takeoff/Slow)</div>
-        <div style="color:#aaa;">[W] Pitch DOWN (Dive/Accel)</div>
-        <div style="color:#aaa;">[A/D] Turn Left/Right</div>
-        <div style="color:#00ff88; font-weight:bold; margin-top:5px;">[SHIFT] BOOST 💨</div>
-    </div>
-
-    <!-- Mobile Controls Viewport -->
-    <div class="mobile-controls ingame-ui">
-        <div id="joystick" class="joystick-container">
-            <div id="joystick-knob"></div>
-        </div>
-        <div class="mobile-action-btns">
-            <div id="btn-boost" class="mobile-btn">Boost</div>
-        </div>
-    </div>
-
-    <!-- ─── Leaderboard Panel ─── -->
-    <div id="leaderboard-panel">
-        <div class="lb-title">🏆 LOCAL RANKINGS</div>
-        <div class="lb-tabs">
-            <button class="lb-tab casual active" id="lb-tab-casual" onclick="switchLbTab('casual')">🌿 Casual</button>
-            <button class="lb-tab extreme" id="lb-tab-extreme" onclick="switchLbTab('extreme')">💀 Extreme</button>
-        </div>
-        <div id="lb-list" class="lb-list"></div>
-        <div style="text-align:center;margin-top:4px;">
-            <button onclick="clearScores()"
-                style="background:none;border:none;color:#444;font-size:10px;cursor:pointer;font-family:inherit;">⚠
-                Clear All Records</button>
-        </div>
-    </div>
-
-    <div id="crosshair" class="ingame-ui">✛</div>
-    <div class="hud-line ingame-ui" style="width: 150px; height: 1px; margin-top: 20px;"></div>
-    <div class="hud-line ingame-ui" style="width: 100px; height: 1px; margin-top: -20px;"></div>
-
-    <div id="takeoff-guide">Accelerate past the WHITE LINE<br>then press [S] to TAKE OFF!</div>
-    </div><!-- #game-container -->
 
     <script>
         // ─── 1. Scene Setup ───
@@ -1797,7 +1778,7 @@
             planeGroup.translateZ(currentSpeed);
 
             if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Aircraft Stalled: Ground collision!"); return; }
-            if (!hasTakenOff && distanceTraveled > 6000) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
+            if (!hasTakenOff && distanceTraveled > 12000) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
 
             // Collision Detection
             if (hasTakenOff && !isGameOver) {
