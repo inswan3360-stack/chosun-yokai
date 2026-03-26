@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Survive the high-speed pursuit of the ancient sea monster in the Registry of Chosun Mysteries. A high-stakes flight survival game featuring mystical creatures.">
     <title>Flight Glitch | Registry of Chosun Mysteries</title>
     <style>
@@ -33,6 +33,19 @@
             border: none;
             border-radius: 0;
             overflow: hidden;
+        }
+
+        #game-container::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.6;
         }
 
         canvas {
@@ -265,7 +278,7 @@
             pointer-events: none;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1024px) and (pointer: coarse) {
             .mobile-controls { display: flex; }
             .hangar-title { font-size: 44px; margin-bottom: 5px; }
             .selector-container { gap: 15px; padding: 10px 15px; }
@@ -440,90 +453,75 @@
             font-family: inherit;
         }
 
-        /* ─── HUD Speedometer ─── */
+        /* ─── HUD Speedometer (Circular Dial) ─── */
         #hud-speedometer {
             position: absolute;
-            bottom: 40px;
-            right: 40px;
-            width: 280px;
-            height: 65px;
-            background: rgba(0, 5, 20, 0.6);
-            border: 1px solid rgba(0, 255, 204, 0.5);
-            border-radius: 4px;
+            bottom: 20px;
+            right: 20px;
+            width: 130px;
+            height: 130px;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(10px);
-            padding: 8px;
         }
 
-        .speed-text-top {
-            font-size: 8px;
-            letter-spacing: 2px;
-            color: #00ffcc;
-            opacity: 0.8;
-            margin-bottom: 5px;
-            font-weight: 900;
+        #speed-dial-svg {
+            width: 130px;
+            height: 130px;
+            position: absolute;
+            top: 0; left: 0;
         }
+
+        #speed-dial-center {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #speed-value {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+
+        .speed-unit-label {
+            font-size: 8px;
+            color: #00ffcc;
+            letter-spacing: 2px;
+            font-weight: 900;
+            margin-top: 1px;
+        }
+
+        .speed-dial-label {
+            font-size: 7px;
+            color: #aaa;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        /* ─── stall/takeoff markers now drawn in SVG ─── */
+        .speed-text-top { display: none; }
 
         .speed-bar-container {
-            position: relative;
-            width: 260px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
+            display: none;
         }
 
         #speed-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 100%;
+            display: none;
             background: linear-gradient(90deg, #00ffcc, #00bbff);
             box-shadow: 0 0 20px #00ffcc;
             /* No transition for instant feedback */
         }
 
-        .stall-zone {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 0;
-            height: 100%;
-            background: rgba(255, 0, 0, 0.4);
-            border-right: 1px solid #ff4444;
-        }
-
-        .takeoff-line {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 2px;
-            height: 100%;
-            background: #fff;
-            box-shadow: 0 0 10px #fff;
-            z-index: 5;
-        }
-
-        #speed-value {
-            position: absolute;
-            top: -30px;
-            left: 0; /* Align left to prevent cutoff on right side */
-            font-size: 26px;
-            font-weight: 900;
-            color: #00ffcc;
-            text-shadow: 0 0 15px #00ffcc;
-        }
-
-        #speed-value::after {
-            content: " KTS";
-            font-size: 10px;
-            opacity: 0.6;
-        }
+        .stall-zone { display: none; }
+        .takeoff-line { display: none; }
 
         /* ─── Name Entry Popup ─── */
         #name-popup {
@@ -649,79 +647,7 @@
             margin-bottom: 5px;
         }
 
-        #hud-speedometer {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 300px;
-            background: rgba(10, 15, 20, 0.8);
-            border: 2px solid #555;
-            border-radius: 8px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-        }
-
-        .speed-text-top {
-            color: #aaa;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .speed-bar-container {
-            position: relative;
-            width: 24px;
-            height: 220px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 10px 0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        #speed-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 0%;
-            background: linear-gradient(to top, #ff2222, #ffb800, #00ff88, #00d4ff);
-            transition: height 0.1s linear;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .stall-zone {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 0, 0, 0.5);
-            z-index: 1;
-        }
-
-        .takeoff-line {
-            position: absolute;
-            left: -5px;
-            width: 34px;
-            height: 3px;
-            background: #fff;
-            z-index: 2;
-            box-shadow: 0 0 5px #fff;
-        }
-
-        #speed-value {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 900;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #00ff88;
-        }
+        /* duplicate removed */
 
         #center-warning {
             position: absolute;
@@ -1034,8 +960,83 @@
             max-width: 90vw;
         }
 
-        .go-lb-mini .lb-list {
-            max-height: 160px;
+        /* ─── Compass HUD ─── */
+        #hud-compass {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 130px;
+            height: 130px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        #compass-svg {
+            width: 130px;
+            height: 130px;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        #compass-center {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        #compass-heading {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 0 10px #ffaa00;
+        }
+
+        #compass-dir {
+            font-size: 11px;
+            font-weight: 900;
+            color: #ffaa00;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        /* ─── Mobile full-screen fixes ─── */
+        @media (max-width: 768px) {
+            body {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+            #game-container {
+                width: 100%;
+                height: 100%;
+                min-height: -webkit-fill-available;
+            }
+            canvas {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            /* Move HUDs above the joystick area (joystick is ~140px + 40px bottom = 180px) */
+            #hud-speedometer {
+                bottom: 200px;
+                right: 15px;
+                width: 110px;
+                height: 110px;
+            }
+            #speed-dial-svg { width: 110px; height: 110px; }
+            #hud-compass {
+                bottom: 200px;
+                left: 15px;
+                width: 110px;
+                height: 110px;
+            }
+            #compass-svg { width: 110px; height: 110px; }
+            #speed-value { font-size: 18px; }
+            #compass-heading { font-size: 16px; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1120,13 +1121,65 @@
         <div id="altitude-warning">⚠️ CEILING REACHED: DESCEND NOW! ⚠️</div>
 
         <div id="hud-speedometer" class="ingame-ui">
-            <div class="speed-text-top">AIRSPEED</div>
-            <div class="speed-bar-container">
+            <svg id="speed-dial-svg" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer ring -->
+                <circle cx="65" cy="65" r="60" fill="rgba(0,5,20,0.75)" stroke="rgba(0,255,204,0.4)" stroke-width="2"/>
+                <!-- Tick marks & labels drawn by JS -->
+                <g id="dial-ticks"></g>
+                <!-- Arc track background -->
+                <path id="arc-bg" d="" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <!-- Stall zone arc -->
+                <path id="arc-stall" d="" stroke="rgba(255,30,30,0.6)" stroke-width="8" fill="none" stroke-linecap="butt"/>
+                <!-- Speed arc fill -->
+                <path id="arc-fill" d="" stroke="url(#speedGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <!-- Needle -->
+                <line id="speed-needle" x1="65" y1="65" x2="65" y2="20" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="65" cy="65" r="5" fill="#00ffcc"/>
+                <!-- Takeoff marker line -->
+                <line id="takeoff-marker" x1="65" y1="14" x2="65" y2="24" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="speedGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00ffcc"/>
+                        <stop offset="100%" stop-color="#00aaff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div id="speed-dial-center">
+                <div id="speed-value">0</div>
+                <div class="speed-unit-label">KTS</div>
+                <div class="speed-dial-label">AIRSPEED</div>
+            </div>
+            <!-- hidden elements kept for JS compat -->
+            <div class="speed-bar-container" style="display:none">
                 <div class="stall-zone"></div>
                 <div class="takeoff-line"></div>
                 <div id="speed-fill"></div>
             </div>
-            <div id="speed-value">0</div>
+        </div>
+
+        <!-- ─── Compass HUD ─── -->
+        <div id="hud-compass" class="ingame-ui">
+            <svg id="compass-svg" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="65" cy="65" r="60" fill="rgba(0,5,20,0.75)" stroke="rgba(255,170,0,0.4)" stroke-width="2"/>
+                <!-- Tick ring -->
+                <g id="compass-ticks"></g>
+                <!-- Cardinal labels -->
+                <text x="65" y="18" text-anchor="middle" font-size="11" font-weight="900" fill="#ff4444" font-family="'Outfit','Courier New',sans-serif">N</text>
+                <text x="65" y="120" text-anchor="middle" font-size="10" font-weight="900" fill="#aaa" font-family="'Outfit','Courier New',sans-serif">S</text>
+                <text x="118" y="69" text-anchor="middle" font-size="10" font-weight="900" fill="#aaa" font-family="'Outfit','Courier New',sans-serif">E</text>
+                <text x="12" y="69" text-anchor="middle" font-size="10" font-weight="900" fill="#aaa" font-family="'Outfit','Courier New',sans-serif">W</text>
+                <!-- Compass rose needle -->
+                <polygon id="compass-needle-n" points="65,22 61,65 65,60 69,65" fill="#ff4444"/>
+                <polygon id="compass-needle-s" points="65,108 61,65 65,70 69,65" fill="#888"/>
+                <circle cx="65" cy="65" r="5" fill="#ffaa00"/>
+                <!-- Heading arc indicator -->
+                <circle id="compass-ring" cx="65" cy="65" r="52" fill="none" stroke="rgba(255,170,0,0.15)" stroke-width="6"/>
+                <line id="compass-heading-line" x1="65" y1="65" x2="65" y2="16" stroke="rgba(255,170,0,0.5)" stroke-width="1.5" stroke-dasharray="3,3"/>
+            </svg>
+            <div id="compass-center">
+                <div id="compass-heading">000°</div>
+                <div id="compass-dir">N</div>
+            </div>
         </div>
 
         <div id="stats-panel">
@@ -1223,12 +1276,16 @@
             runwayGroup.add(block);
         }
 
-        // ─── 4. Ground Obstacles (Building-centric as requested) ───
+        // ─── 4. Ground Obstacles ───
         const groundObstacles = [];
-        for (let i = 0; i < 50; i++) groundObstacles.push(createTree());
-        for (let i = 0; i < 280; i++) groundObstacles.push(createBuilding());
-        for (let i = 0; i < 40; i++) groundObstacles.push(createMountain());
-        for (let i = 0; i < 30; i++) groundObstacles.push(createCastle());
+        // 비율: 건물 350, 나무 80, 산 15(소형), 성 20, 탑 40, 굴뚝 25, 교량기둥 20, 게이트 15
+        for (let i = 0; i < 80;  i++) groundObstacles.push(createTree());
+        for (let i = 0; i < 350; i++) groundObstacles.push(createBuilding());
+        for (let i = 0; i < 15;  i++) groundObstacles.push(createMountain());
+        for (let i = 0; i < 20;  i++) groundObstacles.push(createCastle());
+        for (let i = 0; i < 40;  i++) groundObstacles.push(createTower());
+        for (let i = 0; i < 25;  i++) groundObstacles.push(createChimney());
+        for (let i = 0; i < 20;  i++) groundObstacles.push(createBridgePillar());
         for (let i = 0; i < 15; i++) {
             const gate = createGate();
             groundObstacles.push(gate);
@@ -1265,27 +1322,51 @@
             if (obs._isGate) {
                 obs.lookAt(x, y, z + 100);
                 obs.scale.set(1.5, 1.5, 1.5);
-            } else if (Math.random() < 0.08) {
-                const giantScale = 3 + Math.random() * 3;
-                obs.scale.set(giantScale, giantScale * 1.2, giantScale);
+            } else if (obs._isMountain) {
+                // 산은 크기 고정 (작은 언덕 느낌)
+                const s = 0.5 + Math.random() * 0.7;
+                obs.scale.set(s, s, s);
+            } else if (obs._isTower || obs._isChimney) {
+                // 탑/굴뚝은 가끔 약간 크게
+                const s = 0.8 + Math.random() * 0.6;
+                obs.scale.set(s, s * (0.9 + Math.random() * 0.4), s);
             } else {
-                obs.scale.set(1, 1, 1);
+                // 건물은 다양한 크기
+                const isMega = !obs._isGate && Math.random() < 0.15;
+                const s = isMega ? (1.5 + Math.random() * 1.5) : (0.7 + Math.random() * 1.2);
+                const hScale = isMega ? (2.0 + Math.random() * 3.5) : (0.8 + Math.random() * 0.6);
+                obs.scale.set(s, s * hScale, s);
             }
         }
 
         function createTree() {
             const g = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 15, 5), mats.treeTrunk); trunk.position.y = 7.5; g.add(trunk);
-            const leaves = new THREE.Mesh(new THREE.ConeGeometry(12, 30, 5), mats.treeLeaf); leaves.position.y = 25; g.add(leaves);
+            const type = Math.floor(Math.random() * 3);
+            if (type === 0) {
+                // 침엽수
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2.5, 12, 5), mats.treeTrunk); trunk.position.y = 6; g.add(trunk);
+                const leaves = new THREE.Mesh(new THREE.ConeGeometry(10, 24, 6), mats.treeLeaf); leaves.position.y = 22; g.add(leaves);
+                const leaves2 = new THREE.Mesh(new THREE.ConeGeometry(7, 18, 6), mats.treeLeaf); leaves2.position.y = 30; g.add(leaves2);
+            } else if (type === 1) {
+                // 활엽수
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(2, 3, 10, 6), mats.treeTrunk); trunk.position.y = 5; g.add(trunk);
+                const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(14, 0), mats.treeLeaf); crown.position.y = 22; g.add(crown);
+            } else {
+                // 야자수
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(1, 2, 20, 5), mats.treeTrunk); trunk.rotation.z = 0.1; trunk.position.y = 10; g.add(trunk);
+                const crown = new THREE.Mesh(new THREE.ConeGeometry(12, 8, 5), mats.treeLeaf); crown.position.y = 22; g.add(crown);
+            }
             return g;
         }
         function createMountain() {
             const g = new THREE.Group();
-            const h = 200 + Math.random() * 400, r = 100 + Math.random() * 150;
-            // More detailed mountain with extra rock layers
+            // 작은 언덕 크기로 제한 (h: 60~140, r: 50~100)
+            const h = 60 + Math.random() * 80, r = 50 + Math.random() * 50;
             const base = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7), mats.mountain); base.position.y = h / 2; g.add(base);
-            const mid = new THREE.Mesh(new THREE.IcosahedronGeometry(r * 0.7, 0), mats.mountain); mid.position.y = h * 0.3; mid.scale.y = 0.5; g.add(mid);
-            const snow = new THREE.Mesh(new THREE.ConeGeometry(r * 0.45, h * 0.45, 7), mats.snow); snow.position.y = h - (h * 0.45) / 2 + 0.5; g.add(snow);
+            if (Math.random() > 0.4) {
+                const snow = new THREE.Mesh(new THREE.ConeGeometry(r * 0.4, h * 0.35, 7), mats.snow); snow.position.y = h - (h * 0.35) / 2; g.add(snow);
+            }
+            g._isMountain = true;
             return g;
         }
         function createGate() {
@@ -1308,20 +1389,149 @@
         }
         function createBuilding() {
             const g = new THREE.Group();
-            const h = 40 + Math.random() * 80, w = 30 + Math.random() * 30;
-            const bMat = mats.building.clone();
-            const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), bMat); base.position.y = h / 2; g.add(base);
+            const type = Math.floor(Math.random() * 6);
 
-            // Add some "windows" for realism/detail
-            for(let i=0; i<8; i++) {
-                const win = new THREE.Mesh(new THREE.BoxGeometry(w+2, 4, 4), new THREE.MeshBasicMaterial({color: 0xffeeaa}));
-                win.position.set(0, (h*0.2) + (Math.random()*(h*0.6)), (Math.random()-0.5)*w);
-                g.add(win);
+            if (type === 0) {
+                // 일반 사무용 빌딩
+                const h = 50 + Math.random() * 80, w = 25 + Math.random() * 25;
+                const bMat = mats.building.clone();
+                const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), bMat); base.position.y = h / 2; g.add(base);
+                // 창문 줄
+                for (let i = 1; i < 5; i++) {
+                    const wRow = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 3, w + 0.5), new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 }));
+                    wRow.position.y = (h / 5) * i; g.add(wRow);
+                }
+                if (Math.random() > 0.5) {
+                    const roof = new THREE.Mesh(new THREE.BoxGeometry(w * 0.4, h * 0.15, w * 0.4), bMat); roof.position.y = h + h * 0.075; g.add(roof);
+                }
+
+            } else if (type === 1) {
+                // 고층 유리 빌딩
+                const h = 100 + Math.random() * 150, w = 20 + Math.random() * 20;
+                const glassMat = new THREE.MeshLambertMaterial({ color: 0x224466 });
+                const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), glassMat); base.position.y = h / 2; g.add(base);
+                // 수평 밴드
+                for (let i = 0; i < 8; i++) {
+                    const band = new THREE.Mesh(new THREE.BoxGeometry(w + 1, 2, w + 1), new THREE.MeshBasicMaterial({ color: 0x44aadd }));
+                    band.position.y = (h / 8) * i + 5; g.add(band);
+                }
+                // 첨탑
+                const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 2, 30, 4), new THREE.MeshLambertMaterial({ color: 0x888888 })); spire.position.y = h + 15; g.add(spire);
+
+            } else if (type === 2) {
+                // 넓은 창고/공장 (낮고 넓음)
+                const h = 20 + Math.random() * 20, w = 40 + Math.random() * 40, d = 60 + Math.random() * 40;
+                const facMat = new THREE.MeshLambertMaterial({ color: 0x996644 });
+                const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), facMat); base.position.y = h / 2; g.add(base);
+                // 지붕 능선
+                const ridge = new THREE.Mesh(new THREE.BoxGeometry(w + 2, 8, d + 2), new THREE.MeshLambertMaterial({ color: 0x775533 })); ridge.position.y = h + 4; ridge.scale.y = 0.3; g.add(ridge);
+                // 굴뚝 2개
+                for (let i = -1; i <= 1; i += 2) {
+                    const ch = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 25, 6), new THREE.MeshLambertMaterial({ color: 0x555555 })); ch.position.set(i * w * 0.3, h + 12, 0); g.add(ch);
+                }
+
+            } else if (type === 4) {
+                // 원형 사일로
+                const h = 30 + Math.random() * 40, r = 8 + Math.random() * 8;
+                const siloMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+                const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 10), siloMat); body.position.y = h / 2; g.add(body);
+                const dome = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), siloMat); dome.position.y = h; g.add(dome);
+                // 쌍둥이 사일로
+                if (Math.random() > 0.4) {
+                    const body2 = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.8, r * 0.8, h * 0.85, 10), siloMat); body2.position.set(r * 1.6, h * 0.425, 0); g.add(body2);
+                    const dome2 = new THREE.Mesh(new THREE.SphereGeometry(r * 0.8, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), siloMat); dome2.position.set(r * 1.6, h * 0.85, 0); g.add(dome2);
+                }
+
+            } else if (type === 5) {
+                // 터널형 건물 (뚫린 세그먼트)
+                const h = 80 + Math.random() * 120, w = 80;
+                const bMat = mats.building.clone();
+                const sideL = new THREE.Mesh(new THREE.BoxGeometry(20, h, w), bMat); sideL.position.set(-30, h/2, 0); g.add(sideL);
+                const sideR = new THREE.Mesh(new THREE.BoxGeometry(20, h, w), bMat); sideR.position.set(30, h/2, 0); g.add(sideR);
+                const bridge = new THREE.Mesh(new THREE.BoxGeometry(w, 20, w), bMat); bridge.position.set(0, h-10, 0); g.add(bridge);
+                // Glow inside
+                const glow = new THREE.Mesh(new THREE.BoxGeometry(40, h-20, 2), new THREE.MeshBasicMaterial({ color: 0x00ffcc, transparent: true, opacity: 0.15 }));
+                glow.position.set(0, (h-20)/2, 0); g.add(glow);
+
+            } else {
+                // L자형 복합 건물
+                const h = 40 + Math.random() * 50, w = 20 + Math.random() * 20;
+                const cMat = mats.building.clone();
+                const blockA = new THREE.Mesh(new THREE.BoxGeometry(w, h, w * 2), cMat); blockA.position.set(0, h / 2, 0); g.add(blockA);
+                const blockB = new THREE.Mesh(new THREE.BoxGeometry(w * 1.5, h * 0.6, w), cMat); blockB.position.set(w * 1.25, h * 0.3, -w * 0.5); g.add(blockB);
             }
+            return g;
+        }
 
-            if (Math.random() > 0.3) {
-                const roof = new THREE.Mesh(new THREE.ConeGeometry(w * 0.8, 20, 4), mats.buildingRoof);
-                roof.position.y = h + 10; roof.rotation.y = Math.PI / 4; g.add(roof);
+        // ─── 송전탑 ───
+        function createTower() {
+            const g = new THREE.Group();
+            const metalMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            const type = Math.floor(Math.random() * 2);
+            if (type === 0) {
+                // 라디오/통신 타워
+                const h = 80 + Math.random() * 80;
+                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(1, 2.5, h, 6), metalMat); shaft.position.y = h / 2; g.add(shaft);
+                // 크로스바들
+                for (let i = 0.2; i < 0.9; i += 0.25) {
+                    const bar = new THREE.Mesh(new THREE.BoxGeometry(h * 0.3, 1.5, 1.5), metalMat); bar.position.y = h * i; g.add(bar);
+                }
+                // 빨간 경고등
+                const light = new THREE.Mesh(new THREE.SphereGeometry(2, 6, 6), new THREE.MeshBasicMaterial({ color: 0xff2200 })); light.position.y = h + 2; g.add(light);
+            } else {
+                // 송전탑 (사다리꼴)
+                const h = 60 + Math.random() * 40;
+                const legMat = metalMat;
+                [[-8, -8], [8, -8], [-8, 8], [8, 8]].forEach(([x, z]) => {
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.5, h, 4), legMat);
+                    leg.position.set(x * 0.3, h / 2, z * 0.3); leg.rotation.z = x > 0 ? 0.1 : -0.1; g.add(leg);
+                });
+                // 가로 와이어
+                for (let i = 0; i < 3; i++) {
+                    const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 30, 4), wireMat); wire.position.set(0, h * 0.7 + i * 5, 0); wire.rotation.z = Math.PI / 2; g.add(wire);
+                }
+                const top = new THREE.Mesh(new THREE.ConeGeometry(3, 10, 4), metalMat); top.position.y = h + 5; g.add(top);
+            }
+            g._isTower = true;
+            return g;
+        }
+
+        // ─── 공장 굴뚝 ───
+        function createChimney() {
+            const g = new THREE.Group();
+            const h = 70 + Math.random() * 80;
+            const rBase = 5 + Math.random() * 4, rTop = rBase * 0.6;
+            const mat = new THREE.MeshLambertMaterial({ color: 0x664433 });
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBase, h, 10), mat); body.position.y = h / 2; g.add(body);
+            // 빨간/흰 줄무늬
+            for (let i = 0; i < 4; i++) {
+                const band = new THREE.Mesh(new THREE.CylinderGeometry(rTop + 0.5, rBase + 0.5, 3, 10), new THREE.MeshLambertMaterial({ color: i % 2 === 0 ? 0xff2200 : 0xeeeeee }));
+                band.position.y = (h / 4) * (i + 0.5); g.add(band);
+            }
+            // 연기 구름 힌트
+            const rim = new THREE.Mesh(new THREE.TorusGeometry(rTop + 1, 1.5, 6, 12), new THREE.MeshLambertMaterial({ color: 0x555555 })); rim.position.y = h; rim.rotation.x = Math.PI / 2; g.add(rim);
+            g._isChimney = true;
+            return g;
+        }
+
+        // ─── 교량 기둥 ───
+        function createBridgePillar() {
+            const g = new THREE.Group();
+            const h = 40 + Math.random() * 60;
+            const concMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+            const cableMat = new THREE.MeshBasicMaterial({ color: 0x888888 });
+            // 두 개의 기둥
+            [-15, 15].forEach(x => {
+                const pillar = new THREE.Mesh(new THREE.BoxGeometry(6, h, 6), concMat); pillar.position.set(x, h / 2, 0); g.add(pillar);
+                const top = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), concMat); top.position.set(x, h + 4, 0); g.add(top);
+            });
+            // 수평 연결 빔
+            const beam = new THREE.Mesh(new THREE.BoxGeometry(36, 3, 4), concMat); beam.position.y = h * 0.6; g.add(beam);
+            // 케이블
+            for (let i = -1; i <= 1; i += 0.5) {
+                const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, h * 0.8, 4), cableMat);
+                cable.position.set(i * 10, h * 0.5, 0); cable.rotation.z = Math.PI * 0.12 * i; g.add(cable);
             }
             return g;
         }
@@ -1333,10 +1543,20 @@
         for (let i = 0; i < 12; i++) { const h = createBalloon(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
 
         function createEnemyPlane() {
-            const g = new THREE.Group(); const mat = new THREE.MeshLambertMaterial({ color: 0xaa2222 });
-            g.add(new THREE.Mesh(new THREE.BoxGeometry(3, 3, 15), mat));
-            const wing = new THREE.Mesh(new THREE.BoxGeometry(20, 0.5, 4), mat); wing.position.set(0, 0, 2); g.add(wing);
-            const tail = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 3), mat); tail.position.set(0, 2, -6); g.add(tail);
+            const g = new THREE.Group(); 
+            const mat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xff0055 });
+            // Drone Body
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 1.5, 6), mat); body.rotation.x = Math.PI/2; g.add(body);
+            // Rotors
+            for(let i=0; i<4; i++) {
+                const arm = new THREE.Mesh(new THREE.BoxGeometry(10, 0.5, 0.5), mat);
+                arm.rotation.y = (i * Math.PI) / 2; g.add(arm);
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(3, 0.2, 8, 12), glowMat);
+                ring.position.set(Math.cos(i*Math.PI/2)*10, 0, Math.sin(i*Math.PI/2)*10);
+                ring.rotation.x = Math.PI/2; g.add(ring);
+            }
+            const core = new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 8), glowMat); g.add(core);
             g.type = 'plane'; return g;
         }
         function createRocket() {
@@ -1351,14 +1571,18 @@
         }
         function createBalloon() {
             const g = new THREE.Group();
-            const balloon = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 2), mats.balloon);
-            balloon.position.y = 25; g.add(balloon);
-            const basket = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), mats.treeTrunk);
-            g.add(basket);
-            for (let i = 0; i < 4; i++) {
-                const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 15), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                rope.position.set(i % 2 === 0 ? 4 : -4, 10, i < 2 ? 4 : -4);
-                g.add(rope);
+            const orbGeo = new THREE.IcosahedronGeometry(12, 1);
+            const mat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+            const core = new THREE.Mesh(orbGeo, mat); g.add(core);
+            // Spikes
+            const spikeGeo = new THREE.ConeGeometry(2, 8, 4);
+            const spikeMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+            for(let i=0; i<6; i++) {
+                const s = new THREE.Mesh(spikeGeo, spikeMat);
+                if(i<2) { s.position.y = (i===0?1: -1)*14; s.rotation.x = (i===0?0:Math.PI); }
+                else if(i<4) { s.position.x = (i===2?1: -1)*14; s.rotation.z = (i===2?-Math.PI/2:Math.PI/2); }
+                else { s.position.z = (i===4?1: -1)*14; s.rotation.x = (i===4?Math.PI/2:-Math.PI/2); }
+                g.add(s);
             }
             g.type = 'balloon'; return g;
         }
@@ -1669,6 +1893,22 @@
             setTimeout(() => showNamePopup(finalDist, selectedDiff, diffLevel), 1000);
         }
 
+        function triggerHazardExplosion(h) {
+            h.visible = false;
+            const expColors = [0x00ffcc, 0xff0055, 0xffaa00];
+            for (let i = 0; i < 40; i++) {
+                const p = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3), new THREE.MeshBasicMaterial({ color: expColors[Math.floor(Math.random() * expColors.length)] }));
+                p.position.copy(h.position);
+                scene.add(p);
+                explosionParticles.push({ mesh: p, velocity: new THREE.Vector3((Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120), life: 0.8 });
+            }
+            if (audioCtx) {
+                const o = audioCtx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.2);
+                const g = audioCtx.createGain(); g.gain.setValueAtTime(0.2, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.2);
+                o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.2);
+            }
+        }
+
         function resetPlayer() {
             isGameOver = false; hasTakenOff = false; planeGroup.visible = true;
             planeGroup.position.set(0, FLOOR_HEIGHT, -100);
@@ -1859,11 +2099,85 @@
                 pitch = Math.min(pitch + 1.5 * delta, 0.3);
             }
 
-            let fillPct = Math.min(100, (currentSpeed / maxGaugeSpeed) * 100);
-            document.getElementById('speed-fill').style.width = fillPct + '%';
+            let fillPct = Math.min(1.0, currentSpeed / maxGaugeSpeed);
+            let stallPct = Math.min(1.0, stallSpeed / maxGaugeSpeed);
+            let takeoffPct = Math.min(1.0, takeoffSpeed / maxGaugeSpeed);
+
+            // ── Circular Dial Update ──
+            const dialR = 52, dialCX = 65, dialCY = 65;
+            const startAngle = -220 * Math.PI / 180; // bottom-left
+            const sweepAngle = 260 * Math.PI / 180;  // 260° sweep
+
+            function polarToXY(angleDeg, r) {
+                const a = (angleDeg - 90) * Math.PI / 180;
+                return { x: dialCX + r * Math.cos(a), y: dialCY + r * Math.sin(a) };
+            }
+            function arcPath(startDeg, endDeg, r) {
+                if (Math.abs(endDeg - startDeg) < 0.1) return '';
+                const s = polarToXY(startDeg, r);
+                const e = polarToXY(endDeg, r);
+                const large = (endDeg - startDeg) > 180 ? 1 : 0;
+                return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+            }
+
+            const dialStartDeg = -130; // -130° from top = bottom-left
+            const dialEndDeg = 130;    // 130° from top = bottom-right
+
+            // Background arc
+            document.getElementById('arc-bg').setAttribute('d', arcPath(dialStartDeg, dialEndDeg, dialR));
+
+            // Stall zone arc
+            const stallEndDeg = dialStartDeg + stallPct * 260;
+            document.getElementById('arc-stall').setAttribute('d', arcPath(dialStartDeg, stallEndDeg, dialR));
+
+            // Speed fill arc
+            const speedEndDeg = dialStartDeg + fillPct * 260;
+            const arcFillPath = fillPct > stallPct ? arcPath(stallEndDeg, speedEndDeg, dialR) : '';
+            document.getElementById('arc-fill').setAttribute('d', arcFillPath);
+
+            // Needle
+            const needleAngleDeg = dialStartDeg + fillPct * 260;
+            const needleAngleRad = (needleAngleDeg - 90) * Math.PI / 180;
+            const nx = dialCX + 42 * Math.cos(needleAngleRad);
+            const ny = dialCY + 42 * Math.sin(needleAngleRad);
+            document.getElementById('speed-needle').setAttribute('x2', nx);
+            document.getElementById('speed-needle').setAttribute('y2', ny);
+
+            // Takeoff marker
+            const tAngleDeg = dialStartDeg + takeoffPct * 260;
+            const tAngleRad = (tAngleDeg - 90) * Math.PI / 180;
+            const tx1 = dialCX + 48 * Math.cos(tAngleRad), ty1 = dialCY + 48 * Math.sin(tAngleRad);
+            const tx2 = dialCX + 56 * Math.cos(tAngleRad), ty2 = dialCY + 56 * Math.sin(tAngleRad);
+            document.getElementById('takeoff-marker').setAttribute('x1', tx1);
+            document.getElementById('takeoff-marker').setAttribute('y1', ty1);
+            document.getElementById('takeoff-marker').setAttribute('x2', tx2);
+            document.getElementById('takeoff-marker').setAttribute('y2', ty2);
+
             document.getElementById('speed-value').innerText = Math.floor(currentSpeed * 40);
-            document.querySelector('.stall-zone').style.width = ((stallSpeed / maxGaugeSpeed) * 100) + '%';
-            document.querySelector('.takeoff-line').style.left = ((takeoffSpeed / maxGaugeSpeed) * 100) + '%';
+
+            // ── Compass Update ──
+            // yaw is the plane's yaw in radians (world space Y rotation)
+            // Convert to compass heading: 0=N, 90=E, 180=S, 270=W
+            let headingRad = -planeGroup.rotation.y; // three.js Y rotation
+            let headingDeg = ((headingRad * 180 / Math.PI) % 360 + 360) % 360;
+            let headingInt = Math.floor(headingDeg);
+
+            // Rotate the compass needles opposite to heading so they always point correctly
+            const needleGroupN = document.getElementById('compass-needle-n');
+            const needleGroupS = document.getElementById('compass-needle-s');
+            const compassLine = document.getElementById('compass-heading-line');
+            // Rotate needle by -headingDeg so N always points north
+            const rot = `rotate(${headingDeg}, 65, 65)`;
+            needleGroupN.setAttribute('transform', rot);
+            needleGroupS.setAttribute('transform', rot);
+            compassLine.setAttribute('transform', rot);
+
+            document.getElementById('compass-heading').innerText = String(headingInt).padStart(3, '0') + '°';
+
+            // Direction label
+            const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+            const dirIdx = Math.round(headingDeg / 45) % 8;
+            document.getElementById('compass-dir').innerText = dirs[dirIdx];
 
             planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
             planeGroup.translateZ(currentSpeed);
@@ -1910,6 +2224,8 @@
                         let hitRadius = (h.type === 'balloon' ? 18 : 6) * h.scale.x;
                         const hazardSphere = new THREE.Sphere(h.position, hitRadius);
                         if (planeBox.intersectsSphere(hazardSphere)) {
+                            // EXPLOSION FEEDBACK
+                            triggerHazardExplosion(h);
                             isHit = true; crashReason = h.type === 'rocket' ? "Intercepted by enemy missile!" : "Mid-air collision!"; break;
                         }
                     }
