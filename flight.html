@@ -57,30 +57,18 @@
             left: 0;
         }
 
-        /* Back Button */
-        .back-portal {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100000;
-            color: #00ffcc;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 700;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border-radius: 50px;
-            border: 1px solid #00ffcc;
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
+        /* blip-nav integration */
+        #game-container {
+            margin-top: 80px;
+            height: calc(100vh - 80px) !important;
         }
-        .back-portal:hover {
-            background: rgba(0, 255, 204, 0.2);
-            transform: scale(1.05);
-        }
+    </style>
+    <script src="components/blip-nav.js" type="module"></script>
+    <script src="utils/blip-sync.js" type="module"></script>
+</head>
+
+<body>
+    <blip-nav></blip-nav>
 
         #hangar-screen {
             position: absolute;
@@ -2353,9 +2341,17 @@
         let lbCurrentTab = 'casual';
 
         /** Load scores object: { casual: { 1:[dist,...], 2:[...] }, extreme:{...} } */
-        function loadScores() {
+        function loadScoresSync() {
             try { return JSON.parse(localStorage.getItem(LB_KEY)) || { casual: {}, extreme: {} }; }
             catch (e) { return { casual: {}, extreme: {} }; }
+        }
+
+        async function loadScores() {
+            if (window.blipSync) {
+                const cloud = await window.blipSync.loadGlobal(LB_KEY);
+                if (cloud) return cloud;
+            }
+            return loadScoresSync();
         }
 
         /**
@@ -2363,10 +2359,10 @@
          * Score entries are { name, dist } objects sorted by dist desc.
          * Returns true if it's a new personal best for that level.
          */
-        function saveScore(diff, level, dist, name) {
+        async function saveScore(diff, level, dist, name) {
             if (dist <= 0) return false;
             name = (name || 'PILOT').toUpperCase().trim().slice(0, 16) || 'PILOT';
-            const data = loadScores();
+            const data = await loadScores();
             if (!data[diff]) data[diff] = {};
             const key = String(level);
             if (!data[diff][key]) data[diff][key] = [];
@@ -2377,7 +2373,12 @@
             normalised.push({ name, dist });
             normalised.sort((a, b) => b.dist - a.dist);
             data[diff][key] = normalised.slice(0, 5);
-            localStorage.setItem(LB_KEY, JSON.stringify(data));
+            
+            if (window.blipSync) {
+                await window.blipSync.saveGlobal(LB_KEY, data);
+            } else {
+                localStorage.setItem(LB_KEY, JSON.stringify(data));
+            }
             return dist > prevBest;
         }
 
@@ -2390,8 +2391,8 @@
         }
 
         /** Build HTML rows for a given difficulty's scores, grouped by danger level */
-        function buildLbRows(diff) {
-            const data = loadScores();
+        async function buildLbRows(diff) {
+            const data = await loadScores();
             const diffData = data[diff] || {};
             const levels = Object.keys(diffData).map(Number).sort((a, b) => a - b);
             if (levels.length === 0) return `<div class="lb-empty">No records yet!<br>Take off and make history 🚀</div>`;
@@ -2413,16 +2414,17 @@
         }
 
         /** Render the full leaderboard panel */
-        function renderLeaderboard(tab) {
+        async function renderLeaderboard(tab) {
             tab = tab || lbCurrentTab;
-            document.getElementById('lb-list').innerHTML = buildLbRows(tab);
+            const html = await buildLbRows(tab);
+            document.getElementById('lb-list').innerHTML = html;
         }
 
         /** Render the mini leaderboard inside the game-over screen */
-        function renderMiniLeaderboard(diff) {
+        async function renderMiniLeaderboard(diff) {
             const el = document.getElementById('go-lb-list');
             if (!el) return;
-            const data = loadScores();
+            const data = await loadScores();
             const diffData = data[diff] || {};
             const levels = Object.keys(diffData).map(Number).sort((a, b) => a - b);
             if (levels.length === 0) { el.innerHTML = `<div class="lb-empty">No records yet!</div>`; return; }
@@ -2447,25 +2449,26 @@
         }
 
         /** Switch tab in the full leaderboard */
-        function switchLbTab(tab) {
+        async function switchLbTab(tab) {
             lbCurrentTab = tab;
-            document.getElementById('lb-tab-casual').classList.toggle('active', tab === 'casual');
-            document.getElementById('lb-tab-extreme').classList.toggle('active', tab === 'extreme');
-            renderLeaderboard(tab);
+            const tabCas = document.getElementById('lb-tab-casual');
+            const tabExt = document.getElementById('lb-tab-extreme');
+            if (tabCas) tabCas.classList.toggle('active', tab === 'casual');
+            if (tabExt) tabExt.classList.toggle('active', tab === 'extreme');
+            await renderLeaderboard(tab);
         }
 
         /** Toggle full leaderboard visibility */
-        function toggleLeaderboard() {
+        async function toggleLeaderboard() {
             const panel = document.getElementById('leaderboard-panel');
             lbVisible = !lbVisible;
             // Hangar mode: fixed position so it sits nicely
-            const onHangar = document.getElementById('hangar-screen').style.display !== 'none';
+            const hangar = document.getElementById('hangar-screen');
+            const onHangar = hangar && hangar.style.display !== 'none';
             panel.className = lbVisible ? (onHangar ? 'hangar-mode' : '') : '';
             panel.style.display = lbVisible ? 'flex' : 'none';
             if (lbVisible) {
-                renderLeaderboard(lbCurrentTab);
-                // default tab = current difficulty
-                switchLbTab(selectedDiff);
+                await switchLbTab(selectedDiff || lbCurrentTab);
             }
         }
 
@@ -2491,17 +2494,17 @@
             input.onkeydown = (e) => { if (e.key === 'Enter') confirmPilotName(); };
         }
 
-        function confirmPilotName() {
+        async function confirmPilotName() {
             const input = document.getElementById('pilot-name-input');
             const name = input.value.trim() || 'PILOT';
             localStorage.setItem(LAST_NAME_KEY, name);
             document.getElementById('name-popup').style.display = 'none';
 
-            const isNew = saveScore(_pendingDiff, _pendingLevel, _pendingDist, name);
+            const isNew = await saveScore(_pendingDiff, _pendingLevel, _pendingDist, name);
             const newRecEl = document.getElementById('go-new-record');
             if (newRecEl) newRecEl.style.display = isNew ? 'inline' : 'none';
             document.getElementById('go-diff-label').textContent = _pendingDiff.toUpperCase();
-            renderMiniLeaderboard(_pendingDiff);
+            await renderMiniLeaderboard(_pendingDiff);
             document.getElementById('game-over-screen').style.display = 'flex';
         }
 

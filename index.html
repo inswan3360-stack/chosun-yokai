@@ -3,8 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="BLIPZONES: A digital playground for simple, nostalgic arcade games. Escape high-spec complexity and return to the pure joy of gameplay.">
-  <title>BLIPZONES | Digital Playground Sanctuary</title>
+  <meta name="description" content="BLIPZONES: The ultimate digital playground for simple, nostalgic arcade games and folklore simulations. Experience high-quality 3D flight, neon racing, and mystical evolution in your browser.">
+  <meta name="keywords" content="arcade games, browser games, yokai, cyber-punk games, neon flight, highway chase, digital playground, blipzones, indie games">
+  <title>BLIPZONES | Digital Playground Sanctuary & Arcade Portal</title>
+  
+  <!-- Structured Data (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "BLIPZONES",
+    "url": "https://blipzones.com/",
+    "description": "A digital playground for simple, nostalgic arcade games and folklore simulations.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://blipzones.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Yokai: Rebirth",
+    "operatingSystem": "Web Browser",
+    "applicationCategory": "GameApplication",
+    "genre": "Simulation, Folklore",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Highway Chase",
+    "operatingSystem": "Web Browser",
+    "applicationCategory": "GameApplication",
+    "genre": "Racing",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@300;400;700;900&display=swap');
     
@@ -623,24 +662,8 @@
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">
-      <span class="logo-mark">⚡</span> BLIPZONES
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="#playground">Playground</a></li>
-      <li><a href="yokai.html">Encyclopedia</a></li>
-      <li><a href="about.html">Philosophy</a></li>
-    </ul>
-    <div class="user-actions">
-      <button id="btnLogin" class="btn-login" onclick="loginWithGoogle()">Sign In</button>
-      <div id="userProfile">
-        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
-        <button class="btn-logout" onclick="logout()">Sign Out</button>
-      </div>
-    </div>
-  </nav>
+  <script type="module" src="components/blip-nav.js"></script>
+  <blip-nav></blip-nav>
 
   <!-- Dynamic Hero Carousel -->
   <section class="hero-carousel">
@@ -1000,6 +1023,38 @@
     document.addEventListener('DOMContentLoaded', initCarousel);
   </script>
 
+  <!-- Platform Content & FAQ (SEO/AdSense Optimization) -->
+  <section class="platform-guides" style="background: rgba(255,255,255,0.02); padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05);">
+    <div class="container" style="max-width: 1000px; padding: 0 40px;">
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px;">
+        <div>
+          <h3 style="color: var(--gold); font-size: 1.5rem; margin-bottom: 25px;">The Blipzones Experience</h3>
+          <p class="philosophy-text" style="font-size: 1rem; color: #aaa; margin-bottom: 20px;">
+            BLIPZONES is carefully curated to bridge the gap between tradition and technology. Our mission is to provide an <strong>Instant Gameplay Framework</strong> that works across all devices, from high-end PCs to mobile browsers. Every game in our repertoire is built with modern web technologies like <strong>Three.js</strong> and <strong>WebAssembly</strong>, ensuring performance without the need for downloads.
+          </p>
+          <p class="philosophy-text" style="font-size: 1rem; color: #aaa;">
+            Whether you are navigating the neon-lit streets of <em>Highway Chase</em> or observing the slow, meditative evolution of <em>Yokai: Rebirth</em>, you are participating in a new form of digital storytelling. We believe that the best games don't need tutorials—they need <strong>soul</strong>.
+          </p>
+        </div>
+        <div>
+          <h3 style="color: var(--gold); font-size: 1.5rem; margin-bottom: 25px;">Frequently Asked Questions</h3>
+          <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--ice); font-size: 0.95rem; margin-bottom: 8px;">Do I need to create an account?</h4>
+            <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.5;">Not at all. You can play all games as a guest. Signing in with Google allows you to save your progress across devices and compete in global leaderboards.</p>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--ice); font-size: 0.95rem; margin-bottom: 8px;">Are the games free?</h4>
+            <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.5;">Yes, all games on BLIPZONES are 100% free to play. We support the platform through minimal, non-intrusive advertising.</p>
+          </div>
+          <div>
+            <h4 style="color: var(--ice); font-size: 0.95rem; margin-bottom: 8px;">Can I play on mobile?</h4>
+            <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.5;">Absolutely. BLIPZONES is designed for a mobile-first experience. Our touch controls and responsive layouts adapt perfectly to any screen size.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="philosophy">
     <div class="container">
       <span class="section-label">Our Core Philosophy</span>
@@ -1026,66 +1081,19 @@
     </div>
   </section>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase sync logic for leaderboards (if needed globally) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { firebaseConfig } from "../firebase-config.js";
 
-    // IMPORTANT: Replace with your actual Firebase project config from Firebase Console
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    if (getApps().length === 0) initializeApp(firebaseConfig);
+    const db = getFirestore();
+    const auth = getAuth();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    // Export functions to global scope for button clicks
-    window.loginWithGoogle = async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error("Login failed:", error);
-      }
-    };
-
-    window.logout = () => signOut(auth);
-
-    onAuthStateChanged(auth, async (user) => {
-      const btnLogin = document.getElementById('btnLogin');
-      const userProfile = document.getElementById('userProfile');
-      const userAvatar = document.getElementById('userAvatar');
-
-      if (user) {
-        btnLogin.style.display = 'none';
-        userProfile.style.display = 'flex';
-        userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
-        
-        // Save user info to Firestore
-        await setDoc(doc(db, "users", user.uid), {
-          name: user.displayName,
-          id: user.uid,
-          lastLogin: new Date()
-        }, { merge: true });
-        
-        console.log("Logged in as:", user.displayName);
-      } else {
-        btnLogin.style.display = 'block';
-        userProfile.style.display = 'none';
-      }
-    });
-
-    // Helper to send game results to Cloud
     window.syncGameResult = async (gameId, score) => {
       if (!auth.currentUser) return;
-      
       const userRef = doc(db, "leaderboards", gameId, "rankings", auth.currentUser.uid);
       await setDoc(userRef, {
         playerName: auth.currentUser.displayName,
@@ -1094,8 +1102,12 @@
         timestamp: new Date()
       }, { merge: true });
     };
-
   </script>
+
+  <script type="module" src="components/blip-ads.js"></script>
+  <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <blip-ads slot-id="homepage-footer"></blip-ads>
+  </div>
 
   <footer>
     <div class="footer-links">

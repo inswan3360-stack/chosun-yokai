@@ -2017,14 +2017,19 @@
     .ab.on-cooldown>span:not(.cd-overlay):not(.cd-bar) {
       opacity: 0.35;
     }
+
+    /* blip-nav integration */
+    #app {
+      margin-top: 80px;
+      min-height: calc(100vh - 80px);
+    }
   </style>
+  <script src="components/blip-nav.js" type="module"></script>
+  <script src="utils/blip-sync.js" type="module"></script>
 </head>
 
 <body>
-  <a href="index.html" class="back-portal">
-    <span>⛩️</span>
-    <span id="backToPortalTxt">Playground</span>
-  </a>
+  <blip-nav></blip-nav>
 
   <!-- 언어 선택 버튼 (모든 화면에서 항상 표시) -->
   <!-- Initialized in English by default - BLIPZONES -->
@@ -2513,41 +2518,75 @@
     // ════════════════════════════════════════════════════════════
     //  DATA PERSISTENCE
     // ════════════════════════════════════════════════════════════
-    // ── 인메모리 저장소 (localStorage 대신) ──
-    var _memStore = {};
-    function saveGame() {
+    // ── blipSync 기반 하이브리드 저장소 ──
+    const GAME_ID = 'yokai-rebirth';
+
+    async function saveGame() {
       if (!gS || !gS.yk) return;
-      // gS.yk는 함수형 속성(actions)이 있어 JSON 직렬화 불가 → id만 저장
-      var gsCopy = JSON.parse(JSON.stringify({
+      // gS.yk contains functions (actions), so only save state
+      const state = {
         ykId: gS.yk.id,
         hunger: gS.hunger, happy: gS.happy, health: gS.health,
         magic: gS.magic, friend: gS.friend, edu: gS.edu,
         coins: gS.coins, xp: gS.xp, age: gS.age,
         sleeping: gS.sleeping, ascending: gS.ascending, prevStage: gS.prevStage,
-        equip: gS.equip || {}, logs: (gS.logs || []).slice(0, 5)
-      }));
-      var saveData = {
-        gS: gsCopy,
-        mgPlays: mgPlays, mgAdUsed: mgAdUsed,
-        adCooldown: adCooldown, adWatchCount: adWatchCount, curSong: curSong
+        equip: gS.equip || {}, logs: (gS.logs || []).slice(0, 10)
       };
-      _memStore['save'] = saveData;
-    }
-    function loadGameData() {
-      return _memStore['save'] || null;
-    }
-    function clearGameData() {
-      delete _memStore['save'];
-    }
-    function saveEncy(id) {
-      var ency = loadEncy();
-      if (ency.indexOf(id) < 0) {
-        ency.push(id);
-        _memStore['ency'] = ency;
+      
+      const saveData = {
+        gS: state,
+        mgPlays,
+        mgAdUsed,
+        adCooldown,
+        adWatchCount,
+        curSong
+      };
+
+      if (window.blipSync) {
+        await window.blipSync.save(GAME_ID, saveData);
+      } else {
+        localStorage.setItem(`blip_${GAME_ID}`, JSON.stringify(saveData));
       }
     }
-    function loadEncy() {
-      return _memStore['ency'] ? _memStore['ency'].slice() : [];
+
+    function loadGameDataSync() {
+       // Synchronous fallback for immediate UI checks
+       const raw = localStorage.getItem(`blip_${GAME_ID}`);
+       return raw ? JSON.parse(raw) : null;
+    }
+
+    async function loadGameData() {
+      if (window.blipSync) {
+        return await window.blipSync.load(GAME_ID);
+      }
+      return loadGameDataSync();
+    }
+
+    async function clearGameData() {
+      localStorage.removeItem(`blip_${GAME_ID}`);
+      // Cloud deletion usually not needed for a simple save slot, 
+      // but we could mark it as cleared in Firestore if desired.
+    }
+
+    async function saveEncy(id) {
+      let ency = await loadEncy();
+      if (ency.indexOf(id) < 0) {
+        ency.push(id);
+        if (window.blipSync) {
+          await window.blipSync.saveGlobal('ency', ency);
+        } else {
+          localStorage.setItem('blip_global_ency', JSON.stringify({value: ency}));
+        }
+      }
+    }
+
+    async function loadEncy() {
+      if (window.blipSync) {
+        const val = await window.blipSync.loadGlobal('ency');
+        return val || [];
+      }
+      const raw = localStorage.getItem('blip_global_ency');
+      return raw ? JSON.parse(raw).value : [];
     }
     // ════════════════════════════════════════════════════════════
     //  AUDIO ENGINE — 8BIT CHIPTUNE
@@ -7089,6 +7128,7 @@
       // 게임 오버 조건 체크
       checkGameOver();
       updateUI();
+      saveGame();
     }
 
     // ════════════════════════════════════════════════════════════
@@ -7176,10 +7216,11 @@
       saveGame();
     }
 
-    function continueGame() {
+    async function continueGame() {
       playSFX('click');
       if (titleRAF) { cancelAnimationFrame(titleRAF); titleRAF = null; }
-      var sv = loadGameData();
+      showNotif('불러오는 중...');
+      var sv = await loadGameData();
       if (!sv || !sv.gS || sv.gS.ascending) { showNotif('저장된 게임이 없습니다.'); return; }
       // ykId로 요괴 객체 재연결
       var yk = YOKAI.find(function (y) { return y.id === sv.gS.ykId; });
@@ -7542,10 +7583,19 @@
       applyLang(); // Update all labels
     })();
     renderTitle();
-    // 이어하기 버튼: 저장 데이터 있을 때만 활성화
+    // 이어하기 버튼: 저장 데이터 있을 때만 활성화 (동기 체크로 즉각 반응)
     (function () {
       var cb = document.getElementById('continueBtn');
-      if (cb) cb.style.opacity = loadGameData() ? '1' : '0.4';
+      if (cb) cb.style.opacity = loadGameDataSync() ? '1' : '0.4';
+      
+      // auth-changed 이벤트 리스너 추가하여 로그인 시 버튼 상태 업데이트
+      window.addEventListener('auth-changed', async () => {
+         const sv = await loadGameData();
+         if (cb) {
+           cb.style.display = sv ? 'block' : 'none';
+           cb.style.opacity = sv ? '1' : '0.4';
+         }
+      });
     })();
     initYokaiSprites(); // 스프라이트 생성 시작
     setTimeout(function () { initAudio(); if (audioOn) playSong(0); }, 400);

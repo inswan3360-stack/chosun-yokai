@@ -1,4 +1,3 @@
-
 # Blueprint: BLIPZONES - Digital Playground Sanctuary
 
 ## 1. 프로젝트 개요
@@ -61,3 +60,52 @@ Official Domain: https://blipzones.com/
 - 로컬 스토리지 데이터 저장 및 SNS 공유 기능 기반 마련.
 - SEO 최적화 및 광고 연동 구조 설계 완료.
 
+---
+
+## 8. 현재 요청사항 (v10) - Monetization & SEO Readiness (수익화 및 점검)
+
+### 주요 목표
+- **AdSense 승인 최적화:** 'Thin Content' 문제를 방지하기 위해 텍스트 기반 콘텐츠 강화 및 정책 페이지(Privacy/Terms) 고도화.
+- **글로벌 규정 준수:** GDPR 및 CCPA 대응을 위한 개인정보 처리방침 업데이트.
+- **검색 엔진 최적화 (SEO) 극대화:** 각 게임별 Schema.org 구조화 데이터 및 메타 태그 강화.
+- **광고 관리 체계 구축:** `ads.txt` 파일 생성 및 광고 배치를 위한 레이아웃 기반 마련.
+
+### 실행 내용
+- **SEO 콘텐츠 보강:** 메인 페이지(`index.html`)에 게임 설명, FAQ, 플랫폼 비전 등 텍스트 섹션 추가.
+- **정책 페이지 업그레이드:** `privacy.html`에 유럽(GDPR) 및 미국(CCPA) 관련 조항 추가.
+- **사이트맵(Sitemap) 동기화:** 누락된 게임(`NEON FLIGHT.html`) sitemap 추가 및 robots.txt 최종 확인.
+- **Schema.org 구현:** 게임 장르, 평점, 개발사 정보 등을 포함한 JSON-LD 구조화 데이터 삽입.
+- **Ads.txt 초기화:** Google AdSense 승인을 위한 기초 파일 생성.
+
+---
+
+## 9. 현재 요청사항 (v11) - Unified Login & Navigation (통합 인증 시스템)
+
+### 주요 목표
+- **사이트 전체 인증 통합:** 메인 페이지와 각 게임 페이지(`yokai`, `flight` 등) 간의 로그인 상태 동기화.
+- **Web Components 기반 모듈화:** 전역 내비게이션 바를 웹 컴포넌트(`<blip-nav>`)로 제작하여 유지보수성 향상.
+- **클라우드 데이터 저장 기반 마련:** Firebase Firestore를 연동하여 로그인 사용자의 게임 진척도(Progress) 자동 클라우드 저장.
+- **통합 UI/UX:** 게임 플레이 중에도 홈으로 돌아가거나 프로필을 확인할 수 있는 일관된 내비게이션 제공.
+
+### 실행 내용
+- **`blip-nav` 웹 컴포넌트 개발:** Firebase Auth 로직과 디자인이 캡슐화된 커스텀 엘리먼트 구현. 고밀도 디자인 시스템(OKLCH, Glassmorphism) 적용.
+- **글로벌 인증 리스너:** 로그인 상태 변화에 따라 사이트 전체의 UI(로그인 버튼 vs 프로필)가 실시간 대응하도록 설계.
+- **게임 진척도 동기화:** `localStorage`와 Firestore를 결합하여 비로그인 시 로컬 저장, 로그인 시 클라우드 동기화 하이브리드 시스템 구축.
+---
+
+## 10. 현재 요청사항 (v12) - Cloud Sync Finalization & Ad Infrastructure (클라우드 동기화 및 광고사양 확립)
+
+### 주요 목표
+- **하이브리드 데이터 동기화 완료:** `localStorage`와 Firestore를 결합한 `blipSync` 유틸리티를 통해 모든 게임(`Yokai`, `Flight`, `Highway`)의 저장 시스템 통합.
+- **전역 인증 내비게이션 적용:** 모든 게임 페이지에 `<blip-nav>` 컴포넌트를 이식하여 일관된 사용자 경험(UX) 제공.
+- **수익화 인프라 구축:** AdSense 승인을 위한 `ads.txt` 정교화 및 전역 광고 컴포넌트(`<blip-ads>`) 도입.
+- **비로그인 유저 보호:** 로그인하지 않은 상태에서도 `localStorage`를 통해 게임 데이터가 유실되지 않도록 기존 로직 보강.
+
+### 실행 내용
+- **`blipSync` 분리 및 고도화:** Firestore와 LocalStorage 간의 충돌 해결 로직(Timestamp 기준)을 캡슐화한 전역 동기화 유틸리티(`utils/blip-sync.js`) 구현.
+- **게임별 데이터 통합:** 
+  - `yokai.html`: 환생 데이터 및 도감(Encyclopedia) 클라우드 동기화.
+  - `flight.html`: 하이코어(Leaderboard) 데이터 클라우드 동기화 및 비동기 로딩 처리.
+  - `HIGHWAY CHASE.html`: 랭킹(Hall of Fame) 데이터 클라우드 동기화 전환.
+- **`blip-nav` 전역 이식:** 모든 게임 페이지의 기존 상단 바/뒤로가기 버튼을 통합 내비게이션 컴포넌트로 대체.
+- **광고 인프라: `blip-ads` 컴포넌트:** 향후 AdSense 코드 삽입이 용이하도록 설계된 플레이스홀더 웹 컴포넌트 개발 및 배치.
