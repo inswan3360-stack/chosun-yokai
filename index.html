@@ -28,6 +28,10 @@
       padding: 0;
     }
 
+    html, body {
+        overflow-x: hidden;
+    }
+
     body {
         background: var(--midnight);
         color: var(--ice);
@@ -593,7 +597,27 @@
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .philosophy-grid { grid-template-columns: 1fr; }
-      .main-title { font-size: 3rem; }
+      
+      .slide-title { font-size: 3.2rem; letter-spacing: -2px; }
+      .slide-desc { font-size: 1rem; padding: 0 20px; }
+      .hero-actions { flex-direction: column; width: 100%; max-width: 300px; margin: 40px auto 0; }
+      
+      .playground-section { padding: 80px 0; }
+      .playground-grid { grid-template-columns: 1fr; padding: 0 20px; gap: 20px; }
+      .play-card { min-height: 420px; padding: 30px; }
+      .card-title { font-size: 1.8rem; }
+      
+      .scroll-hint { right: 20px; bottom: 20px; }
+      .scroll-hint span { display: none; }
+      
+      .modal-container { width: 95%; margin: 20px auto; }
+      .modal-hero { height: 180px; }
+      .modal-body { padding: 25px; }
+    }
+
+    @media (max-width: 480px) {
+      .slide-title { font-size: 2.5rem; }
+      .navbar { padding: 0 15px; }
     }
   </style>
 </head>
