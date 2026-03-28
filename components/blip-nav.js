@@ -63,8 +63,10 @@ class BlipNav extends HTMLElement {
         } else {
             authActions.innerHTML = `
                 <button class="btn-login">Sign In</button>
+                <button class="btn-join">Join Free</button>
             `;
             authActions.querySelector('.btn-login').onclick = () => this.login();
+            authActions.querySelector('.btn-join').onclick = () => this.login();
         }
     }
 
@@ -170,37 +172,53 @@ class BlipNav extends HTMLElement {
                 color: var(--ice);
             }
 
-            .btn-login, .btn-logout {
+            .btn-login {
                 background: transparent;
-                border: 1px solid var(--gold);
-                color: var(--gold);
-                padding: 8px 20px;
-                border-radius: 5px;
-                font-size: 0.8rem;
+                border: none;
+                color: var(--ice);
+                padding: 8px 15px;
+                font-size: 0.85rem;
                 font-weight: 700;
-                cursor: pointer;
                 text-transform: uppercase;
                 letter-spacing: 1px;
-                transition: all 0.3s;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.3s;
             }
+            .btn-login:hover { opacity: 1; color: var(--gold); }
 
-            .btn-login:hover {
-                background: var(--gold);
+            .btn-join {
+                background: linear-gradient(135deg, var(--gold), #ffaa00);
+                border: none;
                 color: var(--midnight);
-                box-shadow: 0 0 20px oklch(80% 0.12 90 / 0.3);
+                padding: 10px 24px;
+                border-radius: 50px;
+                font-size: 0.85rem;
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(200, 144, 10, 0.3);
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                margin-left: 10px;
+            }
+            .btn-join:hover {
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 6px 20px rgba(200, 144, 10, 0.5);
+                filter: brightness(1.1);
             }
 
             .btn-logout {
-                border-color: rgba(255,255,255,0.2);
-                color: rgba(255,255,255,0.5);
-                padding: 5px 12px;
-                font-size: 0.7rem;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid var(--border);
+                color: var(--ice);
+                padding: 6px 15px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.3s;
             }
-
-            .btn-logout:hover {
-                border-color: var(--gold);
-                color: var(--gold);
-                background: rgba(197, 160, 89, 0.1);
             }
 
             @media (max-width: 768px) {
