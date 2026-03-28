@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -2027,10 +2027,7 @@
   </a>
 
   <!-- 언어 선택 버튼 (모든 화면에서 항상 표시) -->
-  <div id="langSwitch">
-    <button class="lang-btn active" id="btnLangKo" onclick="setLang('ko')">한국어</button>
-    <button class="lang-btn" id="btnLangEn" onclick="setLang('en')">English</button>
-  </div>
+  <!-- Initialized in English by default - BLIPZONES -->
   <!-- 전 화면 공통 플로팅 음악 버튼 -->
   <button id="floatMusicBtn" onclick="toggleMusic()" title="음악 ON/OFF">♪</button>
   <div id="app">
@@ -2043,11 +2040,11 @@
         <!-- 피처 태그 (컴팩트) -->
         <div class="title-features">
           <span class="title-feat-tag"><span class="title-feat-tag-icon">🔮</span><span class="title-feat-tag-txt"
-              id="ldC1T">MBTI 전생 검사</span></span>
+              id="ldC1T">MBTI Past-Life Test</span></span>
           <span class="title-feat-tag"><span class="title-feat-tag-icon">🐉</span><span class="title-feat-tag-txt"
-              id="ldC2T">요괴 육성 RPG</span></span>
+              id="ldC2T">Yokai Growth RPG</span></span>
           <span class="title-feat-tag"><span class="title-feat-tag-icon">⚔️</span><span class="title-feat-tag-txt"
-              id="ldC3T">조선 미니게임</span></span>
+              id="ldC3T">Market Mini-games</span></span>
           <span class="title-feat-tag"><span class="title-feat-tag-icon">📊</span><span class="title-feat-tag-txt"
               id="ldC4T">성향 분석</span></span>
         </div>
@@ -2090,7 +2087,7 @@
 
       <!-- 장면 설명 -->
       <div class="quiz-scene">
-        <div class="quiz-scene-lbl" id="qSceneLbl">장면</div>
+        <div class="quiz-scene-lbl" id="qSceneLbl">SCENE</div>
         <div class="quiz-scene-txt" id="qSceneTxt"></div>
       </div>
 
@@ -2106,7 +2103,7 @@
     <!-- RESULT -->
     <div id="resultScreen" class="screen">
       <div class="result-head">
-        <h2 id="ldResultHead">당신의 전생 요괴</h2><button class="hdr-music" id="musicBtnResult" onclick="toggleMusic()">♪
+        <h2 id="ldResultHead">Your Past Life Yokai</h2><button class="hdr-music" id="musicBtnResult" onclick="toggleMusic()">♪
           ON</button>
       </div>
       <div class="result-body">
@@ -2125,19 +2122,19 @@
         <div class="mbti-grid" id="mbtiGrid"></div>
         <div class="r-trait-grid" id="rTraitGrid"></div>
         <div class="r-box r-box-joseon">
-          <div class="r-box-title" style="color:#6aaa30;" id="ldSecJoseon">🏯 조선시대 전생 해석</div>
+          <div class="r-box-title" style="color:#6aaa30;" id="ldSecJoseon">🏯 Folklore Interpretation</div>
           <div class="r-box-txt" style="color:#90c870;" id="rJoseon"></div>
         </div>
         <div class="r-box r-box-modern">
-          <div class="r-box-title" style="color:#9070e0;" id="ldSecModern">📱 현대적 해석</div>
+          <div class="r-box-title" style="color:#9070e0;" id="ldSecModern">📱 Modern Interpretation</div>
           <div class="r-box-txt" style="color:#b090d8;" id="rModern"></div>
         </div>
         <div class="r-box r-box-strength">
-          <div class="r-box-title" style="color:#e0a040;" id="ldSecStrength">⚡ 강점</div>
+          <div class="r-box-title" style="color:#e0a040;" id="ldSecStrength">⚡ Strengths</div>
           <div class="r-box-txt" style="color:#d0b060;" id="rStrength"></div>
         </div>
         <div class="r-box r-box-caution">
-          <div class="r-box-title" style="color:#e06060;" id="ldSecCaution">⚠️ 주의할 점</div>
+          <div class="r-box-title" style="color:#e06060;" id="ldSecCaution">⚠️ Cautions</div>
           <div class="r-box-txt" style="color:#c89090;" id="rCaution"></div>
         </div>
         <div class="r-box r-box-match">
@@ -2163,9 +2160,9 @@
 
     <!-- GAME -->
     <div id="gameScreen" class="screen">
-      <div class="game-top"><span class="game-title" id="gTitle">조선 요괴 전생기</span>
+      <div class="game-top"><span class="game-title" id="gTitle">Yokai: Rebirth</span>
         <div style="display:flex;align-items:center;gap:8px;"><button class="hdr-music" id="musicBtnGame"
-            onclick="toggleMusic()">♪ ON</button><span class="game-coin" id="gCoin">엽전 0냥</span></div>
+            onclick="toggleMusic()">♪ ON</button><span class="game-coin" id="gCoin">0 Coins</span></div>
       </div>
       <div class="evo-bar">
         <div class="evo-stages" id="evoStages"></div>
@@ -2174,7 +2171,7 @@
       <div class="stat-grid">
         <div class="stat-it" id="siHu">
           <div class="stat-top-row">
-            <span class="stat-lbl" id="ldHu">🍚 배고픔</span>
+            <span class="stat-lbl" id="ldHu">🍚 Hunger</span>
             <span class="stat-num" id="snHu">80</span>
           </div>
           <div class="stat-bg">
@@ -2183,7 +2180,7 @@
         </div>
         <div class="stat-it" id="siHa">
           <div class="stat-top-row">
-            <span class="stat-lbl" id="ldHa">😊 행복</span>
+            <span class="stat-lbl" id="ldHa">😊 Happiness</span>
             <span class="stat-num" id="snHa">70</span>
           </div>
           <div class="stat-bg">
@@ -2192,7 +2189,7 @@
         </div>
         <div class="stat-it" id="siHe">
           <div class="stat-top-row">
-            <span class="stat-lbl" id="ldHe">💊 건강</span>
+            <span class="stat-lbl" id="ldHe">💊 Health</span>
             <span class="stat-num" id="snHe">90</span>
           </div>
           <div class="stat-bg">
@@ -2230,145 +2227,144 @@
       <div class="scene-wrap">
         <canvas id="sceneCv" width="480" height="340" onclick="petTap()"></canvas>
         <div class="scene-nametag" id="sceneNametag">? 영혼</div>
-        <div class="scene-agetag" id="sceneAgetag">나이: 0일</div>
-        <div class="scene-notif" id="sceneNotif">알림</div>
+        <div class="scene-agetag" id="sceneAgetag">Age: 0d</div>
+        <div class="scene-notif" id="sceneNotif">Notif</div>
       </div>
       <div class="tab-row">
-        <button class="tab act" onclick="switchTab(0)" id="ldTab0">🏠 돌보기</button>
-        <button class="tab" onclick="switchTab(1)" id="ldTab1">🎮 미니게임</button>
-        <button class="tab" onclick="switchTab(2)" id="ldTab2">🏪 상점</button>
-        <button class="tab" onclick="switchTab(3)" id="ldTab3">📜 일지</button>
+        <button class="tab act" onclick="switchTab(0)" id="ldTab0">🏠 Care</button>
+        <button class="tab" onclick="switchTab(1)" id="ldTab1">🎮 Games</button>
+        <button class="tab" onclick="switchTab(2)" id="ldTab2">🏪 Shop</button>
+        <button class="tab" onclick="switchTab(3)" id="ldTab3">📜 Journal</button>
       </div>
       <div id="tab0" class="tab-content on">
         <div class="acts">
           <button class="ab" id="ldFeed" onclick="doAct('feed')">
-            <div class="ab-inner"><span class="ic">🍚</span><span class="ab-lbl">밥 주기</span></div>
+            <div class="ab-inner"><span class="ic">🍚</span><span class="ab-lbl">Feed</span></div>
           </button>
           <button class="ab" id="ldPlay" onclick="doAct('play')">
-            <div class="ab-inner"><span class="ic">🎵</span><span class="ab-lbl">놀아주기</span></div>
+            <div class="ab-inner"><span class="ic">🎵</span><span class="ab-lbl">Play</span></div>
           </button>
           <button class="ab" id="ldHeal" onclick="doAct('heal')">
-            <div class="ab-inner"><span class="ic">💊</span><span class="ab-lbl">약 먹이기</span></div>
+            <div class="ab-inner"><span class="ic">💊</span><span class="ab-lbl">Heal</span></div>
           </button>
           <button class="ab" id="ldMed" onclick="doAct('meditate')">
-            <div class="ab-inner"><span class="ic">🔮</span><span class="ab-lbl">수련</span></div>
+            <div class="ab-inner"><span class="ic">🔮</span><span class="ab-lbl">Meditate</span></div>
           </button>
           <button class="ab" id="ldChat" onclick="doAct('chat')">
-            <div class="ab-inner"><span class="ic">💋</span><span class="ab-lbl">대화</span></div>
+            <div class="ab-inner"><span class="ic">💋</span><span class="ab-lbl">Chat</span></div>
           </button>
           <button class="ab" id="ldStudy" onclick="doAct('study')">
-            <div class="ab-inner"><span class="ic">📚</span><span class="ab-lbl">공부</span></div>
+            <div class="ab-inner"><span class="ic">📚</span><span class="ab-lbl">Study</span></div>
           </button>
         </div>
         <div class="acts" style="padding-top:0;">
           <button class="ab" onclick="doAct('sleep')">
-            <div class="ab-inner"><span class="ic">🌙</span><span class="ab-lbl" id="sleepLbl">재우기</span></div>
+            <div class="ab-inner"><span class="ic">🌙</span><span class="ab-lbl" id="sleepLbl">Sleep</span></div>
           </button>
           <button class="ab" id="ldEarn" onclick="doAct('earn')">
-            <div class="ab-inner"><span class="ic">🪙</span><span class="ab-lbl">엽전벌기</span></div>
+            <div class="ab-inner"><span class="ic">🪙</span><span class="ab-lbl">Earn Coins</span></div>
           </button>
           <button class="ab" id="ldRitual" onclick="doAct('ritual')">
-            <div class="ab-inner"><span class="ic">🕯️</span><span class="ab-lbl">제례의식</span></div>
+            <div class="ab-inner"><span class="ic">🕯️</span><span class="ab-lbl">Ritual</span></div>
           </button>
         </div>
         <div class="ad-wrap">
-          <button class="ad-btn" id="adBtn" onclick="watchAd()">📺 광고 보고 엽전 50냥 + XP 20 받기!</button>
-          <div class="ad-timer" id="adTimer" data-ko="지금 광고를 시청할 수 있습니다!" data-en="You can watch an ad now!">지금 광고를 시청할
-            수 있습니다!</div>
+          <button class="ad-btn" id="adBtn" onclick="watchAd()">📺 Watch Ad for 50 Coins + 20 XP!</button>
+          <div class="ad-timer" id="adTimer" data-ko="Watch ad for reward!" data-en="You can watch an ad now!">Ad available now!</div>
         </div>
       </div>
       <div id="tab1" class="tab-content">
         <div class="mg-wrap">
           <!-- 게임 선택 화면 -->
           <div id="mgSel">
-            <div class="mg-sel-title" id="ldMgTitle">⚔️ 조선 미니게임</div>
+            <div class="mg-sel-title" id="ldMgTitle">⚔️ Market Mini-games</div>
             <div class="mg-sel-grid">
               <button class="mg-sel-card" onclick="openMG(0)">
                 <span class="msc-ic">🏹</span>
-                <span class="msc-nm" id="ldMg0N">활쏘기</span>
-                <span class="msc-sub" id="ldMg0S">반응속도</span>
+                <span class="msc-nm" id="ldMg0N">Archery</span>
+                <span class="msc-sub" id="ldMg0S">Reaction</span>
               </button>
               <button class="mg-sel-card" onclick="openMG(1)">
                 <span class="msc-ic">📜</span>
-                <span class="msc-nm" id="ldMg1N">수수께끼</span>
-                <span class="msc-sub" id="ldMg1S">지식·추리</span>
+                <span class="msc-nm" id="ldMg1N">Riddle</span>
+                <span class="msc-sub" id="ldMg1S">Knowledge</span>
               </button>
               <button class="mg-sel-card" onclick="openMG(2)">
                 <span class="msc-ic">🎲</span>
-                <span class="msc-nm" id="ldMg2N">윷놀이</span>
-                <span class="msc-sub" id="ldMg2S">운·전략</span>
+                <span class="msc-nm" id="ldMg2N">Yutnori</span>
+                <span class="msc-sub" id="ldMg2S">Luck & Strategy</span>
               </button>
             </div>
             <div class="mg-sel-info">
-              <span id="mgPlaysDisp">남은 횟수: 2회</span>
-              <span style="color:#9e1c0c;font-weight:700;" id="ldMgInfo">소진 시 광고로 1회 추가</span>
+              <span id="mgPlaysDisp">Plays Left: 2</span>
+              <span style="color:#9e1c0c;font-weight:700;" id="ldMgInfo">Watch ad for +1 play</span>
             </div>
           </div>
           <!-- 활쏘기 -->
           <div id="mg0" style="display:none;">
             <canvas id="archCv" width="480" height="200"></canvas>
             <div class="arch-ctrl">
-              <button class="arch-shoot-btn" id="archBtn" onclick="archShoot()">🏹 쏘다!</button>
+              <button class="arch-shoot-btn" id="archBtn" onclick="archShoot()">🏹 Shoot!</button>
             </div>
-            <div class="arch-result" id="archResult">조준하고 버튼을 누르세요!</div>
-            <button class="mg-back-btn" onclick="closeMG()">← 뒤로가기</button>
+            <div class="arch-result" id="archResult">Aim and shoot!</div>
+            <button class="mg-back-btn" onclick="closeMG()">← Back</button>
           </div>
           <!-- 수수께끼 -->
           <div id="mg1" style="display:none;">
             <canvas id="riddleCv" width="480" height="160"></canvas>
             <div class="riddle-opts-grid" id="riddleOpts"></div>
             <div class="riddle-result-bar" id="riddleResult"></div>
-            <button class="mg-back-btn" onclick="closeMG()">← 뒤로가기</button>
+            <button class="mg-back-btn" onclick="closeMG()">← Back</button>
           </div>
           <!-- 윷놀이 -->
           <div id="mg2" style="display:none;">
             <canvas id="yutCv" width="480" height="220"></canvas>
             <div class="yut-ctrl">
-              <button class="yut-throw-btn" id="yutBtn" onclick="throwYut()">🎲 윷 던지기!</button>
+              <button class="yut-throw-btn" id="yutBtn" onclick="throwYut()">🎲 Throw!</button>
             </div>
-            <div class="yut-result" id="yutResult">윷을 던져보세요!</div>
-            <button class="mg-back-btn" onclick="closeMG()">← 뒤로가기</button>
+            <div class="yut-result" id="yutResult">Throw the Yut!</div>
+            <button class="mg-back-btn" onclick="closeMG()">← Back</button>
           </div>
         </div>
       </div>
       <div id="tab2" class="tab-content">
         <div class="shp-wrap">
-          <div class="shp-title" id="ldShopTitle">🏪 저잣거리 상점</div>
+          <div class="shp-title" id="ldShopTitle">🏪 Market Shop</div>
           <div class="shp-row">
-            <button class="shp-it" onclick="buyItem('food',20)"><span class="si">🍖</span><span>고기</span><span
-                class="sp" id="sp_food">20냥</span></button>
-            <button class="shp-it" onclick="buyItem('rice',15)"><span class="si">🍚</span><span>쌀</span><span class="sp"
-                id="sp_rice">15냥</span></button>
-            <button class="shp-it" onclick="buyItem('herb',35)"><span class="si">🌿</span><span>한약</span><span
-                class="sp" id="sp_herb">35냥</span></button>
-            <button class="shp-it" onclick="buyItem('toy',25)"><span class="si">🪁</span><span>팽이</span><span class="sp"
-                id="sp_toy">25냥</span></button>
-            <button class="shp-it" onclick="buyItem('scroll',40)"><span class="si">📜</span><span>서책</span><span
-                class="sp" id="sp_scroll">40냥</span></button>
-            <button class="shp-it" onclick="buyItem('incense',30)"><span class="si">🕯️</span><span>향초</span><span
-                class="sp" id="sp_incense">30냥</span></button>
-            <button class="shp-it" onclick="buyItem('hat',50)"><span class="si">🎩</span><span>갓</span><span class="sp"
-                id="sp_hat">50냥</span></button>
-            <button class="shp-it" onclick="buyItem('fan',45)"><span class="si">🪭</span><span>부채</span><span class="sp"
-                id="sp_fan">45냥</span></button>
-            <button class="shp-it" onclick="buyItem('mask',55)"><span class="si">🎭</span><span>탈</span><span class="sp"
-                id="sp_mask">55냥</span></button>
-            <button class="shp-it" onclick="buyItem('potion',60)"><span class="si">🧪</span><span>영약</span><span
-                class="sp" id="sp_potion">60냥</span></button>
-            <button class="shp-it" onclick="buyItem('gem',100)"><span class="si">💎</span><span>보석</span><span
-                class="sp" id="sp_gem">100냥</span></button>
-            <button class="shp-it" onclick="buyItem('egg',150)"><span class="si">🥚</span><span>요괴알</span><span
-                class="sp" id="sp_egg">150냥</span></button>
+            <button class="shp-it" onclick="buyItem('food',20)"><span class="si">🍖</span><span>Meat</span><span
+                class="sp" id="sp_food">20c</span></button>
+            <button class="shp-it" onclick="buyItem('rice',15)"><span class="si">🍚</span><span>Rice</span><span class="sp"
+                id="sp_rice">15c</span></button>
+            <button class="shp-it" onclick="buyItem('herb',35)"><span class="si">🌿</span><span>Herb</span><span
+                class="sp" id="sp_herb">35c</span></button>
+            <button class="shp-it" onclick="buyItem('toy',25)"><span class="si">🪁</span><span>Toy</span><span class="sp"
+                id="sp_toy">25c</span></button>
+            <button class="shp-it" onclick="buyItem('scroll',40)"><span class="si">📜</span><span>Book</span><span
+                class="sp" id="sp_scroll">40c</span></button>
+            <button class="shp-it" onclick="buyItem('incense',30)"><span class="si">🕯️</span><span>Incense</span><span
+                class="sp" id="sp_incense">30c</span></button>
+            <button class="shp-it" onclick="buyItem('hat',50)"><span class="si">🎩</span><span>Gat</span><span class="sp"
+                id="sp_hat">50c</span></button>
+            <button class="shp-it" onclick="buyItem('fan',45)"><span class="si">🪭</span><span>Fan</span><span class="sp"
+                id="sp_fan">45c</span></button>
+            <button class="shp-it" onclick="buyItem('mask',55)"><span class="si">🎭</span><span>Mask</span><span class="sp"
+                id="sp_mask">55c</span></button>
+            <button class="shp-it" onclick="buyItem('potion',60)"><span class="si">🧪</span><span>Elixir</span><span
+                class="sp" id="sp_potion">60c</span></button>
+            <button class="shp-it" onclick="buyItem('gem',100)"><span class="si">💎</span><span>Gem</span><span
+                class="sp" id="sp_gem">100c</span></button>
+            <button class="shp-it" onclick="buyItem('egg',150)"><span class="si">🥚</span><span>Yokai Egg</span><span
+                class="sp" id="sp_egg">150c</span></button>
           </div>
         </div>
       </div>
       <div id="tab3" class="tab-content">
         <div class="log-wrap">
-          <div class="log-title" id="ldLogTitle">📜 요괴 일지</div>
+          <div class="log-title" id="ldLogTitle">📜 Yokai Journal</div>
           <div id="logBox"></div>
         </div>
         <div class="status-sum">
-          <div class="status-sum-title" id="ldStatusTitle">📊 현황</div>
+          <div class="status-sum-title" id="ldStatusTitle">📊 Status</div>
           <div class="status-sum-txt" id="statusSum"></div>
         </div>
         <div id="diffGuide"
@@ -2383,7 +2379,7 @@
       <div class="ascend-body">
         <div style="text-align:right;margin-bottom:8px;"><button class="hdr-music" id="musicBtnAscend"
             onclick="toggleMusic()">♪ ON</button></div>
-        <div class="ascend-title" id="ascendTitle">승천</div>
+        <div class="ascend-title" id="ascendTitle">Ascend</div>
         <div class="ascend-desc" id="ascendDesc"></div>
         <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
           <button class="ascend-btn" style="flex:1;background:#fee500;color:#3c1e1e;border-color:#fee500;"
@@ -2391,7 +2387,7 @@
           <button class="ascend-btn" style="flex:1;background:#f0f0f0;color:#222;border-color:#ccc;"
             id="btnSaveInstaAsc" onclick="saveForInstagram()">Save for Instagram</button>
         </div>
-        <button class="ascend-btn" id="ldAscendBack" onclick="goTitle()">타이틀로 돌아가기</button>
+        <button class="ascend-btn" id="ldAscendBack" onclick="goTitle()">Back to Title</button>
       </div>
     </div>
 
@@ -2403,34 +2399,34 @@
         </div>
         <div id="goTitle"
           style="font-family:'Noto Serif KR',serif;font-size:26px;font-weight:900;color:#ff4030;letter-spacing:3px;margin-bottom:10px;text-shadow:0 0 20px rgba(255,64,48,0.6);">
-          요괴가 사라졌습니다</div>
+          The Yokai has vanished</div>
         <div id="goSub" style="font-size:14px;color:#c07060;line-height:1.8;margin-bottom:8px;"></div>
         <div id="goDesc" style="font-size:13px;color:#7a4030;line-height:1.8;margin-bottom:28px;max-width:320px;"></div>
         <div
           style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,64,48,0.2);border-radius:8px;padding:12px 20px;margin-bottom:28px;">
-          <div style="color:#c07060;font-size:12px;margin-bottom:8px;font-weight:700;">📊 최종 기록</div>
+          <div style="color:#c07060;font-size:12px;margin-bottom:8px;font-weight:700;">📊 Final Records</div>
           <div id="goRecord" style="color:#a06050;font-size:13px;line-height:1.9;"></div>
         </div>
         <button onclick="restartGame()"
           style="width:100%;max-width:280px;background:linear-gradient(135deg,#c02010,#8a1008);color:#ffd080;border:2px solid #ff6040;padding:14px;font-size:15px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(192,32,16,0.4);">🔄
-          다시 시작하기</button>
+          Restart Game</button>
         <button onclick="goTitle()"
           style="width:100%;max-width:280px;background:rgba(255,255,255,0.05);color:#7a5040;border:1px solid rgba(255,255,255,0.1);padding:12px;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;">←
-          타이틀로 돌아가기</button>
+          Back to Title</button>
       </div>
     </div>
 
     <!-- ENCYCLOPEDIA -->
     <div id="encyclopediaScreen" class="screen">
       <div class="result-head" style="background:#101828;">
-        <h2 id="ldEncyTitle">영혼 도감</h2><button class="hdr-music" id="musicBtnEncy" onclick="toggleMusic()">♪ ON</button>
+        <h2 id="ldEncyTitle">Soul Encyclopedia</h2><button class="hdr-music" id="musicBtnEncy" onclick="toggleMusic()">♪ ON</button>
       </div>
       <div class="ency-grid" id="encyGrid"
         style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;height:calc(100vh - 40px);overflow-y:auto;align-content:start;">
       </div>
       <div
         style="position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:440px;background:#101828;padding:10px;border-top:3px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <div style="color:#d8c8a0;font-size:14px;font-weight:700;"><span id="ldEncyLabel">수집 달성</span>: <span
+        <div style="color:#d8c8a0;font-size:14px;font-weight:700;"><span id="ldEncyLabel">Collection Progress</span>: <span
             id="encyCount">0</span>/16</div>
         <button class="result-btn sec" style="width:auto;padding:8px 20px;margin:0;" onclick="goTitle()">← 뒤로</button>
       </div>
@@ -2447,7 +2443,7 @@
           <div id="encyDetDesc"
             style="color:#c8d8e8;font-size:14px;line-height:1.7;margin-bottom:16px;text-align:center;"></div>
           <button class="result-btn"
-            onclick="document.getElementById('encyModal').style.display='none';playSFX('click');">닫기</button>
+            onclick="document.getElementById('encyModal').style.display='none';playSFX('click');">Close</button>
         </div>
       </div>
     </div>
@@ -2502,11 +2498,11 @@
       style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
       <div
         style="background:var(--paper);border:4px solid var(--border);padding:20px;max-width:400px;width:90%;box-shadow:4px 4px 0 var(--ink);">
-        <h3 style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:18px;">📜 수련 안내</h3>
+        <h3 style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:18px;">📜 Training Guide</h3>
         <div id="tutText" style="color:var(--ink);font-size:14px;line-height:1.7;margin-bottom:16px;"></div>
         <div style="display:flex;justify-content:space-between;">
-          <button id="tutPrevBtn" onclick="tutPrev()" class="result-btn sec" style="width:48%;padding:10px;">이전</button>
-          <button id="tutNextBtn" onclick="tutNext()" class="result-btn" style="width:48%;padding:10px;">다음</button>
+          <button id="tutPrevBtn" onclick="tutPrev()" class="result-btn sec" style="width:48%;padding:10px;">Prev</button>
+          <button id="tutNextBtn" onclick="tutNext()" class="result-btn" style="width:48%;padding:10px;">Next</button>
         </div>
       </div>
     </div>
@@ -3067,10 +3063,8 @@
     ];
 
     function setLang(lang) {
-      currentLang = lang;
-      _memStore['lang'] = lang;
-      document.getElementById('btnLangKo').classList.toggle('active', lang === 'ko');
-      document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+      currentLang = 'en'; // Force English
+      _memStore['lang'] = 'en';
       applyLang();
     }
 
@@ -4438,48 +4432,48 @@
 
     // ── MBTI별 자동 대사 (성향에 맞게) ──
     var MBTI_LINES = {
-      // E (외향)
-      E: ['같이 놀아요!', '오늘도 기운차게!', '이야기 해줘요~', '친구 없어요?', '심심해요!', '저 여기 있어요!', '관심 좀 줘요!', '같이 뭔가 해봐요!'],
-      // I (내향)  
-      I: ['...혼자 있고 싶어요.', '조용히 해줄래요?', '생각 중이에요...', '저 나름 바빠요.', '말 걸지 마세요...', '혼자가 편해요.', '...', '잠깐만요.'],
-      // S (감각)
-      S: ['배고파요!', '지금 당장 먹고 싶어!', '현실적으로 생각해요.', '밥이 최고야!', '몸이 좀 안 좋아요.', '구체적으로 말해줘요.', '오늘 날씨 좋네요.', '건강이 제일이야!'],
-      // N (직관)
-      N: ['뭔가 느낌이 와요...', '미래가 기대돼!', '제 꿈이 있어요!', '우주의 기운이...', '영감이 왔어요!', '뭔가 달라질 것 같아요.', '운명이 느껴져요!', '신비로운 기운이...'],
-      // T (사고)
-      T: ['논리적으로 봐요.', '왜 그런 거죠?', '효율이 중요해요.', '근거가 있나요?', '분석해봤어요.', '감정보다 이성이죠.', '데이터가 필요해요.', '합리적으로 생각해요.'],
-      // F (감정)
+      // E (Extravert)
+      E: ['Let\'s play!', 'Energetic today!', 'Tell me a story~', 'No friends?', 'I\'m bored!', 'I\'m here!', 'Give me attention!', 'Let\'s do something!'],
+      // I (Introvert)  
+      I: ['...I want to be alone.', 'Can you be quiet?', 'I\'m thinking...', 'I\'m busy in my own way.', 'Don\'t talk to me...', 'Alone is comfortable.', '...', 'Just a moment.'],
+      // S (Sensing)
+      S: ['I\'m hungry!', 'I want to eat now!', 'Think practically.', 'Rice is the best!', 'I don\'t feel well.', 'Tell me specifically.', 'The weather is nice today.', 'Health is priority!'],
+      // N (Intuition)
+      N: ['I have a feeling...', 'Excited for the future!', 'I have a dream!', 'Energy of the universe...', 'Inspiration came!', 'Something will change.', 'I feel destiny!', 'Mysterious aura...'],
+      // T (Thinking)
+      T: ['Look logically.', 'Why is that?', 'Efficiency is important.', 'Is there evidence?', 'I analyzed it.', 'Reason over emotion.', 'Data needed.', 'Think rationally.'],
+      // F (Feeling)
       T_: [],// placeholder
-      F: ['기분이 좀 이상해요.', '당신이 걱정돼요.', '따뜻하게 대해줘요.', '마음이 울컥해요.', '행복하고 싶어요.', '같이 있으면 좋아요.', '고마워요... 정말로.', '기분이 어때요?'],
-      // J (판단)
-      J: ['계획대로 가요!', '스케줄이 있어요.', '딱 맞게 해야죠.', '규칙이 중요해요.', '정해진 게 좋아요.', '목표가 뚜렷해요.', '순서대로 해요!', '준비가 완벽해요.'],
-      // P (인식)
-      P: ['즉흥적으로 가자!', '뭐든 될 대로 돼!', '상황 봐서 해요.', '자유가 좋아요!', '계획은 바꾸면 되죠.', '어떻게든 되겠지!', '그냥 해봐요!', '유연하게 가요~'],
-      // 스탯별 대사
-      hungry: ['배고파요... 밥줘요.', '꼬르륵...😫', '먹을 것 좀...', '굶고 있어요!', '밥 없어요?'],
-      unhappy: ['심심해요...', '기분이 별로예요.', '뭔가 재미없어요.', '우울해요...', '위로해줘요.'],
-      sick: ['몸이 아파요.', '약 주세요...', '좀 쉬고 싶어요.', '기운이 없어요.', '힘들어요...'],
-      lowMagic: ['영력이 부족해요.', '수련이 필요해요.', '기운이 떨어져요.', '수련 좀 시켜줘요.', '영력 충전!'],
-      lonely: ['친밀도가 낮아요.', '나 좀 봐줘요.', '외로워요...', '대화해줘요!', '같이 있어요.'],
-      happy: ['기분 최고예요!', '오늘 행복해요!', '신나요!', '좋아요 좋아!', '완전 좋아요!'],
-      strong: ['강해지고 있어요!', '느낌이 달라요!', '뭔가 변하는 것 같아요.', '점점 강해져요!'],
-      // 요괴 특성별
-      trait_마법: ['마법이 넘쳐요!', '주문을 외울게요!', '신비로운 기운이...', '마법진을 그려요!', '꼬리에 힘이 생겨요!'],
-      trait_힘: ['뚝딱! 뭐든 나와라!', '방망이 한 방이면 돼!', '힘이 넘쳐요!', '뚜렷하게 강해!', '뚝딱뚝딱!'],
-      trait_왕: ['짐이 명하노라!', '위엄이 넘쳐요!', '용의 기운이...', '황금빛이 눈부셔!', '천하를 다스려요!'],
-      trait_빠름: ['샤샤샥...', '보였나요?', '빠른 게 최고!', '눈 깜짝할 새에!', '원한이 있어요...'],
-      trait_수비: ['지켜드릴게요!', '악귀를 물리쳐요!', '수호신이에요!', '파란 불꽃이 타요!', '정의를 지켜요!'],
-      trait_물: ['물처럼 흘러요.', '여의주를 찾아요!', '강물이 그리워요.', '언젠간 용이 될 거예요!', '비가 올 것 같아요.'],
-      trait_분노: ['으르릉!!!', '화가 나요!', '전투 준비!', '불꽃이 타올라요!', '전사의 기운!'],
-      trait_생명: ['복을 드릴게요!', '생명이 소중해요!', '따뜻해요~', '아이들이 좋아요!', '복이 넘쳐요!'],
-      trait_불사: ['죽어도 살아있어요!', '부적이 필요해요.', '으스스해요~', '불사의 기운!', '껑충껑충!'],
-      trait_슬픔: ['꽃이 피었어요...', '울고 싶어요.', '원한이 있어요...', '하얀 나비...', '슬픈 노래가 들려요.'],
-      trait_땅: ['땅의 기운이 느껴져요.', '두근두근...', '든든해요!', '흙냄새가 나요.', '뿌리가 깊어요!'],
-      trait_질주: ['달리고 싶어요!', '히잉~!', '빠르게 가요!', '들판을 달려요!', '앞발을 구를게요!'],
-      trait_비: ['비가 오려나요?', '개굴개굴!', '연잎이 좋아요!', '폴짝폴짝!', '비를 불러볼까요?'],
-      trait_얼음: ['차갑게 있을게요.', '냉정해야죠.', '얼음 결정이 예뻐요.', '북풍이 불어요.', '서릿발이 내려요.'],
-      trait_균형: ['한 발로도 괜찮아요!', '균형이 맞아요!', '자유로워요!', '팔짝!', '양손에 불꽃이!'],
-      trait_철: ['쇠가 맛있어요!', '단단해요!', '불가사리예요!', '쇠를 먹고 강해져요!', '금속 소리가 좋아요!'],
+      F: ['I feel a bit strange.', 'I worry about you.', 'Treat me warmly.', 'My heart is fluttering.', 'I want to be happy.', 'I like being together.', 'Thank you... truly.', 'How are you feeling?'],
+      // J (Judging)
+      J: ['Go by the plan!', 'I have a schedule.', 'Must be precisely right.', 'Rules are important.', 'I like things decided.', 'Clear goals.', 'Step by step!', 'Perfect preparation.'],
+      // P (Perceiving)
+      P: ['Let\'s be spontaneous!', 'Whatever happens, happens!', 'Let\'s see how it goes.', 'I love freedom!', 'Plans can change.', 'It\'ll work out somehow!', 'Just do it!', 'Let\'s be flexible~'],
+      // Status
+      hungry: ['I\'m hungry... Feed me.', 'Grrr...😫', 'Something to eat...', 'I\'m starving!', 'No food?'],
+      unhappy: ['I\'m bored...', 'I don\'t feel great.', 'Not fun.', 'I\'m depressed...', 'Comfort me.'],
+      sick: ['I feel sick.', 'Give me medicine...', 'I want to rest.', 'No energy.', 'It\'s hard...'],
+      lowMagic: ['Low Mana.', 'Need training.', 'Energy is dropping.', 'Let me train.', 'Mana recharge!'],
+      lonely: ['Low Bond.', 'Look at me.', 'I\'m lonely...', 'Talk to me!', 'Stay with me.'],
+      happy: ['Great mood!', 'I\'m happy today!', 'Exciting!', 'Love it!', 'Totally good!'],
+      strong: ['Getting stronger!', 'Feeling different!', 'Something is changing.', 'Stronger and stronger!'],
+      // Traits
+      trait_마법: ['Magic is overflowing!', 'I\'ll cast a spell!', 'Mysterious aura...', 'Drawing a magic circle!', 'Power in my tail!'],
+      trait_힘: ['Poof! Anything can appear!', 'One strike of my club!', 'Power is overflowing!', 'Clearly strong!', 'Tap tap tap!'],
+      trait_왕: ['I command you!', 'Overflowing dignity!', 'Aura of the dragon...', 'Golden light is dazzling!', 'Ruling the world!'],
+      trait_빠름: ['Shashak...', 'Did you see?', 'Fast is the best!', 'In the blink of an eye!', 'I have a grudge...'],
+      trait_수비: ['I\'ll protect you!', 'Defeat the evil spirits!', 'I am the guardian!', 'Blue flame is burning!', 'Protecting justice!'],
+      trait_물: ['Flowing like water.', 'Searching for the orb!', 'I miss the river.', 'I\'ll be a dragon one day!', 'Looks like rain.'],
+      trait_분노: ['Grrr!!!', 'I\'m angry!', 'Battle ready!', 'Flames are rising!', 'Warrior\'s spirit!'],
+      trait_생명: ['I\'ll give you blessings!', 'Life is precious!', 'Warm~', 'I like children!', 'Blessings everywhere!'],
+      trait_불사: ['Alive even after death!', 'Need a talisman.', 'Spooky~', 'Immortal aura!', 'Hop hop hop!'],
+      trait_슬픔: ['Flowers have bloomed...', 'I want to cry.', 'I have a grudge...', 'White butterfly...', 'I hear a sad song.'],
+      trait_땅: ['Feeling the earth\'s aura.', 'Thump thump...', 'Dependable!', 'Smells like soil.', 'Deep roots!'],
+      trait_질주: ['I want to run!', 'Neigh!', 'Fast go!', 'Running across the fields!', 'Stamping my hooves!'],
+      trait_비: ['Is it going to rain?', 'Ribbit ribbit!', 'I like lotus leaves!', 'Hop hop hop!', 'Shall I call the rain?'],
+      trait_얼음: ['I\'ll stay cold.', 'Must be cool-headed.', 'Ice crystals are pretty.', 'North wind is blowing.', 'Frost is falling.'],
+      trait_균형: ['One leg is fine!', 'Balanced!', 'Feeeeel free!', 'Hop!', 'Flames in both hands!'],
+      trait_철: ['Iron is tasty!', 'Solid!', 'I am Bulgasari!', 'Eating iron and getting strong!', 'I like metal sounds!'],
     };
 
     // MBTI → 성향 키 (결과에서 저장된 sc 객체 기반)
@@ -5827,9 +5821,9 @@
     }
 
     function doAct(type) {
-      if (gS.sleeping && type !== 'sleep') { showNotif('자고 있어요 💤'); playSFX('fail'); return; }
+      if (gS.sleeping && type !== 'sleep') { showNotif('Sleeping 💤'); playSFX('fail'); return; }
       if (isOnCooldown(type)) {
-        showNotif('⏳ 쿨타임 ' + getCDRemain(type) + '초 남음'); playSFX('fail'); return;
+        showNotif('⏳ Cooldown ' + getCDRemain(type) + 's left'); playSFX('fail'); return;
       }
       playSFX('click');
       var stage = getStage(gS.xp);
@@ -5837,13 +5831,13 @@
       var eff = [1.0, 0.9, 0.80, 0.70, 0.60, 0.52, 0.45][Math.min(stage, 6)];
       var xp = 0, msg = '';
       if (type === 'feed') {
-        if (gS.hunger >= 95) { setBubble('배불러요~'); return; }
+        if (gS.hunger >= 95) { setBubble('Full~'); return; }
         var gain = Math.floor(20 * eff);
         gS.hunger = Math.min(100, gS.hunger + gain);
         gS.happy = Math.min(100, gS.happy + Math.floor(3 * eff));
         gS.coins += 1;
         xp = Math.floor(4 * eff);
-        spawnPts(240, 110, '#f8a800', 6); msg = '밥 +' + gain;
+        spawnPts(240, 110, '#f8a800', 6); msg = 'Feed +' + gain;
       } else if (type === 'play') {
         var hgain = Math.floor(22 * eff), fgain = Math.floor(10 * eff);
         gS.happy = Math.min(100, gS.happy + hgain);
@@ -5851,23 +5845,23 @@
         gS.hunger = Math.max(0, gS.hunger - 10);
         gS.coins += 2;
         xp = Math.floor(7 * eff);
-        spawnPts(240, 110, '#ff80c0', 10); msg = '행복+' + hgain + ' 친밀+' + fgain;
+        spawnPts(240, 110, '#ff80c0', 10); msg = 'Happy +' + hgain + ' Bond +' + fgain;
       } else if (type === 'heal') {
-        if (gS.health >= 95) { showNotif('건강해요!'); return; }
+        if (gS.health >= 95) { showNotif('Healthy!'); return; }
         var hgain2 = Math.floor(25 * eff);
         gS.health = Math.min(100, gS.health + hgain2);
         gS.magic = Math.min(100, gS.magic + Math.floor(5 * eff));
         xp = Math.floor(3 * eff);
-        spawnPts(240, 110, '#80ff80', 6); msg = '건강+' + hgain2;
+        spawnPts(240, 110, '#80ff80', 6); msg = 'Health +' + hgain2;
       } else if (type === 'meditate') {
-        if (gS.hunger < 25) { showNotif('배가 고파서 집중 불가!'); return; }
+        if (gS.hunger < 25) { showNotif('Hungry! Cannot focus.'); return; }
         var mgain = Math.floor(24 * eff), egain = Math.floor(6 * eff);
         gS.magic = Math.min(100, gS.magic + mgain);
         gS.edu = Math.min(100, gS.edu + egain);
         gS.happy = Math.max(0, gS.happy - 6);
         gS.hunger = Math.max(0, gS.hunger - 8);
         xp = Math.floor(10 * eff);
-        spawnPts(240, 110, '#c080ff', 6); msg = '영력+' + mgain + ' 학식+' + egain;
+        spawnPts(240, 110, '#c080ff', 6); msg = 'Mana +' + mgain + ' Wisdom +' + egain;
       } else if (type === 'chat') {
         var fgain2 = Math.floor(20 * eff), hgain3 = Math.floor(12 * eff);
         gS.friend = Math.min(100, gS.friend + fgain2);
@@ -5875,10 +5869,10 @@
         gS.hunger = Math.max(0, gS.hunger - 6);
         gS.coins += 2;
         xp = Math.floor(5 * eff);
-        spawnPts(240, 110, '#ff60a0', 6); msg = '친밀+' + fgain2;
+        spawnPts(240, 110, '#ff60a0', 6); msg = 'Bond +' + fgain2;
       } else if (type === 'study') {
-        if (gS.magic < 20) { showNotif('영력 부족으로 집중 불가!'); return; }
-        if (gS.edu >= 90 && stage >= 3) { showNotif('더 높은 수련이 필요합니다!'); return; }
+        if (gS.magic < 20) { showNotif('Low Mana! Cannot focus.'); return; }
+        if (gS.edu >= 90 && stage >= 3) { showNotif('Higher training needed!'); return; }
         var egain2 = Math.floor(22 * eff);
         gS.edu = Math.min(100, gS.edu + egain2);
         gS.happy = Math.max(0, gS.happy - 10);
@@ -5886,16 +5880,16 @@
         gS.hunger = Math.max(0, gS.hunger - 12);
         xp = Math.floor(12 * eff);
         gS.coins += Math.floor(4 * eff);
-        spawnPts(240, 90, '#60a0ff', 6); msg = '학식+' + egain2;
+        spawnPts(240, 90, '#60a0ff', 6); msg = 'Wisdom +' + egain2;
       } else if (type === 'sleep') {
         if (gS.sleeping) {
           gS.sleeping = false;
-          xp = Math.floor(4 * eff); msg = '수면 완료';
-          document.getElementById('sleepLbl').textContent = '재우기';
+          xp = Math.floor(4 * eff); msg = 'Sleep Complete';
+          document.getElementById('sleepLbl').textContent = 'Sleep';
         } else {
-          if (gS.health > 80 && gS.magic > 80) { showNotif('피곤하지 않아요!'); return; }
-          gS.sleeping = true; showNotif('꿈나라로 💤'); addLog(gS.yk.name + '이 잠들었다.');
-          document.getElementById('sleepLbl').textContent = '깨우기';
+          if (gS.health > 80 && gS.magic > 80) { showNotif('Not tired!'); return; }
+          gS.sleeping = true; showNotif('To Dreamland 💤'); addLog(gS.yk.name + ' has fallen asleep.');
+          document.getElementById('sleepLbl').textContent = 'Wake Up';
           triggerAction('sleep'); return;
         }
       } else if (type === 'earn') {
@@ -5907,19 +5901,19 @@
         gS.hunger = Math.max(0, gS.hunger - 8);
         gS.friend = Math.max(0, gS.friend - 3);
         xp = Math.floor(2 * eff);
-        spawnPts(240, 110, '#f8c800', 6); msg = '엽전+' + bn;
+        spawnPts(240, 110, '#f8c800', 6); msg = 'Coins +' + bn;
       } else if (type === 'ritual') {
         // 제례의식: 단계별 요구 영력 증가
         var reqMagic = [30, 40, 50, 60, 70, 80, 90][Math.min(stage, 6)];
-        if (gS.magic < reqMagic) { showNotif('영력 ' + reqMagic + ' 이상 필요!'); return; }
+        if (gS.magic < reqMagic) { showNotif('Mana ' + reqMagic + ' required!'); return; }
         var xpGain = [20, 28, 38, 50, 65, 85, 110][Math.min(stage, 6)];
         gS.magic = Math.max(0, gS.magic - reqMagic);
         gS.xp += xpGain;
         gS.health = Math.min(100, gS.health + 10);
         gS.happy = Math.min(100, gS.happy + 15);
         for (var i = 0; i < 20; i++) spawnPts(240, 100, '#f8d060', 1);
-        showNotif('제례의식! XP+' + xpGain);
-        addLog(gS.yk.name + '이 제례의식! XP+' + xpGain);
+        showNotif('Ritual! XP+' + xpGain);
+        addLog(gS.yk.name + ' performed Ritual! XP+' + xpGain);
         triggerAction('ritual'); updateUI(); return;
       }
       setCooldown(type);
@@ -7542,10 +7536,10 @@
     // ════════════════════════════════════════════════════════════
     //  INIT
     // ════════════════════════════════════════════════════════════
-    // 저장된 언어 설정 복원
+    // Force English setting
     (function () {
-      var saved = _memStore['lang'] || 'en';
-      if (saved === 'en') { currentLang = 'en'; document.getElementById('btnLangKo').classList.remove('active'); document.getElementById('btnLangEn').classList.add('active'); }
+      currentLang = 'en';
+      applyLang(); // Update all labels
     })();
     renderTitle();
     // 이어하기 버튼: 저장 데이터 있을 때만 활성화
@@ -7564,7 +7558,7 @@
       <a href="terms.html" style="color: #c8900a; text-decoration: none;">Terms of Service</a>
     </div>
     <div style="color: #7a5830; font-size: 12px;">
-      &copy; 2026 Registry of Chosun Mysteries. All rights reserved.
+      &copy; 2026 BLIPZONES. ALL RIGHTS RESERVED.
     </div>
   </footer>
   <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
