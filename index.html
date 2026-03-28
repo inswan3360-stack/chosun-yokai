@@ -297,17 +297,6 @@
       background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.95) 100%);
     }
 
-    .play-card.latest {
-      border: 2px solid var(--accent-cyan);
-    }
-    .latest-tag {
-      background: var(--accent-cyan);
-      color: var(--midnight);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: 900;
-    }
-
     .card-stats {
       display: flex;
       gap: 15px;
@@ -486,16 +475,16 @@
   <section class="hero-showcase">
     <div class="showcase-content">
       <div class="badge">FEATURED EXPERIENCE</div>
-      <h1 class="main-title">NEON<br><span>FLIGHT REBIRTH</span></h1>
+      <h1 class="main-title">HIGHWAY<br><span>CHASE PREMIER</span></h1>
       <p class="hero-desc">
-        A post-processed masterpiece of cyber-aesthetic. Glide through high-speed hexagon gates in a world defined by light and sound. 
+        A high-octane pursuit through neon-soaked futuristic streets. Master the asphalt, outrun the perimeter, and claim your legend in this definitive racing experience.
       </p>
       <div class="hero-actions">
-        <a href="NEON FLIGHT.html" class="play-now-btn primary">LAUNCH GAME</a>
+        <a href="HIGHWAY CHASE.html" class="play-now-btn primary">LAUNCH GAME</a>
         <button onclick="document.querySelector('#playground').scrollIntoView({behavior:'smooth'})" class="btn-more">EXPLORE REPERTOIRE</button>
       </div>
     </div>
-    <div class="showcase-bg"></div>
+    <div class="showcase-bg" style="background-image: linear-gradient(to bottom, rgba(15, 18, 25, 0.4), var(--midnight) 95%), url('assets/previews/highway.png');"></div>
   </section>
 
   <!-- Playground Grid -->
@@ -539,19 +528,6 @@
           <h2 class="card-title">Flight Glitch</h2>
           <div class="card-stats">
             <span>Nostalgic</span> • <span>Hardcore</span> • <span>Skill</span>
-          </div>
-        </div>
-        <div class="play-now-hint">+</div>
-      </div>
-
-      <!-- Neon Flight Card -->
-      <div class="play-card latest" onclick="showGameInfo('neon_flight')" style="background-image: url('assets/previews/neon_flight.png');">
-        <div class="shine"></div>
-        <div class="card-content">
-          <span class="card-tag latest-tag">Latest Release</span>
-          <h2 class="card-title">Neon Flight</h2>
-          <div class="card-stats">
-            <span>Ultra HDR</span> • <span>3D Engine</span> • <span>Elite</span>
           </div>
         </div>
         <div class="play-now-hint">+</div>
@@ -730,14 +706,6 @@
         controls: "• Arrows: Steering & Acceleration<br>• Spacebar: Use Nitro Boost<br>• Scoring increases with risky maneuvers and near-misses.",
         image: "assets/previews/highway.png",
         link: "HIGHWAY CHASE.html"
-      },
-      neon_flight: {
-        title: "Neon Flight",
-        tag: "3D Post-Processed Racing",
-        desc: "A visual masterpiece using Three.js post-processing. Navigate through luminous hexagon gates in a procedurally generated cyberworld. Speed and precision are the only rules in this high-fidelity neon sanctuary.",
-        controls: "• A / D or Arrows: Move Left/Right<br>• Pass through Hexagons to boost score and speed.<br>• Avoid the infinite horizon obstacles.",
-        image: "assets/previews/neon_flight.png",
-        link: "NEON FLIGHT.html"
       }
     };
 
