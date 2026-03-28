@@ -9,15 +9,17 @@
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@300;400;700;900&display=swap');
     
     :root {
-      --ink: #0a0c12;
-      --paper: #e8d09a;
-      --gold: #c5a059;
-      --gold-bright: #f8d060;
-      --accent: #8b2222;
-      --glass: rgba(15, 18, 25, 0.85);
-      --border: rgba(197, 160, 89, 0.3);
-      --muted: #8a8d91;
-      --nav-height: 70px;
+      /* Modern & Stable Palette (OKLCH) */
+      --midnight: oklch(15% 0.02 260);     /* Stable deep base */
+      --surface: oklch(20% 0.03 260);      /* Card/Surface base */
+      --ice: oklch(95% 0.01 260);          /* Clean text */
+      --gold: oklch(80% 0.12 90);          /* Sophisticated gold */
+      --accent-cyan: oklch(75% 0.2 240);   /* Modern spark */
+      --accent-red: oklch(60% 0.2 25);     /* Subtle warmth */
+      --glass: rgba(15, 18, 25, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+      --muted: oklch(70% 0.01 260);        /* Balanced muted text */
+      --nav-height: 80px;
     }
 
     * { 
@@ -27,14 +29,15 @@
     }
 
     body {
-        background: var(--ink);
-        color: var(--paper);
-        font-family: 'Outfit', 'Noto Sans KR', sans-serif;
-        line-height: 1.6;
+        background: var(--midnight);
+        color: var(--ice);
+        font-family: 'Outfit', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+        line-height: 1.7;
         background-image: 
-          radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% -20%, oklch(40% 0.1 260 / 0.15) 0%, transparent 50%),
           url('https://www.transparenttextures.com/patterns/dark-matter.png');
         background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
     }
 
     /* Navigation */
@@ -58,14 +61,22 @@
 
     .nav-logo {
       font-weight: 900;
-      font-size: 1.2rem;
-      letter-spacing: 2px;
-      color: var(--gold-bright);
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: var(--ice);
       text-transform: uppercase;
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      transition: transform 0.3s ease;
+    }
+    .nav-logo:hover { transform: scale(1.02); }
+    .nav-logo .logo-mark {
+      background: linear-gradient(135deg, var(--gold), var(--accent-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .nav-links {
@@ -139,38 +150,40 @@
 
     /* Hero Section */
     .hero {
-      padding-top: calc(var(--nav-height) + 80px);
-      padding-bottom: 60px;
+      padding: calc(var(--nav-height) + 100px) 20px 80px;
       text-align: center;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
+      position: relative;
     }
 
     .badge {
-      display: inline-block;
-      padding: 6px 16px;
-      background: rgba(139, 34, 34, 0.2);
-      border: 1px solid var(--accent);
-      color: #ff5555;
-      font-size: 10px;
-      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 3px;
-      border-radius: 50px;
-      margin-bottom: 25px;
+      letter-spacing: 4px;
+      border-radius: 100px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(5px);
     }
 
     .main-title {
-      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-size: clamp(2.8rem, 10vw, 5.5rem);
       font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      letter-spacing: -2px;
-      color: #fff;
+      line-height: 1.05;
+      margin-bottom: 25px;
+      letter-spacing: -3px;
+      color: var(--ice);
     }
 
     .main-title span {
-      background: linear-gradient(to bottom, var(--gold-bright), var(--gold));
+      background: linear-gradient(135deg, var(--ice) 30%, var(--gold) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -178,11 +191,12 @@
     }
 
     .hero-desc {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       color: var(--muted);
-      max-width: 600px;
-      margin: 0 auto 40px;
-      font-weight: 300;
+      max-width: 700px;
+      margin: 0 auto 50px;
+      font-weight: 400;
+      line-height: 1.6;
     }
 
     /* Playground Cards */
@@ -196,18 +210,19 @@
     }
 
     .play-card {
-      background: var(--glass);
+      background: var(--surface);
       border: 1px solid var(--border);
       padding: 40px;
-      border-radius: 12px;
+      border-radius: 20px;
       text-decoration: none;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      min-height: 350px;
+      min-height: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     .play-card::before {
@@ -219,9 +234,24 @@
     }
 
     .play-card:hover {
-      transform: translateY(-10px);
-      border-color: var(--gold-bright);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(197, 160, 89, 0.1);
+      transform: translateY(-8px) scale(1.02);
+      border-color: oklch(80% 0.12 240 / 0.4);
+      box-shadow: 
+        0 25px 60px rgba(0,0,0,0.5), 
+        0 0 40px oklch(75% 0.2 240 / 0.15);
+    }
+
+    .play-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+      z-index: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .play-card:hover::after {
+      background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
     }
 
     .card-content {
@@ -240,16 +270,18 @@
     }
 
     .card-title {
-      font-size: 1.8rem;
+      font-size: 2.2rem;
       font-weight: 900;
-      color: #fff;
-      margin-bottom: 15px;
+      color: var(--ice);
+      margin-bottom: 12px;
+      letter-spacing: -1px;
     }
 
     .card-desc {
-      font-size: 0.95rem;
-      color: #ccc;
-      line-height: 1.6;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.5;
+      opacity: 0.8;
     }
 
     /* Philosophy Section */
@@ -347,7 +379,7 @@
 
   <nav>
     <a href="index.html" class="nav-logo">
-      <span style="color: var(--accent);">⚡</span> BLIPZONES
+      <span class="logo-mark">⚡</span> BLIPZONES
     </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
@@ -365,11 +397,11 @@
   </nav>
 
   <section class="hero">
-    <div class="badge">Digital Playground Sanctuary</div>
-    <h1 class="main-title">A Digital<br><span>Playground</span></h1>
+    <div class="badge">Next-Gen Digital Playground</div>
+    <h1 class="main-title">Instant Fun,<br><span>Pure Interaction.</span></h1>
     <p class="hero-desc">
-      Reclaiming the pure essence of interactive entertainment. 
-      In an age of overwhelming complexity, we return to the fundamental joy of discovery.
+      복잡한 사양 경쟁과 지루한 튜토리얼에서 벗어나십시오. 
+      BLIPZONES는 오직 '놀이'의 본질에 집중한 가장 현대적이고 가벼운 게이밍 안식처입니다.
     </p>
   </section>
 
@@ -615,10 +647,12 @@
       <span class="section-label">Our Core Philosophy</span>
       <h2 class="section-title">Beyond the Spec-War</h2>
       <p class="philosophy-text">
-        Today's digital landscape is saturated with high-fidelity distractions. We witness a relentless pursuit of pixel-perfect realism and complex algorithmic storytelling that often obscures the core reason we interact: <strong>The Joy of the Game.</strong>
+        고성능 하드웨어나 수주간의 몰입이 필요한 게임들이 즐비한 오늘날, 우리는 오히려 가장 기초적인 질문을 던집니다. <strong>"게임은 언제부터 이렇게 복잡해졌는가?"</strong>
       </p>
-      <p class="philosophy-text" style="font-size: 1rem; color: var(--paper); font-weight: 300;">
-        <em>BLIPZONES</em> was established as a counter-movement. We believe that a true "Playground" shouldn't require high-end hardware or weeks of dedication. It should be an immediate, accessible, and culturally rich experience that welcomes you back to the simplicity of the "Old Days."
+      <p class="philosophy-text" style="font-size: 1.05rem; color: var(--ice); font-weight: 400; opacity: 0.9;">
+        <em>BLIPZONES</em>는 이러한 '디지털 과부하' 시대에 대한 세련된 해답입니다. 
+        우리는 불필요한 장벽을 모두 제거했습니다. 설치도, 높은 사양도, 복잡한 학습도 필요 없습니다. 
+        단 한 번의 'Blip(신호)'으로 시작되는 순수한 즐거움, 그것이 우리가 지향하는 현대적 놀이터의 정의입니다.
       </p>
 
       <div class="philosophy-grid">
@@ -713,8 +747,8 @@
       <a href="terms.html">Terms</a>
       <a href="contact.html">Contact</a>
     </div>
-    <p style="color: var(--muted); font-size: 0.75rem; font-weight: 300; letter-spacing: 1px;">
-      &copy; 2026 BLIPZONES. PRESERVING THE JOY OF GAMING THROUGH SIMPLICITY.
+    <p style="color: var(--muted); font-size: 0.8rem; font-weight: 500; letter-spacing: 2px; opacity: 0.6;">
+      &copy; 2026 BLIPZONES. REDEFINING THE DIGITAL PLAYGROUND.
     </p>
   </footer>
 
