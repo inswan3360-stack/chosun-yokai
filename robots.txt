@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
 Sitemap: https://blipzones.com/sitemap.xml
+
+# Discourage indexing of administrative or legal drafts if they existed
+Disallow: /tmp/
+Disallow: /#가족용/
