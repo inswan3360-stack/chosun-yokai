@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Survive the high-speed pursuit of the ancient sea monster in BLIPZONES. A high-stakes flight survival game featuring mystical creatures.">
     <title>Flight Glitch | BLIPZONES</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3097458973063020" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -1022,6 +1023,78 @@
             #compass-heading { font-size: 16px; }
         }
         /* End of styles */
+
+        /* ─── 실시간 점수 HUD ─── */
+        #hud-score {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            z-index: 1000;
+            background: rgba(0, 5, 20, 0.55);
+            border: 1px solid rgba(0, 255, 204, 0.18);
+            border-radius: 14px;
+            padding: 8px 28px 10px;
+            backdrop-filter: blur(14px);
+            min-width: 160px;
+        }
+        #hud-dist-label {
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: rgba(0,255,204,0.5);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        #hud-dist-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(0,255,204,0.4);
+            letter-spacing: 1px;
+        }
+        .hud-unit {
+            font-size: 14px;
+            color: rgba(0,255,204,0.6);
+            font-weight: 400;
+            margin-left: 2px;
+        }
+        #hud-score-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 5px;
+            width: 100%;
+            justify-content: center;
+        }
+        #hud-score-label {
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: rgba(255,200,0,0.5);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        #hud-score-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            color: #ffcc00;
+            text-shadow: 0 0 12px rgba(255,200,0,0.5);
+        }
+        @keyframes score-pop {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.3); color: #fff; }
+            100% { transform: scale(1); }
+        }
+        .score-popped { animation: score-pop 0.25s ease; }
     </style>
     <script src="components/blip-nav.js" type="module"></script>
     <script src="utils/blip-sync.js" type="module"></script>
@@ -1081,8 +1154,14 @@
         <div id="game-over-screen">
             <h1 class="game-over-title" id="game-over-title">💥 CRASHED!</h1>
             <div id="game-over-reason">You hit an obstacle.</div>
-            <div class="final-score">Survival Distance: <span id="final-distance">0</span> m <span id="go-new-record"
-                    style="display:none;color:#ffd700;font-size:18px;">⭐ NEW RECORD!</span></div>
+            <div class="final-score" style="text-align:center;">
+                <div style="font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-bottom:4px;">SURVIVAL DISTANCE</div>
+                <div style="font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;color:#00ffcc;text-shadow:0 0 30px rgba(0,255,204,0.5);line-height:1;">
+                    <span id="final-distance">0</span><span style="font-size:18px;opacity:0.6;margin-left:4px;">m</span>
+                </div>
+                <div id="go-final-score" style="font-size:13px;color:#ffcc00;margin-top:4px;letter-spacing:1px;"></div>
+                <span id="go-new-record" style="display:none;color:#ffd700;font-size:14px;letter-spacing:2px;">⭐ NEW RECORD!</span>
+            </div>
             <div class="go-lb-mini">
                 <div class="lb-title" style="font-size:12px;">🏆 LOCAL RANKINGS — <span id="go-diff-label">CASUAL</span>
                 </div>
@@ -1200,10 +1279,65 @@
         </div>
 
         <div id="crosshair" class="ingame-ui">＋</div>
+
+        <!-- ─── 실시간 거리/점수 HUD ─── -->
+        <div id="hud-score" class="ingame-ui">
+            <div id="hud-dist-label">DISTANCE</div>
+            <div id="hud-dist-value"><span id="hud-dist-num">0</span><span class="hud-unit"> m</span></div>
+            <div id="hud-score-row">
+                <span id="hud-score-label">SCORE</span>
+                <span id="hud-score-value">0</span>
+            </div>
+        </div>
     </div>
 
     <script>
         // ─── 1. Scene Setup ───
+        const clock = new THREE.Clock();
+        let lastRocketSpawnTime = -999;
+
+        // ─── Difficulty Settings ───
+        let selectedDiff = 'casual';
+        const DIFF_CONFIGS = {
+            casual: {
+                baseSpeed: 3.5,
+                speedScalePerLevel: 0.4,
+                stallSpeedMulti: 0.6,
+                maxAltitude: 900,
+                boundsWarn: 2500,
+                boundsDeath: 3500,
+                hazardSpeedMult: 0.5,
+                homingLevel: 99,
+                homingStrength: 0.8,
+                rocketSpeedBase: 6,
+                spawnWidthBase: 8000,
+                obstacleCountMult: 0.4,
+                skyHazardCount: { plane: 4, rocket: 1, balloon: 4 },
+                diffScalePerDist: 4000,
+                boostExtra: 4.0,
+                rocketCooldown: 18,
+            },
+            extreme: {
+                baseSpeed: 5.5,
+                speedScalePerLevel: 0.9,
+                stallSpeedMulti: 0.8,
+                maxAltitude: 600,
+                boundsWarn: 1200,
+                boundsDeath: 1800,
+                hazardSpeedMult: 0.7,
+                homingLevel: 1,
+                homingStrength: 2.2,
+                rocketSpeedBase: 7,
+                spawnWidthBase: 4000,
+                obstacleCountMult: 1.8,
+                skyHazardCount: { plane: 4, rocket: 2, balloon: 3 },
+                diffScalePerDist: 1800,
+                boostExtra: 6.0,
+                rocketCooldown: 12,
+            }
+        };
+        function getDC() { return DIFF_CONFIGS[selectedDiff]; }
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 4000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1291,21 +1425,32 @@
             const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
             let x, z, y = 0;
+            const isExtreme = (selectedDiff === 'extreme');
 
             if (obs._isGate) {
-                // Gates spawn closer to the center path but varied in height
                 const forwardOffset = 1000 + Math.random() * 2500;
-                const rightOffset = (Math.random() - 0.5) * 1200; // Guided path width
+                const rightOffset = (Math.random() - 0.5) * 1200;
                 const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
                 x = newPos.x; z = newPos.z;
                 y = 100 + Math.random() * 400;
             } else {
-                do {
-                    const forwardOffset = 800 + Math.random() * 3200;
-                    const rightOffset = (Math.random() - 0.5) * spawnWidth;
-                    const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
+                // Extreme: 촘촘한 그리드 배치로 빌딩숲 연출
+                if (isExtreme && (obs._isMountain === undefined) && !obs._isMountain) {
+                    const gridStep = 120 + Math.random() * 80;
+                    const gridX = Math.round((Math.random() - 0.5) * spawnWidth / gridStep) * gridStep;
+                    const gridZ = (800 + Math.random() * 2800);
+                    const newPos = pPos.clone()
+                        .add(forward.clone().multiplyScalar(gridZ))
+                        .add(right.clone().multiplyScalar(gridX));
                     x = newPos.x; z = newPos.z;
-                } while (Math.abs(x) < 250 && z > -500 && z < 7000); // Clear runway path
+                } else {
+                    do {
+                        const forwardOffset = 800 + Math.random() * 3200;
+                        const rightOffset = (Math.random() - 0.5) * spawnWidth;
+                        const newPos = pPos.clone().add(forward.clone().multiplyScalar(forwardOffset)).add(right.clone().multiplyScalar(rightOffset));
+                        x = newPos.x; z = newPos.z;
+                    } while (Math.abs(x) < 250 && z > -500 && z < 7000);
+                }
             }
 
             obs.position.set(x, y, z);
@@ -1313,19 +1458,20 @@
                 obs.lookAt(x, y, z + 100);
                 obs.scale.set(1.5, 1.5, 1.5);
             } else if (obs._isMountain) {
-                // 산은 크기 고정 (작은 언덕 느낌)
-                const s = 0.5 + Math.random() * 0.7;
+                const s = 0.5 + Math.random() * 0.6;
                 obs.scale.set(s, s, s);
             } else if (obs._isTower || obs._isChimney) {
-                // 탑/굴뚝은 가끔 약간 크게
                 const s = 0.8 + Math.random() * 0.6;
-                obs.scale.set(s, s * (0.9 + Math.random() * 0.4), s);
+                obs.scale.set(s, s * (0.9 + Math.random() * 0.5), s);
             } else {
-                // 건물은 다양한 크기
-                const isMega = !obs._isGate && Math.random() < 0.15;
-                const s = isMega ? (1.5 + Math.random() * 1.5) : (0.7 + Math.random() * 1.2);
-                const hScale = isMega ? (2.0 + Math.random() * 3.5) : (0.8 + Math.random() * 0.6);
+                // Extreme: 고층빌딩 비율 높임
+                const megaChance = isExtreme ? 0.30 : 0.12;
+                const isMega = Math.random() < megaChance;
+                const s = isMega ? (1.8 + Math.random() * 1.5) : (0.7 + Math.random() * 1.1);
+                const hScale = isMega ? (2.5 + Math.random() * 4.0) : (0.8 + Math.random() * 0.7);
                 obs.scale.set(s, s * hScale, s);
+                // 랜덤 Y축 회전으로 단조로움 방지
+                obs.rotation.y = Math.random() * Math.PI * 2;
             }
         }
 
@@ -1528,9 +1674,10 @@
 
         // ─── 5. Sky Hazards ───
         const skyHazards = [];
-        for (let i = 0; i < 10; i++) { const h = createEnemyPlane(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
-        for (let i = 0; i < 6; i++) { const h = createRocket(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
-        for (let i = 0; i < 12; i++) { const h = createBalloon(); scene.add(h); skyHazards.push(h); resetSkyHazard(h, new THREE.Vector3(0, 0, 0), new THREE.Quaternion()); }
+        // 최대치로 생성 (casual/extreme에 따라 실제 활성 수 제어)
+        for (let i = 0; i < 4; i++) { const h = createEnemyPlane(); scene.add(h); skyHazards.push(h); h.visible = false; }
+        for (let i = 0; i < 2; i++) { const h = createRocket(); scene.add(h); skyHazards.push(h); h.visible = false; }
+        for (let i = 0; i < 4; i++) { const h = createBalloon(); scene.add(h); skyHazards.push(h); h.visible = false; }
 
         function createEnemyPlane() {
             const g = new THREE.Group(); 
@@ -1577,35 +1724,50 @@
             g.type = 'balloon'; return g;
         }
 
+
         function resetSkyHazard(h, pPos, pQuat) {
             const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(pQuat);
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(pQuat);
-            const spawnDist = 2000 + Math.random() * 3000;
+            const spawnDist = 1800 + Math.random() * 2000;
+            const dc = getDC();
 
             if (h.type === 'plane') {
-                h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 3000));
-                h.position.y = 50 + Math.random() * 800;
-                h.lookAt(pPos.clone().add(new THREE.Vector3((Math.random() - 0.5) * 1000, (Math.random() - 0.5) * 200, 0)));
-                h.speed = 10 + Math.random() * 8;
+                // 적기: 측면에서 교차비행, 정면 충돌 없음
+                const side = Math.random() > 0.5 ? 1 : -1;
+                h.position.copy(pPos)
+                    .add(forward.clone().multiplyScalar(spawnDist))
+                    .add(right.clone().multiplyScalar(side * (600 + Math.random() * 600)));
+                h.position.y = 60 + Math.random() * 250;
+                const crossTarget = pPos.clone().add(right.clone().multiplyScalar(-side * 1500)).add(new THREE.Vector3(0, (Math.random()-0.5)*80, 0));
+                h.lookAt(crossTarget);
+                h.speed = 7 + Math.random() * 4;
+
             } else if (h.type === 'rocket') {
-                if (Math.random() > 0.4) {
-                    h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist * 0.6)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 1500));
-                    h.position.y = -10;
-                    h.lookAt(pPos.x, pPos.y + 300 + Math.random() * 400, pPos.z);
-                    h.speed = 14 + Math.random() * 10;
-                } else {
-                    h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 1000));
-                    h.position.y = pPos.y + (Math.random() - 0.5) * 300;
-                    h.lookAt(pPos);
-                    h.speed = 18 + Math.random() * 12;
+                // 미사일: 쿨다운 + 후방 발사
+                const now = clock.elapsedTime;
+                if (now - lastRocketSpawnTime < dc.rocketCooldown) {
+                    h.position.set(99999, -9999, 99999);
+                    h.visible = false;
+                    return;
                 }
-            } else if (h.type === 'balloon') {
-                h.position.copy(pPos).add(forward.clone().multiplyScalar(spawnDist)).add(right.clone().multiplyScalar((Math.random() - 0.5) * 3500));
-                h.position.y = 100 + Math.random() * 1000;
+                lastRocketSpawnTime = now;
+                const rSide = Math.random() > 0.5 ? 1 : -1;
+                h.position.copy(pPos)
+                    .add(forward.clone().multiplyScalar(-600 - Math.random() * 400))
+                    .add(right.clone().multiplyScalar(rSide * (150 + Math.random() * 250)));
+                h.position.y = pPos.y + (Math.random() - 0.5) * 80;
                 h.lookAt(pPos);
-                h.speed = 0.5 + Math.random() * 1.5;
-                if (Math.random() < 0.1) h.scale.set(3, 3, 3);
-                else h.scale.set(1, 1, 1);
+                h.speed = (dc.rocketSpeedBase || 7) + Math.random() * 2;
+                h._warningShown = false;
+
+            } else if (h.type === 'balloon') {
+                // 풍선: 전방 공간에 배치, 느리게 부유
+                h.position.copy(pPos)
+                    .add(forward.clone().multiplyScalar(spawnDist))
+                    .add(right.clone().multiplyScalar((Math.random() - 0.5) * 2000));
+                h.position.y = 50 + Math.random() * 350;
+                h.speed = 0.2 + Math.random() * 0.6;
+                h.scale.set(1, 1, 1);
             }
             h.visible = true;
         }
@@ -1756,43 +1918,7 @@
         const keys = { w: false, a: false, s: false, d: false, shift: false };
         const FLOOR_HEIGHT = 4.0;
 
-        // ─── Difficulty Settings ───
-        let selectedDiff = 'casual'; // 'casual' | 'extreme'
-
-        const DIFF_CONFIGS = {
-            casual: {
-                baseSpeed: 3.5,
-                speedScalePerLevel: 0.4,
-                stallSpeedMulti: 0.6,
-                maxAltitude: 900,
-                boundsWarn: 2500,
-                boundsDeath: 3500,
-                hazardSpeedMult: 0.6,
-                homingLevel: 8,
-                spawnWidthBase: 8000,
-                obstacleCountMult: 0.4, // Map sparsity
-                skyHazardCount: { plane: 6, rocket: 2, balloon: 6 },
-                diffScalePerDist: 4000,
-                boostExtra: 4.0,
-            },
-            extreme: {
-                baseSpeed: 6.0,
-                speedScalePerLevel: 1.2,
-                stallSpeedMulti: 0.85,
-                maxAltitude: 420,
-                boundsWarn: 900,
-                boundsDeath: 1400,
-                hazardSpeedMult: 1.5,
-                homingLevel: 1,             // rockets home immediately
-                spawnWidthBase: 3500,
-                obstacleCountMult: 1.4,
-                skyHazardCount: { plane: 14, rocket: 10, balloon: 16 },
-                diffScalePerDist: 1200,
-                boostExtra: 9.0,
-            }
-        };
-
-        function getDC() { return DIFF_CONFIGS[selectedDiff]; }
+        // ─── Difficulty Settings (moved to top) ───
 
         function setDifficulty(diff) {
             selectedDiff = diff;
@@ -1805,7 +1931,7 @@
                 btn.className = 'start-btn casual-start';
                 btn.textContent = '🚀 SYSTEM LOGIN (START)';
             } else {
-                desc.textContent = '💀 MAX SPEED · Homing missiles · Tight boundaries · Only for the brave. Good luck.';
+                desc.textContent = '🏙️ Dense city · Precision homing missile · Navigate the urban maze · One missile. Don\'t get hit.';
                 btn.className = 'start-btn';
                 btn.textContent = '☠️ ENTER HELL (START)';
             }
@@ -1878,7 +2004,10 @@
                 expOsc.start(); expOsc.stop(audioCtx.currentTime + 0.6);
             }
             const finalDist = Math.floor(distanceTraveled / 10);
-            document.getElementById('final-distance').innerText = finalDist;
+            const finalScore = finalDist + (diffLevel * 100);
+            document.getElementById('final-distance').innerText = finalDist.toLocaleString();
+            const goScoreEl = document.getElementById('go-final-score');
+            if (goScoreEl) goScoreEl.innerText = 'SCORE  ' + finalScore.toLocaleString();
             // Show the name-entry popup instead of game-over immediately
             setTimeout(() => showNamePopup(finalDist, selectedDiff, diffLevel), 1000);
         }
@@ -1903,9 +2032,12 @@
             isGameOver = false; hasTakenOff = false; planeGroup.visible = true;
             planeGroup.position.set(0, FLOOR_HEIGHT, -100);
             pitch = 0; roll = 0; yaw = 0; currentSpeed = 0; distanceTraveled = 0;
+            lastRocketSpawnTime = -999;
             explosionParticles.forEach(p => scene.remove(p.mesh)); explosionParticles.length = 0;
-            groundObstacles.forEach(obs => repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, 4000));
-            skyHazards.forEach(h => { h.visible = false; resetSkyHazard(h, planeGroup.position, planeGroup.quaternion); });
+            const dc = getDC();
+            groundObstacles.forEach(obs => repositionGroundObstacle(obs, planeGroup.position, planeGroup.quaternion, dc.spawnWidthBase));
+            // difficulty에 맞게 sky hazard 초기화 (전부 숨기고 시작)
+            skyHazards.forEach(h => { h.visible = false; });
             oceanLeviathans.forEach(h => h.visible = false);
             document.getElementById('takeoff-guide').style.display = 'block';
             if (audioCtx) engineGain.gain.setTargetAtTime(0.1, audioCtx.currentTime, 0.5);
@@ -1980,7 +2112,6 @@
         // ─── 9. Main Loop ───
         buildVehicle(0);
         planeGroup.position.set(0, FLOOR_HEIGHT, 0);
-        const clock = new THREE.Clock();
         const colorHelper = new THREE.Color();
 
         function animate() {
@@ -2025,15 +2156,23 @@
             currentSpeed += (dynamicTargetSpeed - currentSpeed) * 1.2 * delta;
             currentSpeed = Math.max(0, currentSpeed);
 
-            if (keys.w) pitch += 2.0 * delta; if (keys.s) pitch -= 2.0 * delta;
-            if (keys.a) { roll += 3.0 * delta; yaw += 1.5 * delta; }
-            if (keys.d) { roll -= 3.0 * delta; yaw -= 1.5 * delta; }
-            if (!keys.w && !keys.s) pitch += (0 - pitch) * 2 * delta;
-            if (!keys.a && !keys.d) { roll += (0 - roll) * 2 * delta; yaw += (0 - yaw) * 1.0 * delta; }
+            if (keys.w) pitch += 2.2 * delta;
+            if (keys.s) pitch -= 2.2 * delta;
+            if (keys.a) { roll += 3.5 * delta; yaw += Math.sin(roll) * 2.0 * delta; }
+            if (keys.d) { roll -= 3.5 * delta; yaw += Math.sin(roll) * 2.0 * delta; }
 
-            pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch));
-            roll = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, roll));
-            yaw = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, yaw));
+            // 키를 떼면 pitch는 중립 복귀, roll은 유지 (360도 자유 회전)
+            if (!keys.w && !keys.s) pitch += (0 - pitch) * 2.5 * delta;
+            // roll은 키 안 누르면 천천히 중립 복귀 (완전히 뒤집힌 채로도 유지 가능)
+            if (!keys.a && !keys.d) {
+                roll += (0 - roll) * 1.2 * delta;
+                yaw += (0 - yaw) * 1.2 * delta;
+            }
+
+            // pitch만 제한, roll은 360도 완전 허용
+            pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
+            // roll: 제한 없음 (360도)
+            yaw = Math.max(-Math.PI / 1.8, Math.min(Math.PI / 1.8, yaw));
 
             if (planeGroup.position.y >= MAX_ALTITUDE) {
                 planeGroup.position.y = MAX_ALTITUDE;
@@ -2297,16 +2436,71 @@
             }
 
             if (hasTakenOff) {
+                // ── 난이도별 활성 hazard 수 조절 ──
+                const counts = dc.skyHazardCount;
+                const planes   = skyHazards.filter(h => h.type === 'plane');
+                const rockets  = skyHazards.filter(h => h.type === 'rocket');
+                const balloons = skyHazards.filter(h => h.type === 'balloon');
+
+                // 비활성 hazard를 주기적으로 스폰 (이미 활성 수 < 허용 수일 때)
+                const activeP = planes.filter(h => h.visible).length;
+                const activeR = rockets.filter(h => h.visible).length;
+                const activeB = balloons.filter(h => h.visible).length;
+
+                if (activeP < counts.plane && Math.random() < 0.008) {
+                    const h = planes.find(h => !h.visible);
+                    if (h) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
+                }
+                if (activeR < counts.rocket && Math.random() < 0.004) {
+                    const h = rockets.find(h => !h.visible);
+                    if (h) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
+                }
+                if (activeB < counts.balloon && Math.random() < 0.006) {
+                    const h = balloons.find(h => !h.visible);
+                    if (h) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
+                }
+
                 skyHazards.forEach(h => {
-                    if (!h.visible) h.visible = true;
-                    if (h.type === 'rocket' && diffLevel >= dc.homingLevel) {
-                        const dummy = h.clone(); dummy.lookAt(planeGroup.position);
-                        const homingStr = selectedDiff === 'extreme' ? 6.0 : 3.0;
-                        h.quaternion.slerp(dummy.quaternion, delta * homingStr);
+                    if (!h.visible) return;
+
+                    if (h.type === 'rocket') {
+                        // 호밍: 정확하지만 천천히 조준 — 피할 여지 있음
+                        if (diffLevel >= dc.homingLevel) {
+                            const dummy = new THREE.Object3D();
+                            dummy.position.copy(h.position);
+                            dummy.lookAt(planeGroup.position);
+                            h.quaternion.slerp(dummy.quaternion, delta * (dc.homingStrength || 2.0));
+                        }
+                        // 미사일 경고
+                        const rocketDist = h.position.distanceTo(planeGroup.position);
+                        if (rocketDist < 1000 && !h._warningShown) {
+                            h._warningShown = true;
+                            const warnEl = document.getElementById('center-warning');
+                            warnEl.innerHTML = '🚨 MISSILE LOCK ⚠<br><span style="font-size:15px;color:#ffaa00;">BREAK AWAY!</span>';
+                            warnEl.style.display = 'block';
+                            setTimeout(() => { if (warnEl.innerHTML.includes('MISSILE')) warnEl.style.display = 'none'; }, 2800);
+                        }
+                        h.translateZ(h.speed * delta * 60);
+                        // 너무 멀어지거나 지나치면 비활성화
+                        if (h.position.distanceTo(planeGroup.position) > 4000) h.visible = false;
+
+                    } else if (h.type === 'plane') {
+                        const bonus = diffLevel * 0.25;
+                        h.translateZ((h.speed + bonus) * delta * 60);
+                        if (h.position.clone().sub(planeGroup.position).dot(
+                            new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion)) < -500) {
+                            resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
+                        }
+
+                    } else if (h.type === 'balloon') {
+                        // 풍선: 느리게 부유 + 약간 흔들림
+                        h.position.y += Math.sin(clock.elapsedTime * 0.7 + h.position.x * 0.01) * 0.25;
+                        h.translateZ(h.speed * delta * 60);
+                        if (h.position.clone().sub(planeGroup.position).dot(
+                            new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion)) < -500) {
+                            resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
+                        }
                     }
-                    const hazardSpeedBonus = selectedDiff === 'extreme' ? diffLevel * 1.2 : diffLevel * 0.4;
-                    h.translateZ((h.speed * dc.hazardSpeedMult + hazardSpeedBonus) * delta * 60);
-                    if (h.position.clone().sub(planeGroup.position).dot(new THREE.Vector3(0, 0, 1).applyQuaternion(planeGroup.quaternion)) < -300) resetSkyHazard(h, planeGroup.position, planeGroup.quaternion);
                 });
             } else { skyHazards.forEach(h => h.visible = false); }
 
@@ -2325,10 +2519,28 @@
             colorHelper.setHex(themes[currentTheme].ground).lerp(new THREE.Color(themes[nextTheme].ground), lerpT);
             ground.material.color.copy(colorHelper);
 
-            document.getElementById('score').innerText = Math.floor(distanceTraveled / 10);
+            const distM = Math.floor(distanceTraveled / 10);
+            const scoreVal = distM + (diffLevel * 100);
+            document.getElementById('score').innerText = distM;
             document.getElementById('difficulty').innerText = diffLevel;
             document.getElementById('biome-name').innerText = themes[currentTheme].name;
             document.getElementById('altitude').innerText = Math.floor((planeGroup.position.y - FLOOR_HEIGHT) * 3.28);
+
+            // ─── 실시간 상단 HUD 업데이트 ───
+            if (hasTakenOff) {
+                document.getElementById('hud-dist-num').innerText = distM.toLocaleString();
+                const scoreEl = document.getElementById('hud-score-value');
+                const prevScore = parseInt(scoreEl.dataset.val || '0');
+                if (scoreVal !== prevScore) {
+                    scoreEl.innerText = scoreVal.toLocaleString();
+                    scoreEl.dataset.val = scoreVal;
+                    if (scoreVal > prevScore + 80) {
+                        scoreEl.classList.remove('score-popped');
+                        void scoreEl.offsetWidth;
+                        scoreEl.classList.add('score-popped');
+                    }
+                }
+            }
 
             renderer.render(scene, camera);
         }
