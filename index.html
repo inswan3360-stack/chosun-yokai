@@ -53,8 +53,10 @@
       --surface: oklch(20% 0.03 260);      /* Card/Surface base */
       --ice: oklch(95% 0.01 260);          /* Clean text */
       --gold: oklch(80% 0.12 90);          /* Sophisticated gold */
+      --gold-bright: oklch(90% 0.15 90);   /* Bright gold for accents */
       --accent-cyan: oklch(75% 0.2 240);   /* Modern spark */
       --accent-red: oklch(60% 0.2 25);     /* Subtle warmth */
+      --ink: oklch(12% 0.02 260);          /* Dark ink */
       --glass: rgba(15, 18, 25, 0.7);
       --border: rgba(255, 255, 255, 0.08);
       --muted: oklch(70% 0.01 260);        /* Balanced muted text */
@@ -842,19 +844,27 @@
       transform: rotate(90deg);
     }
 
+    .modal-actions {
+      text-align: center;
+      margin-top: 10px;
+    }
+
     .play-now-btn {
       display: inline-block;
       padding: 18px 50px;
+      background: linear-gradient(135deg, #f0d080, #c5a059); /* Fallback to hex if OKLCH fails */
       background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-      color: #000;
+      color: #000 !important;
       text-decoration: none;
       font-weight: 900;
       border-radius: 50px;
       text-transform: uppercase;
       letter-spacing: 3px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       transition: all 0.3s;
-      box-shadow: 0 10px 25px rgba(197, 160, 89, 0.3);
+      box-shadow: 0 10px 25px rgba(197, 160, 89, 0.4);
+      border: none;
+      cursor: pointer;
     }
 
     .play-now-btn:hover {
