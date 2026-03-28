@@ -735,7 +735,7 @@
       </div>
 
       <!-- Liquid State Card -->
-      <div class="play-card" onclick="showGameInfo('liquid')" style="background-image: url('assets/previews/liquid.png');">
+      <div class="play-card" onclick="showGameInfo('liquid')" style="background-image: url('assets/previews/liquid.png'), radial-gradient(circle at center, #c5a059 20%, #050508 100%); background-blend-mode: overlay;">
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Precision Physics</span>
@@ -939,6 +939,7 @@
         desc: "A high-end 3D physics puzzle chamber. Guide your neon-gold liquid mass through a field of shifting obstacles into the target goals. Experience the satisfying flow of mercury in a minimalist laboratory environment.",
         controls: "• Tilt the board to guide the liquid.<br>• Successfully stabilize all target cores to proceed through the 100 chambers.",
         image: "assets/previews/liquid.png",
+        fallback: "background: radial-gradient(circle at center, #c5a059 0%, #050508 100%);",
         link: "liquid.html"
       }
     };
@@ -951,7 +952,7 @@
       document.getElementById('modalTag').innerText = data.tag;
       document.getElementById('modalDesc').innerText = data.desc;
       document.getElementById('modalControls').innerHTML = data.controls;
-      document.getElementById('modalHero').style.backgroundImage = `url(${data.image})`;
+      document.getElementById('modalHero').style.backgroundImage = `url(${data.image}), radial-gradient(circle at center, #c5a059 20%, #050508 100%)`;
       document.getElementById('playBtn').href = data.link;
 
       const modal = document.getElementById('gameModal');
@@ -1010,7 +1011,8 @@
         title: 'LIQUID<br><span>STATE CHAMBERS</span>',
         desc: 'Satisfying stability. Master the golden flow through 100 shifting chambers of pure physics challenges.',
         link: 'liquid.html',
-        image: 'assets/previews/liquid.png'
+        image: 'assets/previews/liquid.png',
+        fallback: "background: radial-gradient(circle at center, #c5a059 20%, #050508 100%);"
       }
     ];
 
@@ -1024,7 +1026,7 @@
         const slideEl = document.createElement('div');
         slideEl.className = `hero-slide ${index === 0 ? 'active' : ''}`;
         slideEl.innerHTML = `
-          <div class="slide-bg" style="background-image: url('${slide.image}')"></div>
+          <div class="slide-bg" style="background-image: url('${slide.image}'); ${slide.fallback || ''}"></div>
           <div class="slide-content">
             <div class="slide-badge">${slide.badge}</div>
             <h1 class="slide-title">${slide.title}</h1>
