@@ -33,11 +33,23 @@
         color: var(--ice);
         font-family: 'Outfit', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
         line-height: 1.7;
+        background-color: #0b0d13;
         background-image: 
-          radial-gradient(circle at 50% -20%, oklch(40% 0.1 260 / 0.15) 0%, transparent 50%),
-          url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            linear-gradient(rgba(25, 30, 45, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(25, 30, 45, 0.4) 1px, transparent 1px);
+        background-size: 50px 50px;
         background-attachment: fixed;
         -webkit-font-smoothing: antialiased;
+        position: relative;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at 50% 10%, oklch(40% 0.1 240 / 0.15), transparent 60%);
+        pointer-events: none;
+        z-index: -1;
     }
 
     /* Navigation */
@@ -148,140 +160,214 @@
       color: var(--paper);
     }
 
-    /* Hero Section */
-    .hero {
-      padding: calc(var(--nav-height) + 100px) 20px 80px;
-      text-align: center;
-      max-width: 1100px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .badge {
-      display: inline-flex;
+    /* Hero Showcase Transformation */
+    .hero-showcase {
+      min-height: 100vh;
+      display: flex;
       align-items: center;
-      padding: 8px 18px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      color: var(--gold);
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      border-radius: 100px;
-      margin-bottom: 30px;
-      backdrop-filter: blur(5px);
+      justify-content: center;
+      padding: var(--nav-height) 40px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--midnight);
     }
 
-    .main-title {
-      font-size: clamp(2.8rem, 10vw, 5.5rem);
+    .showcase-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: linear-gradient(to bottom, rgba(15, 18, 25, 0.4), var(--midnight) 95%), url('assets/previews/neon_flight.png');
+      background-size: cover;
+      background-position: center;
+      filter: blur(10px) brightness(0.6);
+      transform: scale(1.1);
+      z-index: 1;
+      opacity: 0.6;
+    }
+
+    .showcase-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .play-now-btn.primary {
+      padding: 16px 40px;
+      background: linear-gradient(135deg, var(--gold), var(--accent-cyan));
+      color: var(--midnight);
+      text-decoration: none;
       font-weight: 900;
-      line-height: 1.05;
-      margin-bottom: 25px;
-      letter-spacing: -3px;
-      color: var(--ice);
+      border-radius: 8px;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3), 0 0 50px rgba(121, 144, 203, 0.1);
+      transition: all 0.3s;
     }
 
-    .main-title span {
-      background: linear-gradient(135deg, var(--ice) 30%, var(--gold) 100%);
+    .play-now-btn.primary:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(197, 160, 89, 0.4), 0 0 60px rgba(121, 144, 203, 0.2);
+    }
+
+    .btn-more {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--ice);
+      padding: 16px 40px;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-more:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--gold);
+    }
+
+    /* Playground Section Refinement */
+    .playground-section {
+      padding: 120px 0;
+      background: linear-gradient(to bottom, var(--midnight), #0a0b0e);
+    }
+
+    .section-title span {
+      background: linear-gradient(135deg, var(--gold), var(--accent-cyan));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: block;
     }
 
-    .hero-desc {
-      font-size: 1.25rem;
-      color: var(--muted);
-      max-width: 700px;
-      margin: 0 auto 50px;
-      font-weight: 400;
-      line-height: 1.6;
-    }
-
-    /* Playground Cards */
     .playground-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      max-width: 1100px;
-      margin: 60px auto;
-      padding: 0 20px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 60px auto 0;
+      padding: 0 40px;
     }
 
     .play-card {
-      background: var(--surface);
+      min-height: 500px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 24px;
       border: 1px solid var(--border);
       padding: 40px;
-      border-radius: 20px;
-      text-decoration: none;
-      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-      position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      min-height: 400px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     .play-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+      background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.9) 100%);
+      transition: background 0.4s;
       z-index: 1;
     }
 
     .play-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      border-color: oklch(80% 0.12 240 / 0.4);
-      box-shadow: 
-        0 25px 60px rgba(0,0,0,0.5), 
-        0 0 40px oklch(75% 0.2 240 / 0.15);
+      transform: translateY(-15px) scale(1.03);
+      border-color: var(--gold);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px oklch(80% 0.12 90 / 0.1);
     }
 
-    .play-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-      z-index: 1;
-      transition: opacity 0.5s ease;
+    .play-card:hover::before {
+      background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.95) 100%);
     }
 
-    .play-card:hover::after {
-      background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+    .play-card.latest {
+      border: 2px solid var(--accent-cyan);
     }
-
-    .card-content {
-      position: relative;
-      z-index: 2;
-    }
-
-    .card-tag {
-      font-size: 10px;
-      color: var(--gold-bright);
+    .latest-tag {
+      background: var(--accent-cyan);
+      color: var(--midnight);
+      padding: 4px 10px;
+      border-radius: 4px;
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-      display: block;
+    }
+
+    .card-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 15px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .card-stats span {
+      color: var(--gold);
     }
 
     .card-title {
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: var(--ice);
-      margin-bottom: 12px;
-      letter-spacing: -1px;
+      font-size: 2.5rem;
+      transition: transform 0.4s;
     }
 
-    .card-desc {
-      font-size: 1rem;
-      color: var(--muted);
-      line-height: 1.5;
-      opacity: 0.8;
+    .play-card:hover .card-title {
+      transform: translateX(10px);
+    }
+
+    .play-card .shine {
+      position: absolute;
+      top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+      transform: skewX(-25deg);
+      transition: none;
+      z-index: 5;
+    }
+
+    .play-card:hover .shine {
+      left: 150%;
+      transition: all 0.8s ease-in-out;
+    }
+
+    .play-now-hint {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        background: var(--gold);
+        color: var(--midnight);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 900;
+        z-index: 5;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .play-card:hover .play-now-hint {
+        opacity: 1;
+        transform: translateY(0);
     }
 
     /* Philosophy Section */
@@ -396,37 +482,79 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="badge">Next-Gen Digital Playground</div>
-    <h1 class="main-title">Instant Fun,<br><span>Pure Interaction.</span></h1>
-    <p class="hero-desc">
-      Escape the noise of high-spec competition and exhausting tutorials. 
-      BLIPZONES is a modern sanctuary dedicated to the pure essence of play—lightweight, intuitive, and immediately accessible.
-    </p>
+  <!-- Featured Gameplay Showcase (Hero) -->
+  <section class="hero-showcase">
+    <div class="showcase-content">
+      <div class="badge">FEATURED EXPERIENCE</div>
+      <h1 class="main-title">NEON<br><span>FLIGHT REBIRTH</span></h1>
+      <p class="hero-desc">
+        A post-processed masterpiece of cyber-aesthetic. Glide through high-speed hexagon gates in a world defined by light and sound. 
+      </p>
+      <div class="hero-actions">
+        <a href="NEON FLIGHT.html" class="play-now-btn primary">LAUNCH GAME</a>
+        <button onclick="document.querySelector('#playground').scrollIntoView({behavior:'smooth'})" class="btn-more">EXPLORE REPERTOIRE</button>
+      </div>
+    </div>
+    <div class="showcase-bg"></div>
   </section>
 
-  <section id="playground" class="playground-grid">
-    <div class="play-card" onclick="showGameInfo('yokai')" style="background-image: url('assets/previews/yokai.png'); background-size: cover; background-position: center; cursor: pointer;">
-      <div class="card-content">
-        <span class="card-tag">Simulation</span>
-        <h2 class="card-title">Yokai: Rebirth</h2>
-        <p class="card-desc">Experience the subtle evolution of ancestral spirits. No complex mechanics, just the natural flow of folklore.</p>
-      </div>
+  <!-- Playground Grid -->
+  <section id="playground" class="playground-section">
+    <div class="container">
+      <div class="section-label">THE REPERTOIRE</div>
+      <h2 class="section-title">CHOOSE YOUR <span>INTERACTION.</span></h2>
     </div>
-
-    <div class="play-card" onclick="showGameInfo('flight')" style="background-image: url('assets/previews/flight.png'); background-size: cover; background-position: center; cursor: pointer;">
-      <div class="card-content">
-        <span class="card-tag">Arcade</span>
-        <h2 class="card-title">Flight Glitch</h2>
-        <p class="card-desc">Pure, high-intensity survival. A return to the arcade era where skill and focus were the only specifications that mattered.</p>
+    <div class="playground-grid">
+      <!-- Yokai Card -->
+      <div class="play-card" onclick="showGameInfo('yokai')" style="background-image: url('assets/previews/yokai.png');">
+        <div class="shine"></div>
+        <div class="card-content">
+          <span class="card-tag">Folklore Simulation</span>
+          <h2 class="card-title">Yokai: Rebirth</h2>
+          <div class="card-stats">
+            <span>Relaxing</span> • <span>Evolving</span> • <span>Tradition</span>
+          </div>
+        </div>
+        <div class="play-now-hint">+</div>
       </div>
-    </div>
 
-    <div class="play-card" onclick="showGameInfo('highway')" style="background-image: url('assets/previews/highway.png'); background-size: cover; background-position: center; cursor: pointer;">
-      <div class="card-content">
-        <span class="card-tag">Racing</span>
-        <h2 class="card-title">Highway Chase</h2>
-        <p class="card-desc">A high-speed adrenaline rush through neon-lit streets. Outrun the law and master the asphalt.</p>
+      <!-- Highway Chase Card -->
+      <div class="play-card" onclick="showGameInfo('highway')" style="background-image: url('assets/previews/highway.png');">
+        <div class="shine"></div>
+        <div class="card-content">
+          <span class="card-tag">Street Racing</span>
+          <h2 class="card-title">Highway Chase</h2>
+          <div class="card-stats">
+            <span>High-Speed</span> • <span>Survival</span> • <span>Neon</span>
+          </div>
+        </div>
+        <div class="play-now-hint">+</div>
+      </div>
+
+      <!-- Flight Glitch Card -->
+      <div class="play-card" onclick="showGameInfo('flight')" style="background-image: url('assets/previews/flight.png');">
+        <div class="shine"></div>
+        <div class="card-content">
+          <span class="card-tag">Arcade Classic</span>
+          <h2 class="card-title">Flight Glitch</h2>
+          <div class="card-stats">
+            <span>Nostalgic</span> • <span>Hardcore</span> • <span>Skill</span>
+          </div>
+        </div>
+        <div class="play-now-hint">+</div>
+      </div>
+
+      <!-- Neon Flight Card -->
+      <div class="play-card latest" onclick="showGameInfo('neon_flight')" style="background-image: url('assets/previews/neon_flight.png');">
+        <div class="shine"></div>
+        <div class="card-content">
+          <span class="card-tag latest-tag">Latest Release</span>
+          <h2 class="card-title">Neon Flight</h2>
+          <div class="card-stats">
+            <span>Ultra HDR</span> • <span>3D Engine</span> • <span>Elite</span>
+          </div>
+        </div>
+        <div class="play-now-hint">+</div>
       </div>
     </div>
   </section>
@@ -602,6 +730,14 @@
         controls: "• Arrows: Steering & Acceleration<br>• Spacebar: Use Nitro Boost<br>• Scoring increases with risky maneuvers and near-misses.",
         image: "assets/previews/highway.png",
         link: "HIGHWAY CHASE.html"
+      },
+      neon_flight: {
+        title: "Neon Flight",
+        tag: "3D Post-Processed Racing",
+        desc: "A visual masterpiece using Three.js post-processing. Navigate through luminous hexagon gates in a procedurally generated cyberworld. Speed and precision are the only rules in this high-fidelity neon sanctuary.",
+        controls: "• A / D or Arrows: Move Left/Right<br>• Pass through Hexagons to boost score and speed.<br>• Avoid the infinite horizon obstacles.",
+        image: "assets/previews/neon_flight.png",
+        link: "NEON FLIGHT.html"
       }
     };
 
