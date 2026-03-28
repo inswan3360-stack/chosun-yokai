@@ -160,41 +160,113 @@
       color: var(--paper);
     }
 
-    /* Hero Showcase Transformation */
-    .hero-showcase {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--nav-height) 40px 80px;
-      text-align: center;
+    /* Hero Carousel Refinement */
+    .hero-carousel {
+      height: 100vh;
+      width: 100%;
       position: relative;
       overflow: hidden;
       background: var(--midnight);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .showcase-bg {
+    .hero-slider {
+      width: 100%;
+      height: 100%;
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: linear-gradient(to bottom, rgba(15, 18, 25, 0.4), var(--midnight) 95%), url('assets/previews/neon_flight.png');
+      top: 0; left: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.2s ease, visibility 1.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 40px;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .slide-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background-size: cover;
       background-position: center;
-      filter: blur(10px) brightness(0.6);
-      transform: scale(1.1);
+      filter: brightness(0.4) saturate(0.8);
+      transform: scale(1.05);
+      transition: transform 8s linear;
       z-index: 1;
-      opacity: 0.6;
     }
 
-    .showcase-content {
+    .hero-slide.active .slide-bg {
+      transform: scale(1.15);
+    }
+
+    .slide-content {
       position: relative;
       z-index: 2;
-      max-width: 900px;
-      animation: fadeIn 1s ease-out;
+      max-width: 1000px;
+      text-align: center;
+      transform: translateY(30px);
+      transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+      opacity: 0;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hero-slide.active .slide-content {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.3s;
+    }
+
+    .slide-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .slide-title {
+      font-size: clamp(3rem, 12vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 25px;
+      letter-spacing: -4px;
+      color: var(--ice);
+      text-transform: uppercase;
+    }
+
+    .slide-title span {
+      background: linear-gradient(135deg, var(--gold), var(--accent-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-desc {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
     }
 
     .hero-actions {
@@ -237,6 +309,81 @@
     .btn-more:hover {
       background: rgba(255, 255, 255, 0.05);
       border-color: var(--gold);
+    }
+
+    .carousel-nav {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .dots-container {
+      display: flex;
+      gap: 12px;
+    }
+
+    .dot {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.4s;
+    }
+
+    .dot.active {
+      background: var(--gold);
+      width: 70px;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+
+    .scroll-hint:hover { opacity: 1; }
+    
+    .scroll-hint span {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+
+    .mouse {
+      width: 20px;
+      height: 35px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      position: relative;
+    }
+
+    .mouse::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 4px;
+      animation: mouseWheel 2s infinite;
+    }
+
+    @keyframes mouseWheel {
+      0% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, 15px); }
     }
 
     /* Playground Section Refinement */
@@ -471,20 +618,22 @@
     </div>
   </nav>
 
-  <!-- Featured Gameplay Showcase (Hero) -->
-  <section class="hero-showcase">
-    <div class="showcase-content">
-      <div class="badge">FEATURED EXPERIENCE</div>
-      <h1 class="main-title">HIGHWAY<br><span>CHASE PREMIER</span></h1>
-      <p class="hero-desc">
-        A high-octane pursuit through neon-soaked futuristic streets. Master the asphalt, outrun the perimeter, and claim your legend in this definitive racing experience.
-      </p>
-      <div class="hero-actions">
-        <a href="HIGHWAY CHASE.html" class="play-now-btn primary">LAUNCH GAME</a>
-        <button onclick="document.querySelector('#playground').scrollIntoView({behavior:'smooth'})" class="btn-more">EXPLORE REPERTOIRE</button>
-      </div>
+  <!-- Dynamic Hero Carousel -->
+  <section class="hero-carousel">
+    <div id="heroSlider" class="hero-slider">
+      <!-- Slides will be injected via JS for cleaner management -->
     </div>
-    <div class="showcase-bg" style="background-image: linear-gradient(to bottom, rgba(15, 18, 25, 0.4), var(--midnight) 95%), url('assets/previews/highway.png');"></div>
+    
+    <!-- Carousel Controls -->
+    <div class="carousel-nav">
+      <div class="dots-container" id="carouselDots"></div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-hint" onclick="document.querySelector('#playground').scrollIntoView({behavior:'smooth'})">
+      <div class="mouse"></div>
+      <span>SCROLL DOWN</span>
+    </div>
   </section>
 
   <!-- Playground Grid -->
@@ -744,6 +893,87 @@
         closeModal();
       }
     }
+    // Hero Carousel Logic
+    const carouselData = [
+      {
+        id: 'yokai',
+        badge: 'DIGITAL FOLKLORE',
+        title: 'YOKAI<br><span>REBIRTH</span>',
+        desc: 'Escape the rush and embrace evolution. A sophisticated interaction with ancestral spirits and tradition.',
+        link: 'yokai.html',
+        image: 'assets/previews/yokai.png'
+      },
+      {
+        id: 'highway',
+        badge: 'CYBER PURSUIT',
+        title: 'HIGHWAY<br><span>CHASE PREMIER</span>',
+        desc: 'Limitless speed meets definitive control. Master the futuristic asphalt and outrun the digital perimeter.',
+        link: 'HIGHWAY CHASE.html',
+        image: 'assets/previews/highway.png'
+      },
+      {
+        id: 'flight',
+        badge: 'ARCADE SURVIVAL',
+        title: 'FLIGHT<br><span>GLITCH CLASSIC</span>',
+        desc: 'Pure focus. Pure survival. Re-imagining the raw intensity of the arcade era for the modern explorer.',
+        link: 'flight.html',
+        image: 'assets/previews/flight.png'
+      }
+    ];
+
+    let currentSlide = 0;
+    const slider = document.getElementById('heroSlider');
+    const dotsContainer = document.getElementById('carouselDots');
+
+    function initCarousel() {
+      carouselData.forEach((slide, index) => {
+        // Create slide
+        const slideEl = document.createElement('div');
+        slideEl.className = `hero-slide ${index === 0 ? 'active' : ''}`;
+        slideEl.innerHTML = `
+          <div class="slide-bg" style="background-image: url('${slide.image}')"></div>
+          <div class="slide-content">
+            <div class="slide-badge">${slide.badge}</div>
+            <h1 class="slide-title">${slide.title}</h1>
+            <p class="slide-desc">${slide.desc}</p>
+            <div class="hero-actions">
+              <a href="${slide.link}" class="play-now-btn primary">LAUNCH GAME</a>
+              <button onclick="document.querySelector('#playground').scrollIntoView({behavior:'smooth'})" class="btn-more">VIEW ALL</button>
+            </div>
+          </div>
+        `;
+        slider.appendChild(slideEl);
+
+        // Create dot
+        const dot = document.createElement('div');
+        dot.className = `dot ${index === 0 ? 'active' : ''}`;
+        dot.onclick = () => goToSlide(index);
+        dotsContainer.appendChild(dot);
+      });
+
+      setInterval(nextSlide, 6000);
+    }
+
+    function goToSlide(index) {
+      const slides = document.querySelectorAll('.hero-slide');
+      const dots = document.querySelectorAll('.dot');
+      if (!slides.length) return;
+      
+      slides[currentSlide].classList.remove('active');
+      dots[currentSlide].classList.remove('active');
+      
+      currentSlide = index;
+      
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+      let next = (currentSlide + 1) % carouselData.length;
+      goToSlide(next);
+    }
+
+    document.addEventListener('DOMContentLoaded', initCarousel);
   </script>
 
   <section class="philosophy">
