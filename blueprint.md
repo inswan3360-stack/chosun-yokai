@@ -109,3 +109,15 @@ Official Domain: https://blipzones.com/
   - `HIGHWAY CHASE.html`: 랭킹(Hall of Fame) 데이터 클라우드 동기화 전환.
 - **`blip-nav` 전역 이식:** 모든 게임 페이지의 기존 상단 바/뒤로가기 버튼을 통합 내비게이션 컴포넌트로 대체.
 - **광고 인프라: `blip-ads` 컴포넌트:** 향후 AdSense 코드 삽입이 용이하도록 설계된 플레이스홀더 웹 컴포넌트 개발 및 배치.
+
+### Version 13: 전역 광고 통합 및 인증 UI 고도화 (AdSense & Auth UI Split)
+- **전역 애드센스(AdSense) 코드 삽입:** 모든 HTML 페이지의 `<head>` 태그 내부에 파트너 ID(`ca-pub-3097458973063020`) 기반 애드센스 스크립트 전역 적용.
+- **인증 UI 분리 (Sign In vs Join):** `<blip-nav>` 컴포넌트 내에 '로그인'과 '가입(Sign Up)' 버튼을 시각적으로 분리하여 신규 유입 및 전환율 증대.
+- **게임 선택 모달 고도화:** 메인 화면의 게임 정보 창에 클라우드 동기화와 리더보드 순위 보존을 위한 가입 유도(Call-to-Action) 문구 및 링크 추가.
+- **레이아웃 안정성 개선:** `flight.html` 등 게임 페이지에서 네비게이션바 삽입 시 발생하던 PC 환경의 레이아웃 밀림(off-screen) 현상 해결 (`flex-direction: column` 적용).
+
+### 실행 내용 (v13)
+- **애드센스 전역 적용:** `index.html`, `flight.html`, `yokai.html`, `HIGHWAY CHASE.html`, `about.html`, `contact.html`, `privacy.html`, `terms.html`, `NEON FLIGHT.html` 에 스크립트 삽입 완료.
+- **`blip-nav.js` 업데이트:** 로그인 상태가 아닐 때 `btn-login`과 `btn-join`이 각각 다른 스타일로 노출되도록 HTML 및 CSS 수정.
+- **`index.html` 모달 업데이트:** `gameModal` 내부의 `modal-actions` 섹션에 동기화 안내 및 가입 권장 문구 추가.
+- **`flight.html` 구조 최적화:** 중복된 `animate()` 호출 삭제 및 HTML 구조 정규화(Tag nesting 오류 수정).
