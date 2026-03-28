@@ -219,7 +219,6 @@ class BlipNav extends HTMLElement {
                 cursor: pointer;
                 transition: background 0.3s;
             }
-            }
 
             @media (max-width: 768px) {
                 .nav-links { display: none; }
