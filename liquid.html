@@ -133,6 +133,7 @@
     <div class="overlay-title gold">STABLE</div>
     <div class="level-badge">PROCEEDING TO CHAMBER <span id="next-level-num">2</span></div>
     <button class="btn-primary" onclick="nextLevel()">NEXT CHAMBER →</button>
+    <button class="btn-secondary" onclick="shareProgress()" style="margin-top:20px; border-color:rgba(0,212,255,0.3); color:var(--neon-blue)">𝕏 SHARE STABILITY</button>
 </div>
 <div id="fail-overlay" class="overlay-screen">
     <div class="overlay-tag" style="color:var(--danger)">— CRITICAL FAILURE —</div>
@@ -836,6 +837,12 @@ window.launchGame=async()=>{
 window.nextLevel=()=>{currentLevel++;setupLevel(currentLevel);};
 window.resetLevel=()=>setupLevel(currentLevel);
 window.restartGame=()=>{currentLevel=1;setupLevel(1);};
+
+window.shareProgress=()=>{
+    const text = `Stabilized Chamber ${currentLevel} in #LiquidState! 🧪✨ The fluid physics on BLIPZONES are incredible. Play instantly: https://blipzones.com/liquid.html @blipzones`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+};
 
 window.addEventListener('resize',()=>{
     camera.aspect=window.innerWidth/window.innerHeight;

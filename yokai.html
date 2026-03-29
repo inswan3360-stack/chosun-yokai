@@ -829,6 +829,22 @@
       height: 100%;
       border-radius: 10px;
       transition: width 0.5s cubic-bezier(.4, 0, .2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-f::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%);
+      animation: stat-shine 2.8s linear infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes stat-shine {
+      0% { left: -100%; }
+      100% { left: 200%; }
     }
 
     /* 위험 시 깜빡임 */
@@ -854,19 +870,23 @@
     }
 
     .s-hu {
-      background: linear-gradient(90deg, #d02010, #ff4030);
+      background: linear-gradient(90deg, #c01808, #ff5040);
+      box-shadow: 0 0 7px rgba(255,64,48,0.55), inset 0 1px 0 rgba(255,160,140,0.25);
     }
 
     .s-ha {
-      background: linear-gradient(90deg, #c87010, #f0a030);
+      background: linear-gradient(90deg, #b06808, #f8a828);
+      box-shadow: 0 0 7px rgba(248,168,40,0.5), inset 0 1px 0 rgba(255,220,140,0.25);
     }
 
     .s-he {
-      background: linear-gradient(90deg, #1a7038, #30c060);
+      background: linear-gradient(90deg, #1a6830, #28c050);
+      box-shadow: 0 0 7px rgba(40,192,80,0.5), inset 0 1px 0 rgba(160,255,180,0.2);
     }
 
     .s-mg {
-      background: linear-gradient(90deg, #6030b0, #a060f0);
+      background: linear-gradient(90deg, #5828a0, #9848e8);
+      box-shadow: 0 0 7px rgba(152,72,232,0.55), inset 0 1px 0 rgba(200,160,255,0.25);
     }
 
     .s-fm {
@@ -881,12 +901,23 @@
       position: relative;
       overflow: hidden;
       border-bottom: 2px solid var(--border);
+      box-shadow: inset 0 -8px 20px rgba(0,0,0,0.4);
+    }
+
+    .scene-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,0.35) 100%);
+      z-index: 2;
     }
 
     #sceneCv {
       display: block;
       width: 100%;
       image-rendering: pixelated;
+      image-rendering: crisp-edges;
       cursor: pointer;
     }
 
@@ -3317,29 +3348,43 @@
         this.cache = new Map();
         // 한국 전통 오방색 기반 확장 팔레트 (32색)
         this.palette = [
-          '#ffffff', '#f8f8f8', '#d0d0d0', '#a0a0a0', '#707070', '#404040', '#202020', '#000000',
-          '#ffe0c0', '#f5c090', '#c88040', '#905020', '#603010',
-          '#e84030', '#ff8070', '#c02020', '#801010',
-          '#4090f0', '#80c0ff', '#1060c0', '#082060',
-          '#40c060', '#80f090', '#208040', '#0a4020',
-          '#f8d030', '#e0a000', '#a06010',
-          '#c060e0', '#8030b0',
-          '#40d0e0', '#0080a0'
+          // Whites & grays
+          '#ffffff', '#f8f8f8', '#e8e8e8', '#d0d0d0', '#b0b0b0', '#888888', '#606060', '#404040', '#282828', '#181818', '#0c0c0c', '#000000',
+          // Skin tones (Korean traditional)
+          '#fff0e0', '#ffe8cc', '#f8d8a8', '#f0c080', '#d09840', '#b07028', '#805018', '#502808',
+          // Warm reds & oranges
+          '#ff6050', '#e83020', '#c01010', '#800808', '#ff9848', '#e07820', '#c05810',
+          // Blues & teals
+          '#a0d0ff', '#60a8f0', '#2878d0', '#0848a8', '#083080', '#40d8e8', '#1898b8', '#086880',
+          // Greens (jade, bamboo, moss)
+          '#a0f0a0', '#60c860', '#28a040', '#0a6820', '#083810', '#c8e880', '#88b840', '#507020',
+          // Golds & yellows (obangsaek)
+          '#ffe860', '#f8c800', '#d09800', '#a06800', '#604000',
+          // Purples & magentas
+          '#e880f0', '#b840d0', '#8020a0', '#501070',
+          // Pinks & roses
+          '#ffc0d8', '#ff88b8', '#e84888', '#b82060',
+          // Atmospheric (moonlight, mist, spirit)
+          '#e0e8ff', '#c0c8f8', '#8090e0', '#4858c0',
+          // Earth tones (clay, stone, wood)
+          '#d0a870', '#a87840', '#705020', '#4a3010', '#281800',
+          // Jade green (Korean traditional)
+          '#80d0a8', '#40a870', '#206040',
         ];
       }
 
       generate(ykId) {
         if (this.cache.has(ykId)) return this.cache.get(ykId);
         const canvas = document.createElement('canvas');
-        canvas.width = 128; canvas.height = 128;
+        canvas.width = 256; canvas.height = 256;
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         const yk = YOKAI.find(y => y.id === ykId);
         if (!yk) return null;
-        // 96px 좌표계를 128px 캔버스에 꽉 차게 스케일 적용
+        // 96px 좌표계를 256px 캔버스에 꽉 차게 스케일 적용
         ctx.save();
-        ctx.scale(128 / 96, 128 / 96);
+        ctx.scale(256 / 96, 256 / 96);
         this.drawYokaiFull(ctx, yk);
         ctx.restore();
         this.applyPixelEffect(ctx);
@@ -3352,7 +3397,7 @@
 
       // 2×2 픽셀 퀀타이즈 + 팔레트 매핑
       applyPixelEffect(ctx) {
-        const W = 128, H = 128, BLOCK = 2;
+        const W = 256, H = 256, BLOCK = 2;
         const src = ctx.getImageData(0, 0, W, H);
         const d = src.data;
         // 블록 단위로 대표색 선택
@@ -3380,7 +3425,7 @@
 
       // 외곽선 추가 (검은 1px)
       applyOutline(ctx) {
-        const W = 128, H = 128;
+        const W = 256, H = 256;
         const src = ctx.getImageData(0, 0, W, H);
         const d = src.data;
         const out = new Uint8ClampedArray(d);
@@ -4297,7 +4342,7 @@
       // Result 요괴 그리기 (64x64 스프라이트 중앙 정렬)
       ctx.save();
       if (window._resultYk) {
-        drawYokai(ctx, window._resultYk, 3, (Date.now() / 1000) % 1000, 160 / 2 - 32, 180 / 2 - 40, null);
+        drawYokai(ctx, window._resultYk, 3, (Date.now() / 1000) % 1000, 160 / 2 - 64, 180 / 2 - 64, null);
       }
       ctx.restore();
       requestAnimationFrame(renderResult); // 애니메이션 추가
@@ -4310,7 +4355,7 @@
       if (!ctx || !yk) return;
 
       // ── 동적 진화 설정 (Dynamic Evolution) — 캐릭터 확대 ──
-      var evoScMap = [0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6];
+      var evoScMap = [0.4, 0.55, 0.7, 0.85, 1.0, 1.15, 1.3];
       var scFactor = evoScMap[Math.min(stage, 6)];
       var baseSc = STAGE_SCALES[Math.min(stage, 6)];
       var alpha = 1;
@@ -4343,9 +4388,9 @@
       // ctx.filter 대신 globalAlpha만 사용 (크로스브라우저 안전)
       ctx.globalAlpha = alpha;
 
-      // 64x64 기준 중심점 (ox+32, oy+32)
-      var cx = ox + 32;
-      var cy = oy + 32;
+      // 128x128 기준 중심점 (ox+64, oy+64)
+      var cx = ox + 64;
+      var cy = oy + 64;
       ctx.translate(cx, cy + bobY);
       ctx.scale(scaleX, scaleY);
       if (rotX) ctx.rotate(rotX);
@@ -4356,24 +4401,43 @@
       var img = sLoader.get(spriteId);
 
       if (img && img.complete && img.naturalWidth > 0) {
-        ctx.drawImage(img, ox, oy, 64, 64); // 96px 스프라이트를 64px로 축소 렌더
+        ctx.drawImage(img, ox, oy, 128, 128); // 256px 스프라이트를 128px로 렌더
       } else {
         // 이미지 로딩 중일 경우 대비한 기본 형태
         ctx.fillStyle = yk.bc;
         ctx.beginPath();
-        ctx.arc(ox + 32, oy + 40, 20, 0, Math.PI * 2);
+        ctx.arc(ox + 64, oy + 80, 40, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // ── 단계별 오라 효과 (ctx.filter 대체) ──
+      // ── 단계별 오라 효과 ──
       if (stage >= 4) {
         var puls = Math.sin(t * 3) * 0.12 + 0.18;
-        ctx.globalAlpha = puls;
-        for (var _a = 0; _a < 12; _a++) {
-          var _ang = _a / 12 * Math.PI * 2 + t * 0.6;
-          var _r = 26 + Math.sin(t * 2 + _a) * 5;
-          ctx.fillStyle = stage >= 5 ? '#f8d060' : yk.gc;
-          ctx.fillRect(ox + 32 + Math.cos(_ang) * _r - 2, oy + 32 + Math.sin(_ang) * _r * 0.55 - 2, 4, 4);
+        var orbitCnt = stage >= 6 ? 20 : stage >= 5 ? 16 : 12;
+        var orbitR = stage >= 6 ? 34 : stage >= 5 ? 30 : 26;
+        var orbitCol = stage >= 6 ? '#fff8a0' : stage >= 5 ? '#f8d060' : yk.gc;
+        var orbitSize = stage >= 5 ? 5 : 4;
+        for (var _a = 0; _a < orbitCnt; _a++) {
+          var _ang = _a / orbitCnt * Math.PI * 2 + t * (stage >= 5 ? 0.8 : 0.6);
+          var _r = orbitR + Math.sin(t * 2 + _a * 0.7) * 6;
+          var _puls2 = Math.sin(t * 3 + _a * 0.5) * 0.15 + puls;
+          ctx.globalAlpha = Math.max(0, _puls2);
+          ctx.fillStyle = orbitCol;
+          ctx.fillRect(ox + 64 + Math.cos(_ang) * _r - 2, oy + 64 + Math.sin(_ang) * _r * 0.5 - 2, orbitSize, orbitSize);
+          // Inner glow dot
+          ctx.globalAlpha = Math.max(0, _puls2 * 0.5);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(ox + 64 + Math.cos(_ang) * _r - 1, oy + 64 + Math.sin(_ang) * _r * 0.5 - 1, 2, 2);
+        }
+        // Stage 6: double ring
+        if (stage >= 6) {
+          for (var _b = 0; _b < 12; _b++) {
+            var _ang2 = _b / 12 * Math.PI * 2 - t * 0.4;
+            var _r2 = 20 + Math.sin(t * 3 + _b) * 3;
+            ctx.globalAlpha = puls * 0.6;
+            ctx.fillStyle = '#ffd860';
+            ctx.fillRect(ox + 64 + Math.cos(_ang2) * _r2 - 1, oy + 64 + Math.sin(_ang2) * _r2 * 0.5 - 1, 3, 3);
+          }
         }
         ctx.globalAlpha = 1;
       }
@@ -4383,44 +4447,44 @@
         if (gS.equip.hat) {
           // 갓 (Gat)
           ctx.fillStyle = '#111';
-          ctx.fillRect(ox + 20, oy + 10, 24, 4); // 챙
-          ctx.fillRect(ox + 26, oy + 4, 12, 6);  // 모자
-          ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(ox + 20, oy + 10, 24, 4);
+          ctx.fillRect(ox + 40, oy + 20, 48, 8); // 챙
+          ctx.fillRect(ox + 52, oy + 8, 24, 12);  // 모자
+          ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.strokeRect(ox + 40, oy + 20, 48, 8);
         }
         if (gS.equip.toy) {
           // 팽이 (Paengi) - 빙글빙글 회전 효과
           ctx.save();
-          var ptx = ox + 15, pty = oy + 48;
+          var ptx = ox + 30, pty = oy + 96;
           ctx.translate(ptx, pty);
           ctx.rotate(t * 15);
           ctx.fillStyle = '#8b4513';
-          artist.fillTriangle(ctx, -5, -4, 5, -4, 0, 6);
-          ctx.fillStyle = '#d2691e'; ctx.fillRect(-5, -6, 10, 2);
+          artist.fillTriangle(ctx, -10, -8, 10, -8, 0, 12);
+          ctx.fillStyle = '#d2691e'; ctx.fillRect(-10, -12, 20, 4);
           ctx.restore();
         }
         if (gS.equip.fan) {
           // 부채 (Fan)
           ctx.save();
-          var ftx = ox + 50, fty = oy + 45;
+          var ftx = ox + 100, fty = oy + 90;
           ctx.translate(ftx, fty);
           ctx.rotate(-0.3 + Math.sin(t * 4) * 0.2);
           ctx.fillStyle = '#fff9e0';
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, -Math.PI * 0.8, -Math.PI * 0.2); ctx.fill();
-          ctx.strokeStyle = '#8b4513'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -15); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 30, -Math.PI * 0.8, -Math.PI * 0.2); ctx.fill();
+          ctx.strokeStyle = '#8b4513'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -30); ctx.stroke();
           ctx.restore();
         }
         if (gS.equip.mask) {
           // 하회탈 (Mask)
           ctx.fillStyle = '#f5deb3';
-          artist.fillEllipse(ctx, ox + 32, oy + 28, 7, 9);
-          ctx.fillStyle = '#111'; ctx.fillRect(ox + 28, oy + 25, 3, 2); ctx.fillRect(ox + 33, oy + 25, 3, 2); // 눈
-          ctx.strokeStyle = '#8b2222'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(ox + 32, oy + 32, 4, 0.2, Math.PI - 0.2); ctx.stroke(); // 미소
+          artist.fillEllipse(ctx, ox + 64, oy + 56, 14, 18);
+          ctx.fillStyle = '#111'; ctx.fillRect(ox + 56, oy + 50, 6, 4); ctx.fillRect(ox + 66, oy + 50, 6, 4); // 눈
+          ctx.strokeStyle = '#8b2222'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ox + 64, oy + 64, 8, 0.2, Math.PI - 0.2); ctx.stroke(); // 미소
         }
         if (gS.equip.scroll) {
           // 두루마리 (Scroll)
-          ctx.fillStyle = '#fffbe8'; ctx.fillRect(ox + 44, oy + 40, 10, 18);
-          ctx.fillStyle = '#111'; ctx.fillRect(ox + 44, oy + 42, 10, 1); ctx.fillRect(ox + 44, oy + 45, 10, 1);
-          ctx.fillStyle = '#8b0000'; ctx.fillRect(ox + 43, oy + 38, 12, 3); ctx.fillRect(ox + 43, oy + 57, 12, 3);
+          ctx.fillStyle = '#fffbe8'; ctx.fillRect(ox + 88, oy + 80, 20, 36);
+          ctx.fillStyle = '#111'; ctx.fillRect(ox + 88, oy + 84, 20, 2); ctx.fillRect(ox + 88, oy + 90, 20, 2);
+          ctx.fillStyle = '#8b0000'; ctx.fillRect(ox + 86, oy + 76, 24, 6); ctx.fillRect(ox + 86, oy + 114, 24, 6);
         }
         ctx.restore();
       }
@@ -4452,7 +4516,7 @@
       if (img && img.complete && img.naturalWidth > 0) {
         ctx.globalAlpha = 0.25 * fl;
         ctx.globalAlpha *= 0.6; // filter 대신 투명도로 표현
-        ctx.drawImage(img, ox, oy + bob, 64, 64);
+        ctx.drawImage(img, ox, oy + bob, 128, 128);
       }
 
       // 중심 불꽃
@@ -4462,7 +4526,7 @@
       var s = 4;
       flames.forEach(function (f) {
         ctx.fillStyle = f[4];
-        ctx.fillRect(ox + 32 - (f[2] * s / 2), oy + 32 + (f[1] * s - 50) + bob, f[2] * s, f[3] * s);
+        ctx.fillRect(ox + 64 - (f[2] * s / 2), oy + 64 + (f[1] * s - 66) + bob, f[2] * s, f[3] * s);
       });
       ctx.restore();
     }
@@ -4471,6 +4535,7 @@
     //  SCENE RENDERER — 경복궁 한국 배경
     // ════════════════════════════════════════════════════════════
     var sceneT = 0, sceneRAF = null, particles2 = [], currentAnim = null, animTimer = null;
+    var atmoP = [], atmoPStage = -1;
 
     // ── 캐릭터 이동 시스템 ──
     var petWalkX = 0, petWalkVX = 0, petWalkDir = 1;
@@ -4561,6 +4626,113 @@
       return lines[Math.floor(Math.random() * lines.length)];
     }
 
+
+    // ════ ATMOSPHERIC PARTICLES ════
+    function initAtmoP(stage, W, H) {
+      atmoP = [];
+      var configs = [
+        // stage 0: soul wisps
+        [{ type:'wisp', cnt:12, col:['#8098ff','#a0b8ff','#c0d0ff'], vy:-0.25, sz:2 }],
+        // stage 1: ghost wisps
+        [{ type:'wisp', cnt:14, col:['#90a8ff','#b0c0ff','#d8e0ff'], vy:-0.2, sz:2 }],
+        // stage 2: wisps + petals
+        [{ type:'wisp', cnt:8, col:['#8098e8','#a0b0f0','#c8d0ff'], vy:-0.2, sz:2 },
+         { type:'petal', cnt:10, col:['#ffc8d8','#ffb0c8','#ffe0ec'], vy:0.45, sz:2 }],
+        // stage 3: sakura petals + fireflies
+        [{ type:'petal', cnt:18, col:['#ffb8d0','#ff98c0','#ffd8ec','#ffe0f0'], vy:0.5, sz:2 },
+         { type:'firefly', cnt:8, col:['#c0ff60'], vy:0, sz:1 }],
+        // stage 4: fireflies + golden sparks
+        [{ type:'firefly', cnt:12, col:['#a0ff40','#c8ff70'], vy:0, sz:1 },
+         { type:'spark', cnt:10, col:['#ffd840','#ffe870','#fff0a0'], vy:-0.35, sz:1 }],
+        // stage 5: divine sparks + spirit wisps
+        [{ type:'spark', cnt:16, col:['#ffc020','#ffd840','#fff060','#fff8a0'], vy:-0.5, sz:2 },
+         { type:'wisp', cnt:6, col:['#f0d880','#fff0a0','#fffcc0'], vy:-0.3, sz:3 }],
+        // stage 6: heavenly divine
+        [{ type:'spark', cnt:20, col:['#fff0a0','#ffffd0','#ffd060','#ffb840','#c0e8ff'], vy:-0.6, sz:2 },
+         { type:'petal', cnt:8, col:['#ffd8f0','#e8c8ff','#c8e0ff'], vy:0.3, sz:2 }],
+      ];
+      var cfg = configs[Math.min(stage, 6)];
+      cfg.forEach(function(grp) {
+        for (var i = 0; i < grp.cnt; i++) {
+          var col = grp.col[Math.floor(Math.random() * grp.col.length)];
+          atmoP.push({
+            type: grp.type,
+            x: Math.random() * W,
+            y: grp.type === 'petal' ? Math.random() * H : Math.random() * H * 0.85,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: grp.vy,
+            phase: Math.random() * Math.PI * 2,
+            sz: grp.sz,
+            col: col,
+            age: Math.floor(Math.random() * 300),
+            maxAge: 220 + Math.floor(Math.random() * 200)
+          });
+        }
+      });
+      atmoPStage = stage;
+    }
+
+    function renderAtmoP(ctx, W, H, t, stage) {
+      if (atmoPStage !== stage) initAtmoP(stage, W, H);
+      ctx.save();
+      atmoP.forEach(function(p) {
+        p.age++;
+        if (p.age >= p.maxAge) {
+          p.age = 0;
+          p.x = Math.random() * W;
+          p.y = p.type === 'petal' ? -6 : (p.type === 'spark' || p.type === 'divine') ? H * 0.85 + Math.random() * H * 0.1 : Math.random() * H * 0.8;
+        }
+        var osc = Math.sin(t * 1.8 + p.phase) * 0.5;
+        if (p.type === 'petal') {
+          p.y += p.vy;
+          p.x += p.vx + osc * 0.5;
+        } else if (p.type === 'firefly') {
+          p.x += Math.sin(t * 1.2 + p.phase) * 0.6;
+          p.y += Math.sin(t * 0.9 + p.phase * 1.3) * 0.5;
+        } else {
+          p.y += p.vy;
+          p.x += osc * 0.3;
+        }
+        if (p.x < -8) p.x = W + 8;
+        if (p.x > W + 8) p.x = -8;
+        var lr = p.age / p.maxAge;
+        var alpha = lr < 0.12 ? lr / 0.12 : lr > 0.82 ? (1 - lr) / 0.18 : 1;
+        if (p.type === 'petal') {
+          ctx.globalAlpha = alpha * 0.72;
+          ctx.fillStyle = p.col;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(t * 1.5 + p.phase);
+          ctx.fillRect(-p.sz, -p.sz * 2, p.sz * 2, p.sz * 4);
+          ctx.restore();
+        } else if (p.type === 'wisp') {
+          var g = 0.25 + Math.sin(t * 2.8 + p.phase) * 0.2;
+          ctx.globalAlpha = alpha * g * 0.55;
+          ctx.fillStyle = p.col;
+          ctx.fillRect(p.x - p.sz * 2, p.y - p.sz * 2, p.sz * 4, p.sz * 4);
+          ctx.globalAlpha = alpha * (g + 0.25) * 0.8;
+          ctx.fillRect(p.x - p.sz, p.y - p.sz, p.sz * 2, p.sz * 2);
+        } else if (p.type === 'firefly') {
+          var fl = 0.35 + Math.sin(t * 5.5 + p.phase) * 0.38;
+          ctx.globalAlpha = alpha * fl * 0.85;
+          ctx.fillStyle = '#60ff20';
+          ctx.fillRect(p.x - 1, p.y - 1, 3, 3);
+          ctx.globalAlpha = alpha * fl * 0.25;
+          ctx.fillStyle = '#a0ff60';
+          ctx.fillRect(p.x - 3, p.y - 3, 7, 7);
+        } else {
+          var sg = 0.45 + Math.sin(t * 4.5 + p.phase) * 0.32;
+          ctx.globalAlpha = alpha * sg;
+          ctx.fillStyle = p.col;
+          ctx.fillRect(p.x, p.y, p.sz + 1, p.sz + 1);
+          ctx.globalAlpha = alpha * sg * 0.35;
+          ctx.fillRect(p.x - 1, p.y - 1, p.sz + 3, p.sz + 3);
+        }
+      });
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+    // ════ END ATMOSPHERIC PARTICLES ════
 
     function renderScene() {
       var cv = document.getElementById('sceneCv');
@@ -4820,6 +4992,22 @@
         if (wx - wOff < -20 || wx - wOff > W + 20) continue;
         ctx.fillRect(wx - wOff, wallY - 7, 3, 4); ctx.fillRect(wx - wOff + 18, wallY - 7, 3, 4);
       }
+
+      // ── 지면 안개 (Ground Mist) ──
+      var mistIntensity = [0.06, 0.08, 0.10, 0.13, 0.16, 0.20, 0.25][Math.min(stage, 6)];
+      var mistOff = Math.sin(sceneT * 0.6) * 15;
+      for (var mi = 0; mi < 5; mi++) {
+        var my = wallY - 2 + mi * 5;
+        var mw = 80 + mi * 50;
+        var mx2 = ((mi * 97 + Math.floor(sceneT * 12) + mistOff) % (W + mw)) - mw / 2;
+        ctx.globalAlpha = mistIntensity * (1 - mi * 0.15) * (0.7 + Math.sin(sceneT * 0.8 + mi) * 0.3);
+        ctx.fillStyle = stage >= 4 ? '#d0c8e8' : '#d8e0e8';
+        ctx.fillRect(mx2, my, mw, 6 + mi * 2);
+      }
+      ctx.globalAlpha = 1;
+
+      // ── 대기 파티클 (Atmospheric Particles) ──
+      renderAtmoP(ctx, W, H, sceneT, stage);
 
       // ── 캐릭터 스케일 및 크기 — 기본 크기 확대 ──
       var scFactorForSize = [0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6][Math.min(stage, 6)]; // 전체적으로 크기 상향
@@ -7534,7 +7722,7 @@
       ctx.save();
       ctx.translate(540, 750);
       ctx.scale(5, 5);
-      drawYokai(ctx, yk, 6, 0, -32, -32, null);
+      drawYokai(ctx, yk, 6, 0, -64, -64, null);
       ctx.restore();
 
       // 요괴 정보 박스
