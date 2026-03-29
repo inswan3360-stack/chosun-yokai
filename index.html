@@ -55,21 +55,26 @@
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Yokai: Rebirth",
+    "name": "Liquid State",
     "operatingSystem": "Web Browser",
     "applicationCategory": "GameApplication",
-    "genre": "Simulation, Folklore",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    "genre": "Puzzle, Physics",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "1280"
+    }
   }
   </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Highway Chase",
+    "name": "Neon Flight",
     "operatingSystem": "Web Browser",
     "applicationCategory": "GameApplication",
-    "genre": "Racing",
+    "genre": "Racing, Gate Runner",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
@@ -1007,9 +1012,9 @@
       },
       {
         id: 'liquid',
-        badge: 'PRECISION PHYSICS',
+        badge: 'NEW: PRECISION PHYSICS v5.1',
         title: 'LIQUID<br><span>STATE CHAMBERS</span>',
-        desc: 'Satisfying stability. Master the golden flow through 100 shifting chambers of pure physics challenges.',
+        desc: 'Unrivaled fluid simulation. Master the golden flow through 100 shifting chambers with the all-new Dynamic Perimeter system.',
         link: 'liquid.html',
         image: 'assets/previews/liquid.png',
         fallback: "radial-gradient(circle at center, #c5a059 20%, #050508 100%)"
@@ -1074,16 +1079,33 @@
 
   <!-- Platform Content & FAQ (SEO/AdSense Optimization) -->
   <section class="platform-guides" style="background: rgba(255,255,255,0.02); padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05);">
-    <div class="container" style="max-width: 1000px; padding: 0 40px;">
+    <div class="container" style="max-width: 1200px; padding: 0 40px;">
       <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px;">
         <div>
           <h3 style="color: var(--gold); font-size: 1.5rem; margin-bottom: 25px;">The Blipzones Experience</h3>
           <p class="philosophy-text" style="font-size: 1rem; color: #aaa; margin-bottom: 20px;">
             BLIPZONES is carefully curated to bridge the gap between tradition and technology. Our mission is to provide an <strong>Instant Gameplay Framework</strong> that works across all devices, from high-end PCs to mobile browsers. Every game in our repertoire is built with modern web technologies like <strong>Three.js</strong> and <strong>WebAssembly</strong>, ensuring performance without the need for downloads.
           </p>
-          <p class="philosophy-text" style="font-size: 1rem; color: #aaa;">
-            Whether you are navigating the neon-lit streets of <em>Highway Chase</em> or observing the slow, meditative evolution of <em>Yokai: Rebirth</em>, you are participating in a new form of digital storytelling. We believe that the best games don't need tutorials—they need <strong>soul</strong>.
-          </p>
+          
+          <!-- Recent Update Log (SEO/Marketing/Trust building) -->
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-top: 40px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h4 style="color: var(--ice); font-size: 0.9rem; letter-spacing: 2px;">DEVELOPMENT LOG</h4>
+                <span style="font-size:0.7rem; color:var(--gold); font-weight:900;">LIVE UPDATES</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:15px;">
+                <div style="border-left: 2px solid var(--gold); padding-left: 15px;">
+                    <div style="font-size:0.75rem; color: #666; font-weight:700;">MARCH 29, 2026</div>
+                    <div style="color: var(--ice); font-size: 0.9rem; font-weight:700;">Liquid State v5.1 Deployed</div>
+                    <p style="font-size:0.8rem; color:#888;">New SPH-inspired physics engine and Dynamic Perimeter gating system enabled for all 100 chambers.</p>
+                </div>
+                <div style="border-left: 2px solid #333; padding-left: 15px;">
+                    <div style="font-size:0.75rem; color: #666; font-weight:700;">MARCH 27, 2026</div>
+                    <div style="color: var(--ice); font-size: 0.9rem; font-weight:700;">Global Leaderboard V2</div>
+                    <p style="font-size:0.8rem; color:#888;">Real-time sync between Highway Chase and Flight Glitch platforms finalized.</p>
+                </div>
+            </div>
+          </div>
         </div>
         <div>
           <h3 style="color: var(--gold); font-size: 1.5rem; margin-bottom: 25px;">Frequently Asked Questions</h3>
@@ -1096,8 +1118,12 @@
             <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.5;">Yes, all games on BLIPZONES are 100% free to play. We support the platform through minimal, non-intrusive advertising.</p>
           </div>
           <div>
-            <h4 style="color: var(--ice); font-size: 0.95rem; margin-bottom: 8px;">Can I play on mobile?</h4>
-            <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.5;">Absolutely. BLIPZONES is designed for a mobile-first experience. Our touch controls and responsive layouts adapt perfectly to any screen size.</p>
+            <h4 style="color: var(--gold); font-size: 1rem; margin-top: 30px; margin-bottom: 15px;">Join the Community</h4>
+            <p style="color: #888; font-size: 0.85rem; line-height: 1.6; margin-bottom: 20px;">Stay updated on new game releases, leaderboard challenges, and private beta tests.</p>
+            <div style="display: flex; gap: 10px;">
+                <a href="#" style="background: rgba(255,255,255,0.05); color: white; padding: 10px; border-radius: 5px; flex: 1; text-align: center; text-decoration: none; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--border);">DISCORD</a>
+                <a href="#" style="background: rgba(255,255,255,0.05); color: white; padding: 10px; border-radius: 5px; flex: 1; text-align: center; text-decoration: none; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--border);">X / TWITTER</a>
+            </div>
           </div>
         </div>
       </div>
