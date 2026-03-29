@@ -118,9 +118,11 @@
     import * as THREE from 'three';
 
     let rawMX = 0, rawMY = 0, rawBeta = 0, rawGamma = 0, hasGyro = false;
+    let smoothBeta = 0, smoothGamma = 0, smoothMX = 0, smoothMY = 0;
     let gameStarted = false, currentLevel = 1, isTrans = false; 
-    const TOTAL = 10, LOSS_THRES = 0.5; 
+    const TOTAL = 24, LOSS_THRES = 0.45; 
     let currentArenaSize = 8;
+    let lastTime = performance.now();
 
     class GameEngine {
         constructor() { this.ctx = null; this.master = null; }
@@ -157,25 +159,66 @@
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true; document.getElementById('view-container').appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7)); const mainL = new THREE.DirectionalLight(0xffffff, 2.2); mainL.position.set(10,40,20); mainL.castShadow = true; scene.add(mainL);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8)); 
+    const mainL = new THREE.DirectionalLight(0xffffff, 2.5); mainL.position.set(10,40,20); mainL.castShadow = true; 
+    mainL.shadow.mapSize.width = 1024; mainL.shadow.mapSize.height = 1024;
+    scene.add(mainL);
 
     const world = new THREE.Group(); scene.add(world);
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(8,0.8,8), new THREE.MeshStandardMaterial({ color: 0x08080a, metalness:0.95, roughness:0.02 })); floor.receiveShadow = true; world.add(floor);
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(8,0.8,8), new THREE.MeshStandardMaterial({ color: 0x08080a, metalness:0.95, roughness:0.05 })); floor.receiveShadow = true; world.add(floor);
     let gridHelper = new THREE.GridHelper(8, 8, 0x555555, 0x222222); gridHelper.position.y = 0.42; world.add(gridHelper);
 
     const goalG = new THREE.Group(), wallsG = new THREE.Group(), obsG = new THREE.Group(), anonG = new THREE.Group(), blobG = new THREE.Group();
     world.add(goalG); world.add(wallsG); world.add(obsG); world.add(anonG); world.add(blobG);
 
-    const liquidMat = new THREE.MeshStandardMaterial({ color: 0xfffb00, emissive: 0xc5a059, emissiveIntensity: 3.5, metalness: 0, roughness: 0 });
+    // Premium Liquid Material with slight Fresnel-like glow
+    const liquidMat = new THREE.MeshStandardMaterial({ 
+        color: 0xfffb00, 
+        emissive: 0xfffb00, 
+        emissiveIntensity: 0.8,
+        metalness: 0.8, 
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.9
+    });
+
     const particles = [];
     for(let i=0; i<TOTAL; i++){ 
-        const pMesh = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 16), liquidMat); 
-        pMesh.castShadow = true; blobG.add(pMesh);
-        particles.push({ mesh: pMesh, pos: new THREE.Vector3(), vel: new THREE.Vector3(), visible: true, lastC: 0 }); 
+        const rad = 0.35 + Math.random() * 0.1;
+        const pMesh = new THREE.Mesh(new THREE.SphereGeometry(rad, 16, 16), liquidMat); 
+        pMesh.castShadow = true; 
+        blobG.add(pMesh);
+        particles.push({ 
+            mesh: pMesh, 
+            pos: new THREE.Vector3(), 
+            vel: new THREE.Vector3(), 
+            visible: true, 
+            lastC: 0,
+            rad: rad
+        }); 
     }
 
-    function createWallAt(w,h,d,px,pz,c=0xffffff) { const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshStandardMaterial({ color: 0x151515 })); mesh.position.set(px,0.9,pz); const line = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({ color:c, transparent:true, opacity:0.8 })); mesh.add(line); return mesh; }
-    function createGoal(x, z) { const g = new THREE.Group(); const tBody = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.12, 12, 48), new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent:true, opacity:0.95 })); tBody.rotation.x = Math.PI/2; g.add(tBody); const l = new THREE.PointLight(0x00f3ff, 28, 18); l.position.y = 3.5; g.add(l); g.position.set(x, 0.42, z); g.userData = { timer: 0, done: false, light: l, ring: tBody }; return g; }
+    function createWallAt(w,h,d,px,pz,c=0xffffff) { 
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshStandardMaterial({ color: 0x151515, metalness: 0.5, roughness: 0.2 })); 
+        mesh.position.set(px,0.9,pz); 
+        const line = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({ color:c, transparent:true, opacity:0.8 })); 
+        mesh.add(line); 
+        mesh.receiveShadow = true;
+        mesh.castShadow = true;
+        return mesh; 
+    }
+    function createGoal(x, z) { 
+        const g = new THREE.Group(); 
+        const tBody = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.08, 12, 48), new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent:true, opacity:0.95 })); 
+        tBody.rotation.x = Math.PI/2; 
+        g.add(tBody); 
+        const l = new THREE.PointLight(0x00f3ff, 20, 15); 
+        l.position.y = 2.5; 
+        g.add(l); 
+        g.position.set(x, 0.42, z); 
+        g.userData = { timer: 0, done: false, light: l, ring: tBody }; 
+        return g; 
+    }
 
     window.nextLevel = () => { currentLevel++; setupLevel(currentLevel); };
     window.resetLevel = () => setupLevel(currentLevel);
@@ -195,11 +238,15 @@
         for(let i=0; i<gC; i++) { const a = (lvl*2.5 + i*(Math.PI*2/gC))%(Math.PI*2), r = currentArenaSize * 0.4; goalG.add(createGoal(Math.cos(a)*r, Math.sin(a)*r)); }
         
         const sB = currentArenaSize * 0.35;
-        particles.forEach(p => { p.mesh.position.set(-sB+(Math.random()-0.5)*1.2, 0.65, -sB+(Math.random()-0.5)*1.2); p.vel.set(0,0,0); p.mesh.visible = true; p.lastC = 0; });
+        particles.forEach(p => { 
+            p.mesh.position.set(-sB+(Math.random()-0.5)*2, 0.8, -sB+(Math.random()-0.5)*2); 
+            p.vel.set(0,0,0); 
+            p.mesh.visible = true; 
+            p.lastC = 0; 
+        });
         
         while(wallsG.children.length > 0) wallsG.remove(wallsG.children[0]);
         const hS = currentArenaSize / 2;
-        // DYNAMIC PERIMETER VULNERABILITY (v4.6)
         if(lvl <= 10) { [ [currentArenaSize+1, 1.8, 0.6, 0, hS+0.3], [currentArenaSize+1, 1.8, 0.6, 0, -hS-0.3], [0.6, 1.8, currentArenaSize+1, hS+0.3, 0], [0.6, 1.8, currentArenaSize+1, -hS-0.3, 0] ].forEach(w => wallsG.add(createWallAt(...w))); }
         else {
             const holeCount = Math.min(6, Math.floor((lvl - 10) / 15) + 1);
@@ -238,52 +285,109 @@
     inputTarget.addEventListener('mousemove', (e) => { rawMY = ((e.clientY/window.innerHeight)-0.5); rawMX = -((e.clientX/window.innerWidth)-0.5); });
     inputTarget.addEventListener('touchmove', (e) => { if (e.touches.length > 0) { const t = e.touches[0]; rawMY = (t.clientY/window.innerHeight)-0.5; rawMX = -((t.clientX/window.innerWidth)-0.5); } }, { passive: false });
 
-    function updatePhysics(delta) {
+    function updatePhysics(dt) {
         if (!gameStarted || isTrans) return;
-        const S = getSensitivity(), lF = 0.05 + (S*0.065);
+        
+        // Smooth Input Filtering
+        const inputLerp = 0.1;
+        smoothBeta = THREE.MathUtils.lerp(smoothBeta, rawBeta, inputLerp);
+        smoothGamma = THREE.MathUtils.lerp(smoothGamma, rawGamma, inputLerp);
+        smoothMX = THREE.MathUtils.lerp(smoothMX, rawMX, inputLerp);
+        smoothMY = THREE.MathUtils.lerp(smoothMY, rawMY, inputLerp);
+
+        const S = getSensitivity(), lF = 0.08;
         let tRX, tRZ;
-        if(hasGyro) { tRX = rawBeta*1.1*S; tRZ = -rawGamma*1.1*S; } else { tRX = rawMY * 1.0 * S; tRZ = rawMX * 1.0 * S; }
-        world.rotation.x = THREE.MathUtils.lerp(world.rotation.x, tRX, lF); world.rotation.z = THREE.MathUtils.lerp(world.rotation.z, tRZ, lF);
+        if(hasGyro) { tRX = smoothBeta*1.1*S; tRZ = -smoothGamma*1.1*S; } else { tRX = smoothMY * 1.0 * S; tRZ = smoothMX * 1.0 * S; }
+        
+        world.rotation.x = THREE.MathUtils.lerp(world.rotation.x, tRX, lF); 
+        world.rotation.z = THREE.MathUtils.lerp(world.rotation.z, tRZ, lF);
         document.getElementById('tilt-pointer').style.transform = `translate(${world.rotation.z*140}px, ${world.rotation.x*140}px)`;
         
-        const grav = new THREE.Vector3(-world.rotation.z*0.19, 0, world.rotation.x*0.19); 
+        const grav = new THREE.Vector3(-world.rotation.z*0.25, 0, world.rotation.x*0.25); 
         let aM = 0;
         
+        // Physics Consts
+        const attractionDist = 2.2;
+        const repulsionForce = 0.04;
+        const attractionForce = 0.012;
+        const viscosity = 0.965;
+
         particles.forEach((p, i) => {
             if(!p.mesh.visible) return; aM++;
-            p.vel.add(grav); p.vel.multiplyScalar(0.978); p.mesh.position.add(p.vel);
+            
+            // Gravity and Friction
+            p.vel.add(grav); 
+            p.vel.multiplyScalar(viscosity); 
+            p.mesh.position.add(p.vel);
+
+            // Particle-Particle Interactions (Soft Clustering)
             particles.forEach((o, j) => { 
                 if(i===j||!o.mesh.visible) return; 
-                const d=p.mesh.position.distanceTo(o.mesh.position); 
-                if(d < 1.8) { 
-                    const dr=new THREE.Vector3().subVectors(o.mesh.position,p.mesh.position).normalize(); 
-                    if(d < 0.82) { p.vel.add(dr.clone().multiplyScalar(-0.022)); p.mesh.position.add(dr.clone().multiplyScalar(-(0.82-d)*0.5)); } 
-                    else if(d > 0.88) { p.vel.add(dr.clone().multiplyScalar(Math.pow(d-0.88, 1.3) * 0.028)); }
+                const d = p.mesh.position.distanceTo(o.mesh.position); 
+                const minDist = (p.rad + o.rad) * 0.95;
+                
+                if(d < attractionDist) { 
+                    const dir = new THREE.Vector3().subVectors(o.mesh.position, p.mesh.position).normalize(); 
+                    if(d < minDist) { 
+                        // Hard Repulsion
+                        const overlap = minDist - d;
+                        p.vel.add(dir.clone().multiplyScalar(-repulsionForce * overlap)); 
+                        p.mesh.position.add(dir.clone().multiplyScalar(-overlap * 0.5)); 
+                    } else {
+                        // Soft Cohesion/Clustering
+                        const coreCohesion = Math.max(0, 1.0 - (d / attractionDist));
+                        const force = coreCohesion * coreCohesion * attractionForce;
+                        p.vel.add(dir.clone().multiplyScalar(force));
+                    }
                 }
             });
+
+            // Collision with Walls and Obstacles
             [...obsG.children, ...wallsG.children].forEach(obs => { 
-                const w=obs.geometry.parameters.width+0.1, d=obs.geometry.parameters.depth+0.1, dX=p.mesh.position.x-obs.position.x, dZ=p.mesh.position.z-obs.position.z; 
-                if(Math.abs(dX)<w/2+0.35 && Math.abs(dZ)<d/2+0.35){ 
-                    const pX=(w/2+0.35)-Math.abs(dX), pZ=(d/2+0.35)-Math.abs(dZ); 
-                    if(pX<pZ) p.mesh.position.x+=pX*Math.sign(dX); else p.mesh.position.z+=pZ*Math.sign(dZ); 
-                    p.vel.multiplyScalar(0.4); if(Date.now()-p.lastC > 200){ engine.playClink(p.vel.length()*12); p.lastC=Date.now(); }
+                const w = obs.geometry.parameters.width;
+                const d = obs.geometry.parameters.depth;
+                const halfW = w/2 + p.rad;
+                const halfD = d/2 + p.rad;
+                const dX = p.mesh.position.x - obs.position.x;
+                const dZ = p.mesh.position.z - obs.position.z; 
+                
+                if(Math.abs(dX) < halfW && Math.abs(dZ) < halfD){ 
+                    const pX = halfW - Math.abs(dX); 
+                    const pZ = halfD - Math.abs(dZ); 
+                    if(pX < pZ) p.mesh.position.x += pX * Math.sign(dX); else p.mesh.position.z += pZ * Math.sign(dZ); 
+                    p.vel.multiplyScalar(0.2); 
+                    if(Date.now() - p.lastC > 150){ 
+                        engine.playClink(p.vel.length()*15); 
+                        p.lastC = Date.now(); 
+                    }
                 }
             });
-            if(Math.abs(p.mesh.position.x)>currentArenaSize/2 + 0.6 || Math.abs(p.mesh.position.z)>currentArenaSize/2 + 0.6){ p.mesh.visible=false; }
+
+            // Out of bounds check
+            const limit = currentArenaSize / 2 + 0.5;
+            if(Math.abs(p.mesh.position.x) > limit || Math.abs(p.mesh.position.z) > limit){ 
+                p.mesh.visible = false; 
+            }
         });
 
+        // Level Goal Logic
         let totalDone = 0; const totalNeeded = goalG.children.length;
         goalG.children.forEach(goal => {
             if(goal.userData.done) { totalDone++; return; }
-            let inGoal = 0; particles.forEach(p => { if(p.mesh.visible && p.mesh.position.distanceTo(goal.position) < 1.9) inGoal++; });
-            if(inGoal >= Math.ceil(aM * 0.75) && aM > 0) { 
-                goal.userData.timer += delta; 
-                if(goal.userData.timer >= 1.25) { 
+            let inGoal = 0; 
+            particles.forEach(p => { if(p.mesh.visible && p.mesh.position.distanceTo(goal.position) < 1.8) inGoal++; });
+            
+            // Need most of the liquid to sync
+            const required = Math.max(1, Math.floor(aM * 0.7));
+            if(inGoal >= required && aM > 3) { 
+                goal.userData.timer += dt; 
+                goal.userData.ring.rotation.z += 0.1;
+                if(goal.userData.timer >= 1.2) { 
                     goal.userData.done = true; engine.playCoreSuccess();
                     goal.userData.light.intensity = 0; goal.userData.ring.material.opacity = 0;
                     showToast("CORE SYNCED."); 
                 }
-            } else { goal.userData.timer = Math.max(0, goal.userData.timer - delta*1.5); }
+            } else { goal.userData.timer = Math.max(0, goal.userData.timer - dt * 1.2); }
         });
 
         const syncPrg = totalDone / totalNeeded;
@@ -291,25 +395,46 @@
         document.getElementById('goal-bar').style.width = `${syncPrg*100}%`;
         document.getElementById('goals-badge').innerText = `CORES ${totalDone}/${totalNeeded}`;
 
-        const mP = aM / TOTAL; document.getElementById('mass-stat').innerText = `${Math.floor(mP*100)}%`; document.getElementById('mass-bar').style.width = `${mP*100}%`;
-        if(mP < LOSS_THRES && !isTrans) { isTrans=true; engine.playFail(); setTimeout(()=>document.getElementById('fail-overlay').style.display='flex', 800); }
+        const mP = aM / TOTAL; 
+        document.getElementById('mass-stat').innerText = `${Math.floor(mP*100)}%`; 
+        document.getElementById('mass-bar').style.width = `${mP*100}%`;
+        if(mP < LOSS_THRES && !isTrans) { 
+            isTrans = true; engine.playFail(); 
+            setTimeout(() => document.getElementById('fail-overlay').style.display='flex', 800); 
+        }
         
         if(totalDone === totalNeeded && !isTrans && totalNeeded > 0) { 
-            isTrans=true; engine.playVictory(); 
-            setTimeout(()=>{document.getElementById('overlay').style.display='flex'; document.getElementById('next-level-num').innerText=currentLevel+1;}, 600); 
+            isTrans = true; engine.playVictory(); 
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'flex'; 
+                document.getElementById('next-level-num').innerText = currentLevel + 1;
+            }, 600); 
         }
     }
-    function animate() { 
+
+    function animate(now) { 
         requestAnimationFrame(animate); 
+        const dt = (now - lastTime) / 1000;
+        lastTime = now;
+
         if(gameStarted) { 
             const tCam = new THREE.Vector3(0, 10 + currentArenaSize*1.2, 8 + currentArenaSize*1.1);
             camera.position.lerp(tCam, 0.05); camera.lookAt(0,0,0);
         } else { camera.position.lerp(new THREE.Vector3(0, 22, 20), 0.02); camera.lookAt(0,0,0); }
-        updatePhysics(0.016); 
+        
+        // Fixed step updates for physics stability
+        const steps = 1; 
+        for(let i=0; i<steps; i++) updatePhysics(Math.min(dt, 0.032) / steps); 
+        
         renderer.render(scene, camera); 
     }
-    window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-    setupLevel(1); animate();
+    window.addEventListener('resize', () => { 
+        camera.aspect = window.innerWidth / window.innerHeight; 
+        camera.updateProjectionMatrix(); 
+        renderer.setSize(window.innerWidth, window.innerHeight); 
+    });
+    setupLevel(1); 
+    requestAnimationFrame(animate); 
 </script>
 </body>
 </html>

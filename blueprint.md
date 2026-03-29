@@ -17,6 +17,7 @@ Official Domain: https://blipzones.com/
 2.  **Flight Glitch (플라이트 글리치):** 고전 아케이드 스타일의 고강도 생존 비행 게임. (`flight.html`)
 3.  **HIGHWAY CHASE (하이웨이 체이스):** 네온 시티를 배경으로 하는 짜릿한 신도주 카체이싱 게임. (`HIGHWAY CHASE.html`)
 4.  **NEON FLIGHT (네온 플라이트):** 초고화질 포스트 프로세싱 기반의 네온 사이버펑크 게이트 러너. (`NEON FLIGHT.html`)
+5.  **LIQUID STATE (리퀴드 스테이트):** 100개의 챔버를 통과하는 프리미엄 3D 물리 퍼즐. 황금빛 액체의 부드러운 흐름과 정교한 컨트롤. (`liquid.html`)
 
 ---
 
@@ -121,3 +122,14 @@ Official Domain: https://blipzones.com/
 - **`blip-nav.js` 업데이트:** 로그인 상태가 아닐 때 `btn-login`과 `btn-join`이 각각 다른 스타일로 노출되도록 HTML 및 CSS 수정.
 - **`index.html` 모달 업데이트:** `gameModal` 내부의 `modal-actions` 섹션에 동기화 안내 및 가입 권장 문구 추가.
 - **`flight.html` 구조 최적화:** 중복된 `animate()` 호출 삭제 및 HTML 구조 정규화(Tag nesting 오류 수정).
+
+### Version 14: Liquid State Physics & Smooth Movement (부드러운 물리 이동성 강화)
+- **고성능 액체 시뮬레이션 (SPH-lite):** 단순 구체 이동에서 벗어나, 입자 간 인력(Attraction)과 척력(Repulsion)을 계산하는 SPH 방식의 물리 엔진 도입.
+- **부드러운 클러스터링:** 액체 입자들이 자연스럽게 뭉치고(Clustering) 부드럽게 퍼지는 'Soft Physics' 구현.
+- **입력 신호 평활화 (Input Smoothing):** 모바일의 자이로스코프(Gyro) 및 PC의 마우스 입력 신호에 저역 통과 필터(Low-pass Filter)를 적용하여 떨림 현상 제거 및 부드러운 조작감 제공.
+- **프리미엄 비주얼 강화:** 황금빛 네온 액체의 질감을 위해 금속성(Metalness), 발광(Emissive Intensity), 투명도(Opacity)가 결합된 전용 재질 적용 및 그림자 효과 고도화.
+
+### 실행 내용 (v14)
+- **`liquid.html` 물리 로직 업데이트:** 입자 수 증대(10 -> 24), 입자 간 거리 기반 힘 계산 로직 추가, 시간 델타(dt) 기반의 프레임 독립적 물리 업데이트 구현.
+- **반응형 컨트롤 개선:** `smoothBeta`, `smoothGamma` 변수를 통한 입력 보간 로직 추가로 모바일 기기에서의 흔들림 최소화.
+- **재질 및 조명 밸런싱:** 액체의 가독성과 고급스러움을 위해 메인 라이트 강도 및 입자 크기 동적 조정.
