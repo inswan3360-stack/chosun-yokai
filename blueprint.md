@@ -133,3 +133,33 @@ Official Domain: https://blipzones.com/
 - **`liquid.html` 물리 로직 업데이트:** 입자 수 증대(10 -> 24), 입자 간 거리 기반 힘 계산 로직 추가, 시간 델타(dt) 기반의 프레임 독립적 물리 업데이트 구현.
 - **반응형 컨트롤 개선:** `smoothBeta`, `smoothGamma` 변수를 통한 입력 보간 로직 추가로 모바일 기기에서의 흔들림 최소화.
 - **재질 및 조명 밸런싱:** 액체의 가독성과 고급스러움을 위해 메인 라이트 강도 및 입자 크기 동적 조정.
+
+---
+
+### Version 15: 전면 화면 최적화 (Screen Layout Overhaul)
+
+#### 주요 목표
+- **PC/모바일 반응형 레이아웃 전면 개선:** 모든 게임 페이지에서 `blip-nav` 높이(`80px` PC / `56px` 모바일)를 정확히 반영한 게임 화면 크기 계산.
+- **게임화면 크기 최적화:** `#app` 컨테이너가 9:16 비율을 유지하면서 가용 화면 공간을 최대한 활용.
+- **버튼/터치 영역 확대:** 모바일 터치 디바이스에서 버튼 최소 높이 48px 이상 확보, 퀴즈 옵션 터치 영역 확대.
+- **가로모드(Landscape) 지원:** 모바일 가로 모드에서 nav를 숨기고 전체 화면 게임 플레이 가능.
+- **Safe Area 지원:** iOS 노치/홈바를 고려한 `env(safe-area-inset-*)` 패딩 적용.
+- **PC 배경 퀄리티 향상:** 좁은 게임 창 외부에 금빛 그라디언트 배경 추가, `border-radius` 적용.
+
+#### 실행 내용 (v15)
+- **`blip-nav.js` 업데이트:** 모바일(≤600px)에서 nav 높이 `56px`로 축소, safe-area padding 적용.
+- **`yokai.html` 레이아웃 수정:**
+  - `#app`: `100dvw`, `calc(100dvh - nav높이)` 기준으로 정확히 계산.
+  - PC(≥600px): `border-radius: 12px`, 황금빛 그림자 박스, 세로/가로 중앙 정렬.
+  - `scene-wrap` 최소 높이 `max(80px, 22dvh)`로 캔버스 충분히 확보.
+  - 가로모드: nav 숨기고 전체 화면 활용.
+  - `@media (pointer: coarse)`: 버튼 터치 영역 대폭 확대 (min-height: 48px, 62px).
+- **`flight.html` 수정:**
+  - `#game-container`: `position: fixed; top: nav높이`로 변경, 캔버스가 컨테이너 100% 채우도록 수정.
+  - HUD 스피도미터: `clamp()` 반응형 크기, `env(safe-area-inset-*)` 위치 적용.
+  - 리더보드 패널: `clamp()` 반응형 너비/위치, 모바일에서 하단 오버레이로 전환.
+  - 핸거 화면: `clamp()` 기반 반응형 폰트, 가로모드 콤팩트 레이아웃.
+- **`HIGHWAY CHASE.html` 수정:**
+  - `#gameContainer`: `position: fixed; top: nav높이; left: 50%`로 중앙 고정.
+  - 가로모드 및 소형 화면(≤700px) 반응형 UI 추가.
+

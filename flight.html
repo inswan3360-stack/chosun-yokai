@@ -52,18 +52,48 @@
 
         canvas {
             display: block;
-            width: 100vw !important;
-            height: 100vh !important;
+            width: 100% !important;
+            height: 100% !important;
             position: absolute;
             top: 0;
             left: 0;
         }
 
-        /* blip-nav integration */
+        /* blip-nav integration — 컨테이너가 nav를 배제한 나머지 영역을 차지 */
         #game-container {
-            margin-top: 80px;
-            height: calc(100vh - 80px) !important;
+            position: fixed;
+            top: 80px; /* blip-nav 높이 (PC) */
+            left: 0;
+            width: 100dvw;
+            height: calc(100dvh - 80px) !important;
+            margin-top: 0;
         }
+
+        /* 모바일: blip-nav가 56px이므로 조정 */
+        @media (max-width: 600px) {
+            #game-container {
+                top: 56px;
+                height: calc(100dvh - 56px) !important;
+            }
+        }
+
+        /* 가로모드: nav를 숨기고 전체 화면 활용 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            #game-container {
+                top: 0;
+                height: 100dvh !important;
+            }
+            blip-nav { display: none !important; }
+        }
+
+        /* 모바일 펄스크린 지원 */
+        @media (display-mode: fullscreen) {
+            #game-container {
+                top: 0;
+                height: 100dvh !important;
+            }
+        }
+
         /* Consolidating styles */
 
         #hangar-screen {
@@ -253,25 +283,41 @@
         .mobile-controls {
             display: none;
             position: absolute;
-            bottom: 40px;
+            bottom: max(20px, env(safe-area-inset-bottom, 20px));
             width: 100%;
             justify-content: space-between;
-            padding: 0 40px;
+            padding: 0 clamp(20px, 5vw, 50px);
             box-sizing: border-box;
             z-index: 1000;
             pointer-events: none;
         }
 
-        @media (max-width: 1024px) and (pointer: coarse) {
+        @media (pointer: coarse) {
             .mobile-controls { display: flex; }
-            .hangar-title { font-size: 44px; margin-bottom: 5px; }
-            .selector-container { gap: 15px; padding: 10px 15px; }
-            .arrow-btn { font-size: 30px; }
-            .vehicle-info { width: 180px; }
-            #vehicle-name { font-size: 18px; }
-            #vehicle-desc { font-size: 11px; }
-            .diff-pill { padding: 8px 15px; font-size: 12px; }
-            .start-btn { padding: 15px 30px; font-size: 18px; }
+        }
+
+        @media (max-width: 768px), (pointer: coarse) {
+            .hangar-title { font-size: clamp(28px, 8vw, 60px); margin-bottom: 5px; }
+            .hangar-subtitle { font-size: clamp(13px, 3.5vw, 18px); margin-bottom: 10px; }
+            .selector-container { gap: 12px; padding: 10px 15px; }
+            .arrow-btn { font-size: 28px; }
+            .vehicle-info { width: clamp(140px, 40vw, 220px); }
+            #vehicle-name { font-size: clamp(16px, 4vw, 24px); }
+            #vehicle-desc { font-size: clamp(11px, 2.5vw, 14px); }
+            .diff-pill { padding: 10px 18px; font-size: 13px; }
+            .start-btn { padding: 14px 32px; font-size: 20px; }
+            .diff-container { padding: 14px 20px; }
+        }
+
+        /* 가로 모드: 콤팬트하게 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .hangar-title { font-size: 28px; margin-bottom: 0; }
+            .hangar-subtitle { font-size: 12px; margin-bottom: 6px; margin-top: -4px; }
+            #hangar-screen { padding: 15px 0; gap: 8px; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .selector-container { padding: 8px 12px; gap: 10px; }
+            .vehicle-info { width: 130px; }
+            .diff-container { padding: 8px 15px; }
+            .start-btn { padding: 10px 24px; font-size: 16px; }
         }
 
         .joystick-container {
@@ -437,19 +483,21 @@
             font-family: inherit;
         }
 
+
         /* ─── HUD Speedometer (Circular Dial) ─── */
         #hud-speedometer {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 130px;
-            height: 130px;
+            bottom: max(20px, env(safe-area-inset-bottom, 20px));
+            right: max(20px, env(safe-area-inset-right, 20px));
+            width: clamp(90px, 12vw, 130px);
+            height: clamp(90px, 12vw, 130px);
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
+
 
         #speed-dial-svg {
             width: 130px;
@@ -729,9 +777,9 @@
         #leaderboard-panel {
             position: absolute;
             top: 50%;
-            right: 80px;
+            right: clamp(10px, 4vw, 80px);
             transform: translateY(-50%);
-            width: 260px;
+            width: clamp(200px, 30vw, 260px);
             background: rgba(5, 8, 20, 0.55);
             backdrop-filter: blur(14px) saturate(1.5);
             -webkit-backdrop-filter: blur(14px) saturate(1.5);
@@ -750,9 +798,29 @@
         #leaderboard-panel.hangar-mode {
             position: fixed;
             top: 50%;
-            right: 20px;
+            right: clamp(10px, 3vw, 20px);
             transform: translateY(-50%);
         }
+
+        /* 모바일: 리더보드를 화면 하단 작게 */
+        @media (max-width: 600px) {
+            #leaderboard-panel {
+                top: auto;
+                bottom: max(80px, 12vh);
+                right: 10px;
+                transform: none;
+                width: min(200px, 55vw);
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+            #leaderboard-panel.hangar-mode {
+                right: 10px;
+                bottom: 15px;
+                top: auto;
+                transform: none;
+            }
+        }
+
 
         .lb-title {
             font-size: 13px;

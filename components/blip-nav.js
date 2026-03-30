@@ -220,10 +220,42 @@ class BlipNav extends HTMLElement {
                 transition: background 0.3s;
             }
 
-            @media (max-width: 768px) {
+            @media (max-width: 600px) {
+                :host {
+                    --nav-height: 56px;
+                }
+                .nav-links { display: none; }
+                nav { 
+                    padding: 0 16px;
+                    height: var(--nav-height);
+                }
+                .nav-logo {
+                    font-size: 1.1rem;
+                    gap: 8px;
+                }
+                .btn-join {
+                    padding: 7px 14px;
+                    font-size: 0.75rem;
+                }
+                .btn-login {
+                    padding: 6px 10px;
+                    font-size: 0.75rem;
+                }
+            }
+
+            @media (min-width: 601px) and (max-width: 768px) {
                 .nav-links { display: none; }
                 nav { padding: 0 20px; }
             }
+
+            /* Safe area support for notch devices */
+            @supports (padding-left: env(safe-area-inset-left)) {
+                nav {
+                    padding-left: max(20px, env(safe-area-inset-left));
+                    padding-right: max(20px, env(safe-area-inset-right));
+                }
+            }
+
         </style>
         <nav>
             <a href="index.html" class="nav-logo">

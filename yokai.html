@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Yokai: Rebirth — Explore the ancestor spirits of Chosun on BLIPZONES. Collect Dokkaebi, Gumiho, and mystical guardians in this high-end folklore simulation.">
   <meta name="keywords" content="Korean yokai, Dokkaebi, Gumiho, Chosun folklore, browser evolution game, ghost simulation, blipzones">
   
@@ -39,7 +39,7 @@
       background: #000; 
       display: flex;
       justify-content: center;
-      align-items: center; 
+      align-items: flex-start;
       min-height: 100vh;
       margin: 0;
       padding: 0;
@@ -53,20 +53,48 @@
       display: none !important;
     }
 
+    /* ── PC 배경 패널 ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(200,144,10,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(100,40,10,0.08) 0%, transparent 60%),
+        #07080a;
+      z-index: -1;
+    }
+
     #app {
-      width: 100vw;
-      height: 100vh;
-      max-width: 56.25vh; /* 9:16 ratio */
-      max-height: 100vh;
+      /* 기본(PC): blip-nav 80px 기준 */
+      width: 100dvw;
+      height: calc(100dvh - 80px);
+      margin-top: 80px;
+      max-width: min(480px, 56.25dvh); /* 9:16 비율, 최대 480px */
+      max-height: calc(100dvh - 80px);
       position: relative;
       background: #1a1008;
-      box-shadow: 0 0 100px rgba(0,0,0,1);
+      box-shadow:
+        0 0 0 1px rgba(200,144,10,0.15),
+        0 0 60px rgba(0,0,0,0.8),
+        0 0 120px rgba(0,0,0,0.5);
       border: none;
       border-radius: 0;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
+
+    /* 모바일(600px 이하): nav가 56px이므로 조정 */
+    @media (max-width: 600px) {
+      #app {
+        height: calc(100dvh - 56px);
+        margin-top: 56px;
+        max-height: calc(100dvh - 56px);
+        max-width: 100dvw;
+      }
+    }
+
 
     /* Scrollable content within the centered app if needed */
     .screen {
@@ -90,6 +118,25 @@
       background: #0c0e08;
       border: 2px solid #5a3a10;
       overflow: hidden;
+    }
+
+    #titleScreen.active {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #titleScreen.active #titleCv {
+      flex-shrink: 0;
+      max-height: 42%;
+      object-fit: cover;
+    }
+
+    #titleScreen.active .title-ui {
+      flex: 1 1 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     #titleCv {
@@ -2057,10 +2104,228 @@
       opacity: 0.35;
     }
 
-    /* blip-nav integration */
-    #app {
-      margin-top: 80px;
-      min-height: calc(100vh - 80px);
+    /* blip-nav integration — 위에서 처리됨, 중복 제거 */
+
+    /* ══════════════════════════════════════════
+       ALL-SCREEN FLEX LAYOUT
+       ══════════════════════════════════════════ */
+
+    /* 모든 화면: height 100%는 .screen에서 주지만
+       overflow를 hidden으로 바꿔 flex 자식들이 넘치지 않게 */
+    #quizScreen.active,
+    #resultScreen.active,
+    #ascendScreen.active,
+    #gameOverScreen.active,
+    #encyclopediaScreen.active,
+    #selectYokaiScreen.active {
+      display: flex !important;
+      flex-direction: column;
+      overflow: hidden;     /* 부모 넘침 차단 */
+    }
+
+    /* 스크롤 콘텐츠 영역: flex-grow + min-height:0 이 핵심 */
+    #resultScreen.active .result-body,
+    #ascendScreen.active .ascend-body,
+    #gameOverScreen.active > div {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 퀴즈: 헤드/씬/질문 고정, 옵션 스크롤 */
+    #quizScreen.active .quiz-head,
+    #quizScreen.active .quiz-scene,
+    #quizScreen.active .quiz-q-wrap {
+      flex-shrink: 0;
+    }
+    #quizScreen.active .quiz-opts {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 도감/선택: 헤더+푸터 고정, 그리드 스크롤 */
+    #encyclopediaScreen.active .result-head,
+    #selectYokaiScreen.active .result-head,
+    #encyclopediaScreen.active .screen-footer-bar,
+    #selectYokaiScreen.active .screen-footer-bar {
+      flex-shrink: 0;
+    }
+    #encyclopediaScreen.active #encyGrid,
+    #selectYokaiScreen.active #selectGrid {
+      flex: 1 1 0 !important;
+      min-height: 0;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      /* inline style의 height 덮어씌우기 */
+      height: auto !important;
+    }
+
+    /* 화면 하단 고정 버튼 바 */
+    .screen-footer-bar {
+      flex-shrink: 0;
+      background: #101828;
+      padding: 10px 14px;
+      border-top: 3px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE / MOBILE LAYOUT
+       ══════════════════════════════════════════ */
+
+    /* 게임 화면: 전체 높이 flex 컬럼 (active 상태에서만) */
+    #gameScreen.active {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 고정 크기 요소는 shrink 금지 */
+    #gameScreen .game-top,
+    #gameScreen .evo-bar,
+    #gameScreen .stat-grid,
+    #gameScreen .tab-row {
+      flex-shrink: 0;
+    }
+
+    /* 씬 캔버스 영역: 나머지 공간 모두 차지, 최소 25% 확보 */
+    #gameScreen .scene-wrap {
+      flex: 1 1 0;
+      min-height: max(80px, 22dvh);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 캔버스가 씬 컨테이너 꽉 채움 */
+    #sceneCv {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* 탭 콘텐츠: 고정, 필요시 스크롤 */
+    #gameScreen .tab-content.on {
+      flex-shrink: 0;
+      overflow-y: auto;
+      max-height: 44vh;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+
+    /* ══════════════════════════════════════════
+       PC 레이아웃 (너비 ≥ 600px + 충분한 높이)
+       ══════════════════════════════════════════ */
+    @media (min-width: 600px) {
+      body {
+        align-items: center;
+        justify-content: center;
+        padding-top: 80px; /* nav 높이 */
+        min-height: 100dvh;
+      }
+
+      #app {
+        margin-top: 0;
+        height: min(calc(100dvh - 80px), calc(480px * 16 / 9));
+        width: min(480px, calc((100dvh - 80px) * 9 / 16));
+        max-width: 480px;
+        max-height: calc(100dvh - 80px);
+        border-radius: 12px;
+        box-shadow:
+          0 0 0 1px rgba(200,144,10,0.25),
+          0 0 0 3px rgba(122,72,32,0.3),
+          0 24px 80px rgba(0,0,0,0.85),
+          0 0 120px rgba(200,100,10,0.1);
+      }
+
+      /* PC에서 #titleScreen border 둥글게 */
+      #titleScreen {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      /* PC에서 탭 콘텐츠 최대 높이 조정 */
+      #gameScreen .tab-content.on {
+        max-height: 36vh;
+      }
+    }
+
+    /* ── 소형 화면 (높이 ≤ 680px) ── */
+    @media (max-height: 680px) {
+      .stat-grid { padding: 4px 8px; gap: 3px 6px; }
+      .stat-it { padding: 3px 5px; gap: 1px; }
+      .stat-lbl { font-size: 10px; }
+      .stat-num { font-size: 10px; min-width: 24px; }
+      .stat-bg { height: 5px; }
+      .game-top { padding: 2px 9px; }
+      .evo-bar { padding: 1px 7px; }
+      .evo-s { height: 12px; font-size: 8px; }
+      .tab { padding: 5px 2px; font-size: 10px; }
+      .acts { padding: 6px 8px 3px; gap: 5px; }
+      .ab-inner { padding: 5px 3px 6px; }
+      .ab .ic { font-size: 18px; }
+      .ab .ab-lbl { font-size: 10px; }
+      #gameScreen .tab-content.on { max-height: 38vh; }
+    }
+
+    /* ── 초소형 화면 (높이 ≤ 520px) ── */
+    @media (max-height: 520px) {
+      .stat-grid { display: none; }
+      #gameScreen .tab-content.on { max-height: 48vh; }
+      .game-top { padding: 2px 8px; }
+      .evo-bar { padding: 1px 6px; }
+      .tab { padding: 4px 2px; font-size: 9px; min-height: 36px; }
+      .acts { padding: 4px 6px 2px; gap: 4px; }
+      .ab-inner { padding: 4px 2px 5px; }
+      .ab .ic { font-size: 16px; }
+      .ab .ab-lbl { font-size: 9px; }
+    }
+
+    /* ── 터치 디바이스: 버튼 터치 영역 확대 ── */
+    @media (pointer: coarse) {
+      .tab { padding: 10px 3px; min-height: 48px; }
+      .ab { min-height: 62px; }
+      .ab .ic { font-size: 24px; }
+      .quiz-opt { padding: 14px 15px; }
+      .title-btn { padding: 16px 18px; font-size: 17px; }
+    }
+
+    /* ── 가로모드 최적화 ── */
+    @media (orientation: landscape) and (max-height: 500px) {
+      body {
+        align-items: flex-start;
+        padding-top: 0;
+      }
+      blip-nav { display: none !important; } /* 가로 모바일에서 nav 숨김 */
+      #app {
+        margin-top: 0;
+        height: 100dvh;
+        width: auto;
+        max-width: calc(100dvh * 9 / 16);
+        max-height: 100dvh;
+        border-radius: 0;
+      }
+      #gameScreen .tab-content.on { max-height: 55dvh; }
+      .stat-grid { display: none; }
+      .evo-bar { display: none; }
+    }
+
+    /* ── 노치/홈바 safe area ── */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      #app {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
     }
   </style>
   <script src="components/blip-nav.js" type="module"></script>
@@ -2468,10 +2733,9 @@
         <h2 id="ldEncyTitle">Soul Encyclopedia</h2><button class="hdr-music" id="musicBtnEncy" onclick="toggleMusic()">♪ ON</button>
       </div>
       <div class="ency-grid" id="encyGrid"
-        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;height:calc(100vh - 40px);overflow-y:auto;align-content:start;">
+        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;flex:1 1 0;overflow-y:auto;align-content:start;">
       </div>
-      <div
-        style="position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:440px;background:#101828;padding:10px;border-top:3px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div class="screen-footer-bar">
         <div style="color:#d8c8a0;font-size:14px;font-weight:700;"><span id="ldEncyLabel">Collection Progress</span>: <span
             id="encyCount">0</span>/16</div>
         <button class="result-btn sec" style="width:auto;padding:8px 20px;margin:0;" onclick="goTitle()">← 뒤로</button>
@@ -2500,10 +2764,9 @@
         <h2 id="ldSelectTitle">요괴 선택</h2><button class="hdr-music" id="musicBtnSelect" onclick="toggleMusic()">♪ ON</button>
       </div>
       <div class="ency-grid" id="selectGrid"
-        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;height:calc(100vh - 40px);overflow-y:auto;align-content:start;">
+        style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#0d1520;flex:1 1 0;overflow-y:auto;align-content:start;">
       </div>
-      <div
-        style="position:fixed;bottom:15px;left:50%;transform:translateX(-50%);width:90%;max-width:440px;background:#101828;padding:10px;border-top:3px solid var(--border);display:flex;justify-content:flex-end;align-items:center;">
+      <div class="screen-footer-bar" style="justify-content:flex-end;">
         <button class="result-btn sec" style="width:auto;padding:8px 20px;margin:0;" onclick="goTitle()">← 뒤로</button>
       </div>
       <!-- 선택 확인 모달 -->
@@ -4351,6 +4614,142 @@
 
     var STAGE_SCALES = [7, 8, 9, 11, 13, 15, 18]; // 1픽셀=Npx
 
+    // ── 단계별 시각 진화 오버레이 ──
+    function drawStageOverlay(ctx, yk, stage, t, ox, oy) {
+      if (stage < 1 || stage > 6) return;
+      var cx = ox + 64, cy = oy + 64;
+      ctx.save();
+      // Stage 1 (유령): 파란 빛 wisps + 하단 페이드
+      if (stage === 1) {
+        for (var i = 0; i < 4; i++) {
+          var a = i / 4 * Math.PI * 2 + t * 0.8;
+          var r = 28 + Math.sin(t * 2 + i) * 6;
+          var wx = cx + Math.cos(a) * r;
+          var wy = cy + 8 + Math.sin(a) * r * 0.4;
+          ctx.globalAlpha = 0.22 + Math.sin(t * 3 + i) * 0.1;
+          ctx.fillStyle = '#c8e8ff';
+          ctx.fillRect(wx - 3, wy - 3, 6, 6);
+          ctx.globalAlpha = 0.08 + Math.sin(t * 2 + i) * 0.04;
+          ctx.fillStyle = '#a0c8ff';
+          ctx.fillRect(wx - 5, wy - 5, 10, 10);
+        }
+        for (var j = 0; j < 4; j++) {
+          ctx.globalAlpha = 0.10 - j * 0.02;
+          ctx.fillStyle = '#b0d0ff';
+          ctx.fillRect(ox + 40 + j * 2, oy + 102 + j * 4, 48 - j * 4, 6);
+        }
+      }
+      // Stage 2 (요귀): 한자 룬 궤도
+      if (stage === 2) {
+        var runes = ['靈', '魂', '鬼'];
+        for (var i = 0; i < 3; i++) {
+          var a = i / 3 * Math.PI * 2 + t * 0.6;
+          var r = 38 + Math.sin(t * 1.5 + i) * 8;
+          var rx = cx + Math.cos(a) * r;
+          var ry = cy + Math.sin(a) * r * 0.4;
+          ctx.globalAlpha = Math.max(0, 0.55 + Math.sin(t * 2 + i) * 0.2);
+          ctx.fillStyle = yk.gc || '#88aaff';
+          ctx.font = 'bold 10px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(runes[i], rx, ry);
+        }
+      }
+      // Stage 3 (요괴): 발 아래 에너지 글로우 + 스파크
+      if (stage === 3) {
+        var ga = 0.18 + Math.sin(t * 2.5) * 0.08;
+        ctx.globalAlpha = ga;
+        ctx.fillStyle = yk.gc || '#ffaa44';
+        ctx.fillRect(ox + 32, oy + 110, 64, 8);
+        ctx.globalAlpha = ga * 0.5;
+        ctx.fillRect(ox + 20, oy + 116, 88, 5);
+        for (var i = 0; i < 3; i++) {
+          var sx = ox + 54 + Math.sin(t * 4 + i * 2.1) * 18;
+          ctx.globalAlpha = 0.3 + Math.abs(Math.sin(t * 5 + i)) * 0.25;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(sx, oy + 108 - Math.abs(Math.sin(t * 4 + i)) * 12, 3, 3);
+        }
+      }
+      // Stage 4 (정령): 이중 에너지 링 + 발 크랙
+      if (stage === 4) {
+        for (var ring = 0; ring < 2; ring++) {
+          var rCnt = 8, rRad = 24 + ring * 14;
+          for (var i = 0; i < rCnt; i++) {
+            var a = i / rCnt * Math.PI * 2 + t * (ring === 0 ? 1.2 : -0.9);
+            var px = cx + Math.cos(a) * rRad;
+            var py = cy + 8 + Math.sin(a) * rRad * 0.4;
+            ctx.globalAlpha = Math.max(0, 0.4 + Math.sin(t * 3 + i * 0.7) * 0.2);
+            ctx.fillStyle = ring === 0 ? (yk.gc || '#44aaff') : '#ffffff';
+            ctx.fillRect(px - 2, py - 2, 4, 4);
+          }
+        }
+        for (var i = 0; i < 4; i++) {
+          ctx.globalAlpha = 0.5 + Math.sin(t * 7 + i) * 0.3;
+          ctx.fillStyle = yk.gc || '#44aaff';
+          var crx = ox + 38 + i * 16 + Math.sin(t * 8 + i) * 5;
+          ctx.fillRect(crx - 2, oy + 108 + Math.cos(t * 6 + i) * 3, 4, 4);
+        }
+      }
+      // Stage 5 (신수): 황금 헤일로 + 날개
+      if (stage === 5) {
+        var ha = 0.35 + Math.sin(t * 1.5) * 0.12;
+        ctx.globalAlpha = ha * 0.4;
+        ctx.strokeStyle = '#ffffc0';
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.ellipse(cx, oy + 20, 22, 8, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = ha;
+        ctx.strokeStyle = '#ffd860';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(cx, oy + 20, 22, 8, 0, 0, Math.PI * 2); ctx.stroke();
+        var wf = Math.sin(t * 2.5) * 0.15;
+        ctx.globalAlpha = 0.25 + Math.sin(t * 2) * 0.07;
+        ctx.fillStyle = '#ffe8a0';
+        ctx.beginPath(); ctx.moveTo(ox + 28, oy + 62);
+        ctx.bezierCurveTo(ox - 8 + wf * 40, oy + 30, ox - 18 + wf * 40, oy + 72, ox + 24, oy + 90);
+        ctx.bezierCurveTo(ox + 10, oy + 76, ox + 16, oy + 58, ox + 28, oy + 62); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(ox + 100, oy + 62);
+        ctx.bezierCurveTo(ox + 136 - wf * 40, oy + 30, ox + 146 - wf * 40, oy + 72, ox + 104, oy + 90);
+        ctx.bezierCurveTo(ox + 118, oy + 76, ox + 112, oy + 58, ox + 100, oy + 62); ctx.fill();
+      }
+      // Stage 6 (승천): 별 왕관 + 신성 빛 + 3중 날개
+      if (stage === 6) {
+        // 신성 빛 기둥
+        ctx.globalAlpha = 0.09 + Math.sin(t * 1.8) * 0.05;
+        ctx.fillStyle = '#ffffc0';
+        for (var b = 0; b < 4; b++) {
+          ctx.save(); ctx.translate(cx, cy); ctx.rotate(b / 4 * Math.PI * 2 + t * 0.3);
+          ctx.fillRect(-2, -52, 4, 52); ctx.restore();
+        }
+        // 별 왕관 (8개)
+        for (var i = 0; i < 8; i++) {
+          var sa = i / 8 * Math.PI * 2 + t * 1.1;
+          var sr = 26 + Math.sin(t * 2 + i) * 4;
+          var sx = cx + Math.cos(sa) * sr, sy = oy + 16 + Math.sin(sa) * 8;
+          ctx.globalAlpha = Math.max(0, 0.7 + Math.sin(t * 3 + i * 0.8) * 0.2);
+          ctx.fillStyle = '#fff8a0';
+          ctx.fillRect(sx - 2, sy - 2, 4, 4);
+          ctx.globalAlpha *= 0.5;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(sx - 1, sy - 3, 2, 6); ctx.fillRect(sx - 3, sy - 1, 6, 2);
+        }
+        // 3중 날개
+        var bf = Math.sin(t * 1.8) * 0.18;
+        for (var layer = 0; layer < 3; layer++) {
+          ctx.globalAlpha = Math.max(0, (0.32 - layer * 0.07) + Math.sin(t * 2 + layer) * 0.05);
+          ctx.fillStyle = layer === 0 ? '#ffe8a0' : layer === 1 ? '#fffce0' : '#ffffff';
+          var sp = layer * 10;
+          ctx.beginPath(); ctx.moveTo(ox + 28 - sp, oy + 55);
+          ctx.bezierCurveTo(ox - 20 - sp + bf * 50, oy + 8, ox - 30 - sp + bf * 50, oy + 72, ox + 22 - sp, oy + 96);
+          ctx.bezierCurveTo(ox + 4, oy + 80, ox + 12, oy + 60, ox + 28 - sp, oy + 55); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(ox + 100 + sp, oy + 55);
+          ctx.bezierCurveTo(ox + 148 + sp - bf * 50, oy + 8, ox + 158 + sp - bf * 50, oy + 72, ox + 106 + sp, oy + 96);
+          ctx.bezierCurveTo(ox + 124, oy + 80, ox + 116, oy + 60, ox + 100 + sp, oy + 55); ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
     function drawYokai(ctx, yk, stage, t, ox, oy, extraAnim) {
       if (!ctx || !yk) return;
 
@@ -4370,13 +4769,16 @@
 
       var bobY = Math.sin(t * 2) * 3;
       var scaleX = scFactor, scaleY = scFactor;
+      // 숨쉬기 (미세 확대/축소)
+      scaleX *= 1 + Math.sin(t * 1.6) * 0.013;
+      scaleY *= 1 + Math.sin(t * 1.6 + 0.3) * 0.018;
       var rotX = 0;
 
       // 액션별 애니메이션 보정
       if (extraAnim) {
         var a = extraAnim, at = a.t;
         if (a.act === 'feed') { var s = 1 + Math.abs(Math.sin(at * 8)) * 0.12; scaleX *= s; scaleY *= s; }
-        else if (a.act === 'play') { bobY += Math.abs(Math.sin(at * 6)) * (-20); rotX = Math.sin(at * 5) * 0.25; }
+        else if (a.act === 'play') { var wb = Math.sin(at * 8); bobY += wb * (-6); rotX = Math.sin(at * 7) * 0.06; scaleX *= 1 + Math.abs(wb) * 0.05; scaleY *= 1 - Math.abs(wb) * 0.04; }
         else if (a.act.startsWith('tap_')) {
           if (a.act === 'tap_E') { bobY += Math.abs(Math.sin(at * 7)) * (-25); scaleX *= 1.2; }
           else if (a.act === 'tap_N') { rotX = Math.sin(at * 8) * 0.4; scaleX *= 1.15; }
@@ -4490,6 +4892,9 @@
       }
 
       ctx.restore();
+
+      // 단계별 시각 진화 오버레이
+      drawStageOverlay(ctx, yk, stage, t, ox, oy);
 
       // 신성 오라 효과 (Stage 4+)
       if (stage >= 4) {

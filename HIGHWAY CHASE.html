@@ -400,8 +400,45 @@
 
         /* blip-nav integration */
         #gameContainer {
-            margin-top: 80px;
-            height: calc(100vh - 80px) !important;
+            position: fixed;
+            top: 80px; /* PC: blip-nav 80px */
+            left: 50%;
+            transform: translateX(-50%);
+            height: calc(100dvh - 80px) !important;
+            margin-top: 0;
+        }
+
+        /* 모바일: blip-nav가 56px */
+        @media (max-width: 600px) {
+            #gameContainer {
+                top: 56px;
+                height: calc(100dvh - 56px) !important;
+                max-width: 100dvw;
+            }
+        }
+
+        /* 가로모드: nav 숨기고 전체 화면 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            blip-nav { display: none !important; }
+            #gameContainer {
+                top: 0;
+                height: 100dvh !important;
+            }
+        }
+
+        /* 모바일 컨트롤 버튼 safe-area */
+        .mobile-ui {
+            bottom: max(40px, env(safe-area-inset-bottom, 40px));
+        }
+
+        /* 소형 화면 UI 콤팩트 */
+        @media (max-height: 700px) {
+            .logo-box { margin-bottom: 20px; }
+            .dashboard-panel { padding: 16px; }
+            .btn-launch { padding: 14px; margin-bottom: 12px; }
+            .btn-hall { padding: 10px; }
+            .chrome-title { font-size: clamp(36px, 12vw, 60px); }
+            .chrome-sub { font-size: clamp(18px, 6vw, 28px); letter-spacing: 6px; }
         }
     </style>
     <script src="components/blip-nav.js" type="module"></script>
