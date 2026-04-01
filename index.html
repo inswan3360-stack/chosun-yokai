@@ -752,6 +752,19 @@
         <div class="play-now-hint">+</div>
       </div>
 
+      <!-- Chosun Dash Infinite Card -->
+      <div class="play-card" onclick="showGameInfo('chosundashinfinite')" style="background: radial-gradient(circle at 70% 30%, #4422dd 0%, #0a0c14 100%); border: 1px solid rgba(68,102,221,0.45); box-shadow: 0 0 40px rgba(68,102,221,0.15);">
+        <div class="shine"></div>
+        <div class="card-content">
+          <span class="card-tag">Endless Runner</span>
+          <h2 class="card-title">Dash Infinite</h2>
+          <div class="card-stats">
+            <span>Randomized</span> • <span>Yokai Themes</span> • <span>Infinite</span>
+          </div>
+        </div>
+        <div class="play-now-hint">+</div>
+      </div>
+
       <!-- Liquid State Card -->
       <div class="play-card" onclick="showGameInfo('liquid')" style="background-image: url('assets/previews/liquid.png'), radial-gradient(circle at center, #c5a059 20%, #050508 100%); background-blend-mode: overlay;">
         <div class="shine"></div>
@@ -960,6 +973,15 @@
         fallback: "background: radial-gradient(circle at 30% 60%, #2a1a08 0%, #0a0c14 70%);",
         link: "chosun-dash.html"
       },
+      chosundashinfinite: {
+        title: "Dash Infinite",
+        tag: "Endless Runner",
+        desc: "The ultimate endless challenge. Experience randomized obstacles from 8 different Yokai-inspired themes. The speed increases indefinitely — how far can you dash through the shifting folklore realms?",
+        controls: "• Space / Tap: Jump / Fly<br>• Avoid spikes, blocks, and theme-specific monsters.<br>• Collect your high score and unlock the best distance.",
+        image: "assets/previews/yokai.png",
+        fallback: "background: radial-gradient(circle at 70% 30%, #4422dd 0%, #0a0c14 100%);",
+        link: "chosun-dash-infinite.html"
+      },
       liquid: {
         title: "Liquid State",
         tag: "Precision Physics",
@@ -1034,11 +1056,19 @@
       },
       {
         id: 'chosundash',
-        badge: 'NEW: RHYTHM RUNNER',
+        badge: 'RHYTHM RUNNER',
         title: 'CHOSUN<br><span>DASH 도깨비</span>',
-        desc: 'Sprint through cursed Joseon temples as a glowing Dokkebi spirit. Dodge spikes, ride portals, and survive the relentless beat.',
+        desc: 'Sprint through cursed Joseon temples. Dodge spikes, ride portals, and survive the beat.',
         link: 'chosun-dash.html',
         fallback: "radial-gradient(ellipse at 20% 80%, #3a1e04 0%, #1a0e1a 40%, #0a0c18 100%)"
+      },
+      {
+        id: 'chosundashinfinite',
+        badge: 'NEW: ENDLESS MODE',
+        title: 'DASH<br><span>INFINITE</span>',
+        desc: 'The ultimate endless challenge. Shifting themes, randomized Yokai, and infinite speed.',
+        link: 'chosun-dash-infinite.html',
+        fallback: "radial-gradient(circle at 70% 30%, #4422dd 0%, #0a0c14 100%)"
       },
       {
         id: 'liquid',
