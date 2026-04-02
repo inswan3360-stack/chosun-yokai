@@ -516,7 +516,11 @@ function kill(mType) {
   }
   
   finalDist.textContent = Math.floor(dist);
-  deathMsg.textContent = mType ? `${mType.toUpperCase()}에게 당했습니다!` : "장애물에 부딪혔습니다.";
+  const deathLabels = { spike: '가시에 찔렸습니다!', block: '블록에 부딪혔습니다!', orb: '구슬에 당했습니다!',
+    gwisin: '귀신에게 당했습니다!', gaeguri: '개구리 요괴에게 당했습니다!', gumiho: '구미호에게 당했습니다!',
+    dokkaebi: '도깨비에게 당했습니다!', bulgasari: '불가사리에게 당했습니다!', yaksha: '야차에게 당했습니다!',
+    gangshi: '강시에게 당했습니다!', imugi: '이무기에게 당했습니다!' };
+  deathMsg.textContent = mType ? (deathLabels[mType] || `${mType}에게 당했습니다!`) : '장애물에 부딪혔습니다.';
   setTimeout(() => {
     deathScreen.style.display = 'flex';
   }, 1000);
