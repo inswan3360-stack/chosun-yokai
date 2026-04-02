@@ -191,6 +191,7 @@ function initGame() {
   particles = [];
   trail = [];
   themeChangeCounter = 0;
+  nextSpawnX = 0;
   pl.y = baselineGY - PS;
   pl.vy = 0;
   pl.mode = 'cube';
@@ -201,6 +202,8 @@ function initGame() {
   showBanner(THEMES[0].name, THEMES[0].kor);
   initStars();
 }
+
+function resetGame() { initGame(); }
 
 function initStars() {
   stars = Array.from({ length: 140 }, () => ({
