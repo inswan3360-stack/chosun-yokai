@@ -2379,6 +2379,13 @@
             planeGroup.rotation.set(pitch, yaw, roll, 'YXZ');
             planeGroup.translateZ(currentSpeed);
 
+            // 비행기가 지면 위로 뜬 경우 자동으로 이륙 감지
+            // (지면 체크 블록이 이미 건너뛰어진 경우에도 hasTakenOff를 보장)
+            if (!hasTakenOff && planeGroup.position.y > FLOOR_HEIGHT + 1.0) {
+                hasTakenOff = true;
+                document.getElementById('takeoff-guide').style.display = 'none';
+            }
+
             if (planeGroup.position.y < FLOOR_HEIGHT && hasTakenOff) { triggerGameOver("Aircraft Stalled: Ground collision!"); return; }
             if (!hasTakenOff && distanceTraveled > 12000) { triggerGameOver("Runway Overrun: Failed to rotate!"); return; }
 
