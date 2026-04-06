@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:store.steampowered.com)",
-      "Skill(qa)"
+      "Skill(qa)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Read(//d/#가족용/web/gemini-runner/**)",
+      "Bash(cp -r \"D:/#가족용/web/sky-metropolis\" \"C:/tmp-sky-metropolis\")",
+      "Bash(cp -r \"D:/#가족용/web/gemini-runner\" \"C:/tmp-gemini-runner\")",
+      "Bash(cp -r \"C:/tmp-sky-metropolis/dist/.\" \"D:/#가족용/web/chosun-yokai/sky-metropolis/\")",
+      "Bash(cp -r \"C:/tmp-gemini-runner/dist/.\" \"D:/#가족용/web/chosun-yokai/gemini-runner/\")",
+      "Bash(rm -rf \"C:/tmp-gemini-runner\")",
+      "Bash(rm -rf \"C:/tmp-sky-metropolis\")"
     ]
   }
 }
