@@ -438,20 +438,53 @@
     }
 
     .play-card {
-      min-height: 500px;
-      background-size: cover;
-      background-position: center;
+      min-height: 380px;
+      background-color: #050508;
       border-radius: 24px;
       border: 1px solid var(--border);
-      padding: 40px;
+      padding: 30px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
       transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .card-iframe {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: none;
+      z-index: 0;
+      opacity: 0.6;
+      transition: opacity 0.4s;
+    }
+
+    .card-content {
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .btn-info-small {
+      pointer-events: auto;
+      margin-top: 15px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+      align-self: flex-start;
+    }
+
+    .btn-info-small:hover {
+      background: var(--gold);
+      color: var(--midnight);
     }
 
     .play-card::before {
@@ -461,12 +494,17 @@
       background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.9) 100%);
       transition: background 0.4s;
       z-index: 1;
+      pointer-events: none;
     }
 
     .play-card:hover {
-      transform: translateY(-15px) scale(1.03);
+      transform: translateY(-8px) scale(1.02);
       border-color: var(--gold);
       box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px oklch(80% 0.12 90 / 0.1);
+    }
+    
+    .play-card:hover .card-iframe {
+      opacity: 1;
     }
 
     .play-card:hover::before {
@@ -503,6 +541,7 @@
       transform: skewX(-25deg);
       transition: none;
       z-index: 5;
+      pointer-events: none;
     }
 
     .play-card:hover .shine {
@@ -528,6 +567,8 @@
         opacity: 0;
         transform: translateY(10px);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+        display: none;
     }
 
     .play-card:hover .play-now-hint {
@@ -629,7 +670,7 @@
       
       .playground-section { padding: 80px 0; }
       .playground-grid { grid-template-columns: 1fr; padding: 0 20px; gap: 20px; }
-      .play-card { min-height: 420px; padding: 30px; }
+      .play-card { min-height: 320px; padding: 25px; }
       .card-title { font-size: 1.8rem; }
       
       .scroll-hint { right: 20px; bottom: 20px; }
@@ -701,7 +742,8 @@
     </div>
     <div class="playground-grid">
       <!-- Yokai Card -->
-      <div class="play-card" onclick="showGameInfo('yokai')" style="background-image: url('assets/previews/yokai.png');">
+      <div class="play-card">
+        <iframe class="card-iframe" src="yokai.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Folklore Simulation</span>
@@ -709,12 +751,13 @@
           <div class="card-stats">
             <span>Relaxing</span> • <span>Evolving</span> • <span>Tradition</span>
           </div>
+          <button onclick="showGameInfo('yokai')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
 
       <!-- Highway Chase Card -->
-      <div class="play-card" onclick="showGameInfo('highway')" style="background-image: url('assets/previews/highway.png');">
+      <div class="play-card">
+        <iframe class="card-iframe" src="HIGHWAY CHASE.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Street Racing</span>
@@ -722,12 +765,13 @@
           <div class="card-stats">
             <span>High-Speed</span> • <span>Survival</span> • <span>Neon</span>
           </div>
+          <button onclick="showGameInfo('highway')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
 
       <!-- Flight Glitch Card -->
-      <div class="play-card" onclick="showGameInfo('flight')" style="background-image: url('assets/previews/flight.png');">
+      <div class="play-card">
+        <iframe class="card-iframe" src="flight.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Arcade Classic</span>
@@ -735,13 +779,14 @@
           <div class="card-stats">
             <span>Nostalgic</span> • <span>Hardcore</span> • <span>Skill</span>
           </div>
+          <button onclick="showGameInfo('flight')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
 
 
       <!-- Liquid State Card -->
-      <div class="play-card" onclick="showGameInfo('liquid')" style="background-image: url('assets/previews/liquid.png'), radial-gradient(circle at center, #c5a059 20%, #050508 100%); background-blend-mode: overlay;">
+      <div class="play-card">
+        <iframe class="card-iframe" src="liquid.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Precision Physics</span>
@@ -749,12 +794,13 @@
           <div class="card-stats">
             <span>Satisfying</span> • <span>Tactical</span> • <span>Flow</span>
           </div>
+          <button onclick="showGameInfo('liquid')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
 
       <!-- Sky Metropolis Card -->
-      <div class="play-card" onclick="showGameInfo('skymetropolis')" style="background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=1000'); background-size: cover; background-position: center; border: 1px solid rgba(56,189,248,0.35); box-shadow: 0 0 40px rgba(56,189,248,0.08), inset 0 0 60px rgba(0,0,0,0.5);">
+      <div class="play-card">
+        <iframe class="card-iframe" src="sky-metropolis/index.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">City Builder</span>
@@ -762,12 +808,13 @@
           <div class="card-stats">
             <span>3D Isometric</span> • <span>Strategy</span> • <span>Builder</span>
           </div>
+          <button onclick="showGameInfo('skymetropolis')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
 
       <!-- Alpha Dash Card -->
-      <div class="play-card" onclick="showGameInfo('alphadash')" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1000'); background-size: cover; background-position: center; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 0 40px rgba(168,85,247,0.1), inset 0 0 60px rgba(0,0,0,0.5);">
+      <div class="play-card">
+        <iframe class="card-iframe" src="gemini-runner/index.html" loading="lazy"></iframe>
         <div class="shine"></div>
         <div class="card-content">
           <span class="card-tag">Word Runner</span>
@@ -775,8 +822,8 @@
           <div class="card-stats">
             <span>Agility</span> • <span>Spelling</span> • <span>Fast-Paced</span>
           </div>
+          <button onclick="showGameInfo('alphadash')" class="btn-info-small">GAME INFO</button>
         </div>
-        <div class="play-now-hint">+</div>
       </div>
     </div>
   </section>
